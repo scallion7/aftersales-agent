@@ -12,7 +12,7 @@ PyJWT[crypto]>=2.15.0,<3.0.0
 
 pypdf>=6.21.4,<7.0.0
 jieba==0.42.1
-opentelemetry-sdk>=1.45.1,<2.0.0
+opentelemetry-sdk>=1.45.2,<2.0.0
 jsonschema>=4.20.0,<5.0.0
 
 # Security floors for transitive TLS/auth dependencies (2026-10-25).

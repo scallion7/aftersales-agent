@@ -2,6 +2,12 @@
 
 [文档中心](../README.md) · [证据索引](../evidence/README.md)
 
+## 2026-11-16 依赖安全补丁复验
+
+展示材料提交 `e7e1eed` 的 [CI 43850705491](https://github.com/scallion7/xc_sx_agent/actions/runs/43850705491) 在精确依赖审计中发现 `opentelemetry-api 1.45.1` 的 CVE-2026-126360，因此该次运行不能记为全绿。按[上游公告](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-mf5v-w3w3-f6cg)，将 API/SDK 同步锁定到 `1.45.2`、semantic-conventions 到 `0.66b2`，同时提高 SDK 支持范围的安全下限。其他锁定版本保持不变。
+
+更新后的本地环境逐项匹配 58 个锁定包，`pip check` 通过。两份依赖审计分别覆盖 58/53 个包，均未发现已知漏洞。再次启用 Chromium 运行完整回归，**500 项通过、无跳过，108.695 秒，app 语句覆盖率 82%**。审计 JSON、完整回归压缩日志、覆盖率及锁文件哈希见[补丁复验清单](../evidence/dependency-patch-20261116/checks.json)。这次复验使用受控服务，没有开展真实模型或原冻结保留集评测；后续 CI 按[工作流](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)中的提交 SHA 核对。
+
 ## 2026-11-16 展示材料与分层教学
 
 以代码基线 `37e2fd7` 整理[简历与面试材料](../showcase/README.md)、[三项演示](../showcase/demo.md)和[分层实验](../learning/README.md)。本批未修改应用或现有测试源码，原阶段记录及冻结数据保持原样。

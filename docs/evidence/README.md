@@ -19,6 +19,7 @@
 
 | 目录 | 阅读入口 | 生成时的证据身份 |
 |---|---|---|
+| [dependency-patch-20261116](dependency-patch-20261116/) | [检查清单](dependency-patch-20261116/checks.json)、[锁定依赖审计](dependency-patch-20261116/lock-audit.json)、[范围依赖审计](dependency-patch-20261116/range-audit.json) | 基于 `e7e1eed` 的依赖补丁工作树；修复 CI 发现的 OpenTelemetry 公告，58/53 包审计通过，500 项回归无跳过、82% 覆盖率 |
 | [showcase-20261116](showcase-20261116/) | [检查清单与素材哈希](showcase-20261116/checks.json)、[录像说明](../showcase/recording.md)、[退款恢复轨迹](showcase-20261116/unknown-refund-recovery.json) | 基于 `37e2fd7`，应用和现有测试源码未改；500 项本地回归、82% 覆盖率、两个浏览器短片及展示命令复验，真实人工审核与模型评测未开展 |
 | [release-workflow-20261113](release-workflow-20261113/) | [验收清单](release-workflow-20261113/checks.json)、[27 格原始数据入口](release-workflow-20261113/evaluation.json) | 基于 `75d364a` 的本地工作树，覆盖受控模型的逐题评分与发布、两种数据库、退款对账和浏览器续签 |
 | [docs-refresh-20261110](docs-refresh-20261110/) | [checks.json](docs-refresh-20261110/checks.json) | 2026-11-10，基于 `c5aee67` 的未提交文档工作树；468 项回归通过、无跳过、95.859 秒，另核验技能 helper、配置键、CLI 模块、OpenAPI、静态检查、文档链接与售后演示；未重新测量覆盖率 |

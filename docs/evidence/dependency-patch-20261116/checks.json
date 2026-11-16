@@ -1,0 +1,67 @@
+{
+  "date": "2026-11-16",
+  "base_commit": "e7e1eed6d151650c93e35a71ba3714c014f4f6f1",
+  "working_tree_at_validation": true,
+  "trigger": {
+    "workflow_run": 43850705491,
+    "job_id": 133242171736,
+    "finding": "CVE-2026-126360 in opentelemetry-api 1.45.1"
+  },
+  "upstream_advisory": "https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-mf5v-w3w3-f6cg",
+  "versions": {
+    "opentelemetry-api": "1.45.2",
+    "opentelemetry-sdk": "1.45.2",
+    "opentelemetry-semantic-conventions": "0.66b2"
+  },
+  "python": "3.11.15",
+  "matched_lock_packages": 58,
+  "pip_check": "No broken requirements found.",
+  "audits": {
+    "lock-audit": {
+      "packages": 58,
+      "known_vulnerabilities": 0
+    },
+    "range-audit": {
+      "packages": 53,
+      "known_vulnerabilities": 0
+    }
+  },
+  "unittest": {
+    "passed": 500,
+    "skipped": 0,
+    "seconds": 108.695,
+    "chromium_enabled": true,
+    "chromium_build": 1187,
+    "command": "RUN_BROWSER_E2E=1 python -m coverage run -m unittest discover -s tests -v"
+  },
+  "coverage": {
+    "statements": 13499,
+    "missed": 2371,
+    "percent": 82
+  },
+  "paid_model_calls": 0,
+  "original_holdout_run": false,
+  "original_human_review_completed": false,
+  "requirement_sha256": {
+    "requirements.txt": "9911d0e7af3bdfbc1e69ef773b6ad70ad68653b4530ea09a590161eee94872d3",
+    "requirements-lock.txt": "eaebab2d2d43a1e720476d3f8e811f5eeaedea9f5f87a2b9f02528c2afa23e03"
+  },
+  "artifacts": {
+    "coverage.log": {
+      "bytes": 24993,
+      "sha256": "ec28cded642919a33c830b4276a90cbf1a983e08cebc6bd204b7c27924d9442b"
+    },
+    "lock-audit.json": {
+      "bytes": 3343,
+      "sha256": "c9e3f5e20c6fad8854aa77f19a95aad83b4ad0429615d2d0fa48a98c92d5eef9"
+    },
+    "range-audit.json": {
+      "bytes": 3077,
+      "sha256": "b24ae54ebdcaf726cee568a88c87d2c128c946ab0becd9ffd2e471d1682f84c7"
+    },
+    "unittest.log.gz": {
+      "bytes": 16085,
+      "sha256": "71b3a94fb72800517b7b43c2650ce6ad504d6bb8789f2c791bd297c551735104"
+    }
+  }
+}

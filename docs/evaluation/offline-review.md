@@ -4,6 +4,8 @@
 
 2026-11-13 更新。默认检索诊断使用本地哈希投影，Agent 开发回归使用受控 HTTP 模型。另有显式启用并限额的真实聊天模型入口。当前已有的实测证据均为离线或受控运行。
 
+当前项目负责评测、审核与发布机制的搭建及受控验证。**真实人工审核、原冻结保留集、真实模型效果评测与生产环境验证均为后续自费验证，当前项目暂不涉及**，详见[项目范围](acceptance.md#project-scope)。下方真实审核、`--live` 和生产放行说明保留为后续扩展参考；实施前另行安排人力、调用及部署预算，既有门禁继续有效。
+
 ## 数据集和当前状态
 
 | 数据 | 用途与边界 |
@@ -40,6 +42,8 @@ python -m app.scripts.review_evaluation --review-template \
 这是旧代码与初始未复核标签的历史结果，不是 `c5aee67` 的新质量结论。Recall 只在有 gold 的题上取平均，MRR 包含无证据题；引用指标检查返回文档是否属于 gold，不检查生成回答的逐句蕴含。相同分数既未证明混合检索增益，也未证明不同方法的语义能力相同。
 
 ## 人工复核与保留集
+
+本节属于后续自费验证参考流程，当前项目不执行原数据集的真实审核与保留集评测。
 
 1. 对照原始政策判断题目日期和地域、渠道、商品等条件。先形成结论，再展开初始建议标签，避免直接照抄。
 2. 选择 `gold_documents` 与 `outcome`：`answerable`、`no_evidence`、`needs_clarification` 或 `policy_conflict`。无证据结论的 gold 必须为空；其他结论必须列出支持判断的政策。
@@ -94,6 +98,6 @@ python -m app.scripts.evaluate_platform --agents --release-id "$CONFIG_ID" \
 python -m app.scripts.publish_configuration --report test-results/config-quality.json
 ```
 
-审核通过后，如需真实模型测试，在准备草稿和评测时使用相同的 `--dataset version-export.json --review review-approved.json --split holdout`；评测时再加 `--live`。须准备对应该版本的目标模型凭据和模型目录，真实模式每次最多 10 个新格、20000 个聊天 tokens。可按上述方式 `--resume`。真实模式检查实际模型响应，收到项目受控服务指纹或缺少模型响应时拒绝生成真实验收结果。当前评测只支持本地哈希知识向量，外部 embedding 计费未纳入该预算，CLI 会在首次请求前拒绝相应配置。真实人工审核、真实模型调用及原 holdout 结果须以实际运行证据记录。
+若后续自费开展真实模型测试，须先完成真实审核，并在准备草稿和评测时使用相同的 `--dataset version-export.json --review review-approved.json --split holdout`；评测时再加 `--live`。须准备对应该版本的目标模型凭据和模型目录，真实模式每次最多 10 个新格、20000 个聊天 tokens。可按上述方式 `--resume`。真实模式检查实际模型响应，收到项目受控服务指纹或缺少模型响应时拒绝生成真实验收结果。当前评测只支持本地哈希知识向量，外部 embedding 计费未纳入该预算，CLI 会在首次请求前拒绝相应配置。真实人工审核、真实模型调用及原 holdout 结果须以实际运行证据记录。
 
 发布命令从摘要定位同目录原件，复算 SHA256、逐格评分、数据与知识指纹，通过后将原草稿标为已评估。可用 `--deploy --expected-version N` 指定预期部署修订。生产放行需要完整 v3 矩阵、真实模式以及仍有效的全量 holdout 审核；旧 v2 工程报告仅用于兼容的非生产验证。CLI、发布入口及独立临时库回归见[评测命令](../../app/scripts/evaluate_platform.py)、[发布命令](../../app/scripts/publish_configuration.py)、[端到端测试](../../tests/test_agent_quality_cli.py)。

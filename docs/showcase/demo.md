@@ -78,7 +78,7 @@ python -m unittest tests.test_agent_quality_cli.QualityTests.test_two_batches_pu
 
 整个命令预期输出 `Ran 1 test`、`OK`。拒绝发布属于测试内部已断言的预期结果，所以终端不一定打印发布子进程的错误详情。现场应同时展示源码中的“非零退出”和“草稿未变化”断言，不能把 `OK` 解释成不完整报告也成功发布。
 
-原 32 题人工审核、原 16 题保留集和真实模型评测继续等待人工审核完成。这条演示只使用独立的开发测试材料，不执行这些待办。[评测发布协议](../evaluation/offline-review.md)
+人工审核、真实模型效果评测和生产环境验证为**后续自费验证，当前项目范围外**。原 32 题真实审核尚未完成，原 16 题保留集和真实模型评测未运行；这条演示使用独立的开发测试材料，验证的是评分与发布机制。[项目范围](../evaluation/acceptance.md#project-scope) · [评测发布协议](../evaluation/offline-review.md)
 
 ## 时间不足和故障处理
 

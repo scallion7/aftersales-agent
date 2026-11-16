@@ -6,6 +6,8 @@
 
 项目将模型推理与确定性业务执行分开：LLM 负责理解、规划和解释，服务端负责身份校验、操作确认、权限、幂等、状态转换与审计。演示使用合成业务数据和受控模型，可在本地复现 API、Worker、数据库、MCP 与浏览器之间的完整交互。
 
+**当前项目聚焦系统搭建与技术挖掘**，交付 Agent、RAG、业务工作流、可靠执行、评测发布机制及可复现的工程验证。人工审核、真实模型效果评测和生产环境验证列为**后续自费验证，当前项目暂不涉及**；相关接口与操作说明作为扩展入口保留，详见[项目范围](docs/evaluation/acceptance.md#project-scope)。
+
 [展示与面试](docs/showcase/README.md) · [分层教学](docs/learning/README.md) · [快速演示](docs/guides/five-minute-demo.md) · [系统架构](docs/architecture/overview.md) · [验收证据](docs/evaluation/acceptance.md) · [文档中心](docs/README.md)
 
 ![客户服务界面](docs/assets/workspace.png)
@@ -79,11 +81,11 @@ python -m app.scripts.demo_stack --smoke --directory app/sessions/smoke-demo
 
 本地验收覆盖数据库迁移与恢复、人工接管、令牌续签、退款超时查单、审批阈值固定和多进程日志清理。Agent 政策质量开发集包含 9 个业务家族：ReAct、Plan-and-Execute 和多 Agent 共 27 格，逐题校验关键事实、引用及转人工原因，并在临时目标库验证发布。详细结果见[当前验收](docs/evaluation/acceptance.md)。
 
-[评测与发布指南](docs/evaluation/offline-review.md)提供创建草稿、指定知识快照、限额分批续跑、核验原件及切换配置的命令。真实人工审核仍待完成，原 16 题保留集与付费模型评测待审核完成后执行。最近提交的 CI 状态见页首标记。
+[评测与发布指南](docs/evaluation/offline-review.md)提供创建草稿、指定知识快照、限额分批续跑、核验原件及切换配置的命令。当前使用受控模型验证这些机制；原 32 题人工审核、16 题保留集与真实模型评测归入后续自费验证。最近提交的 CI 状态见页首标记。
 
 - 默认余弦检索与版本化 SQL 知识平台可用；Chroma 后端因未修复安全公告停用。
 - 新平台表有租户作用域，但不能据此认为所有历史业务表已经支持共享数据库的 SaaS 多租户。
-- 恢复验收覆盖隔离部署、停写 PostgreSQL 与独立沙箱；持续写入 PITR、跨区域恢复和生产 SLA 尚无验收证据。
+- 恢复验收覆盖隔离部署、停写 PostgreSQL 与独立沙箱；持续写入 PITR、跨区域恢复和生产 SLA 属于范围外的后续自费验证，当前没有相关验收证据。
 
 ## 简历展示与项目教学
 
@@ -97,7 +99,7 @@ python -m app.scripts.demo_stack --smoke --directory app/sessions/smoke-demo
 | 现场演示或播放录像 | [三项演示](docs/showcase/demo.md)、[录制素材](docs/showcase/recording.md)：正常办理、退款未知恢复、评测拒绝发布 |
 | 分层学习与授课 | [课程与实验](docs/learning/README.md)：基础、业务流程、可靠性三层，包含练习、验收与参考答案 |
 
-课程使用当前代码的隔离实验。第 1–34 期仍作为[历史演进资料](docs/history/README.md)保留，历史命令不代替现行实验步骤。真实模型效果评测待人工审核完成后另行开展。
+课程使用当前代码的隔离实验。第 1–34 期仍作为[历史演进资料](docs/history/README.md)保留，历史命令不代替现行实验步骤。课程不要求开展范围外的自费验证。
 
 ## 代码与文档入口
 

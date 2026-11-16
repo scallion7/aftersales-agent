@@ -40,4 +40,4 @@ flowchart LR
 - **撤销旧授权不阻塞新申请。** 已拒绝、失效或过期的普通提案可以被新提案替代，但新 action 需要重新确认，旧 action 保持不可执行。接管再释放不恢复旧 run 或授权。工作台以全局忙碌状态覆盖接管和刷新，服务端所有权锁继续负责跨客户端竞争。详见[人工接管](../engineering/human-handoff.md)。
 - **脱敏与恢复保留结构。** 工具 JSON 递归脱敏字符串，保留数值类型及合法 action 控制引用。浏览器保存未确认请求的原始 payload 与幂等键；明确的申请版本拒绝可以释放请求，未知冲突和网络错误仍保留待核对意图。详见[对话与证据处理](../engineering/improvement-loop.md)及[请求兼容约定](../engineering/naming-and-compatibility.md)。
 
-第 7 项中的 `0006` 是原决策对应的迁移，不是当前迁移头。后续新增数据集、候选、admission 锁和派生索引的迁移见[扩展与迁移说明](../engineering/improvement-loop.md)。最新架构见[系统架构](../architecture/overview.md)；测试环境、结果及未完成的生产和真实模型验证统一见[当前验收](../evaluation/acceptance.md)。
+第 7 项中的 `0006` 是原决策对应的迁移，不是当前迁移头。后续新增数据集、候选、admission 锁和派生索引的迁移见[扩展与迁移说明](../engineering/improvement-loop.md)。最新架构见[系统架构](../architecture/overview.md)；测试环境与结果见[当前验收](../evaluation/acceptance.md)，生产和真实模型验证归入当前项目范围外的[后续自费验证](../evaluation/acceptance.md#project-scope)。

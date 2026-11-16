@@ -4,6 +4,8 @@
 
 核验基线：2026-11-10，代码 `c5aee67`。本文面向开发者定位召回、排序和证据过滤损失。只使用 development 与本地哈希投影；真实审核流程见[复核工作台](../guides/review-workbench.md)，当前验证范围见[验收状态](acceptance.md)。
 
+当前交付聚焦检索机制、诊断工具及可复现实验流程。人工金标准与真实模型效果属于[后续自费验证](acceptance.md#project-scope)，当前项目暂不涉及；下面的历史诊断数据保留原口径。
+
 ## 查看单次检索诊断
 
 ```bash
@@ -52,7 +54,7 @@ python -m app.scripts.compare_retrieval \
 | 输出变化、改善、退化 | 64 组均无变化 |
 | BM25 / hybrid 缺失证据归因 | 9 次文档实例被证据门槛拒绝；不是 9 个独立业务家族 |
 
-该历史批次的主要损失位于证据判断阶段，扩大候选池没有改善其最终表现。**这些结果不支持语义质量提升结论。** 原始标签仍需真实审核，再决定如何调整证据策略。[摘要](../evidence/retrieval-handoff-round2/comparison.json)关联完整压缩轨迹。实验入口只接受 development，报告始终 `release_eligible=false`；`--review` 可应用全量审核通过的标签，但不会解锁本脚本对 holdout 的运行。
+该历史批次的主要损失位于证据判断阶段，扩大候选池没有改善其最终表现。**这些结果不支持语义质量提升结论。** 若后续自费验证真实效果，须先审核原始标签，再决定如何调整证据策略。[摘要](../evidence/retrieval-handoff-round2/comparison.json)关联完整压缩轨迹。实验入口只接受 development，报告始终 `release_eligible=false`；`--review` 可应用全量审核通过的标签，但不会解锁本脚本对 holdout 的运行。
 
 ## 结果与复现边界
 

@@ -2,7 +2,7 @@
 
 Ecom Service Agent｜电商售后智能体平台。本文按读者要完成的任务组织阅读入口；所有命令默认从仓库根目录执行。项目介绍见[首页](../README.md)，结果与限制统一见[当前验收状态](evaluation/acceptance.md)。
 
-2026-11-16 增加简历面试、演示素材与分层实验，入口按当前代码组织。各次功能验收保留自身日期与代码基线，最新状态按[验收页](evaluation/acceptance.md)及对应提交的 CI 核对。维护者与仓库贡献者为 [scallion7](https://github.com/scallion7)；署名与工程演进见[贡献说明](CONTRIBUTIONS.md)。
+2026-11-16 增加简历面试、演示素材与分层实验，入口按当前代码组织。各次功能验收保留自身日期与代码基线，最新状态按[验收页](evaluation/acceptance.md)及对应提交的 CI 核对。维护者为 [scallion7](https://github.com/scallion7)；工程演进见[项目演进](CONTRIBUTIONS.md)。
 
 ## 从这里开始
 
@@ -64,7 +64,7 @@ Ecom Service Agent｜电商售后智能体平台。本文按读者要完成的�
 ## 证据、素材与历史
 
 - [证据索引](evidence/README.md)：原始日志、JSON 报告、轨迹与产物归属；先看摘要，再读原始文件。
-- [维护者与工程演进](CONTRIBUTIONS.md)：唯一贡献者、历史别名归并、代码与提交依据。
+- [维护者与工程演进](CONTRIBUTIONS.md)：工程范围、代码与提交依据。
 - [历史归档](history/README.md)：阶段 1–34、近期交付快照与历次验收台账；历史说明不充当当前操作指南。
 - [旧路径迁移对照](history/path-migrations.md)：根目录旧跳转页与两份综合说明的去向。
 - [界面素材](assets/)：当前指南使用的截图；旧录像和截图仍保留在 `evidence/platform/`。

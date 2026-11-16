@@ -115,4 +115,4 @@ python -m app.scripts.demo_stack --smoke --directory app/sessions/smoke-demo
 
 ## 维护者
 
-项目维护者与仓库贡献者：[scallion7](https://github.com/scallion7)。历史提交别名通过 `.mailmap` 统一归并，工程演进及提交依据见[贡献说明](docs/CONTRIBUTIONS.md)。
+项目维护者：[scallion7](https://github.com/scallion7)。工程演进及提交依据见[项目演进](docs/CONTRIBUTIONS.md)。

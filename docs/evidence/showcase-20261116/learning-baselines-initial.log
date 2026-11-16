@@ -1,0 +1,241 @@
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_architecture.ApplicationFactoryTests -v
+test_factory_builds_multi_agent_with_same_runtime_config (tests.test_architecture.ApplicationFactoryTests.test_factory_builds_multi_agent_with_same_runtime_config) ... ok
+test_factory_injects_client_and_config_into_single_agent (tests.test_architecture.ApplicationFactoryTests.test_factory_injects_client_and_config_into_single_agent) ... ok
+test_mode_resolution_does_not_depend_on_global_settings (tests.test_architecture.ApplicationFactoryTests.test_mode_resolution_does_not_depend_on_global_settings) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.044s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_async_runs.AsyncRunTests.test_real_react_agent_and_gateway_run_offline -v
+test_real_react_agent_and_gateway_run_offline (tests.test_async_runs.AsyncRunTests.test_real_react_agent_and_gateway_run_offline) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.100s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_plan_execution.ToolContractTests -v
+test_contracts_match_model_visible_schemas (tests.test_plan_execution.ToolContractTests.test_contracts_match_model_visible_schemas) ... ok
+test_registry_rejects_invalid_arguments_before_handler (tests.test_plan_execution.ToolContractTests.test_registry_rejects_invalid_arguments_before_handler) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.004s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_platform_governance.ConnectorTests.test_signed_identity_wrong_tenant_permission_and_expiry tests.test_platform_governance.ConnectorTests.test_override_and_unapproved_write_rejected -v
+test_signed_identity_wrong_tenant_permission_and_expiry (tests.test_platform_governance.ConnectorTests.test_signed_identity_wrong_tenant_permission_and_expiry) ... ok
+test_override_and_unapproved_write_rejected (tests.test_platform_governance.ConnectorTests.test_override_and_unapproved_write_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.067s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_knowledge_platform.RetrievalTests.test_metadata_before_and_after_search tests.test_knowledge_platform.RetrievalTests.test_invented_quote_rejected -v
+test_metadata_before_and_after_search (tests.test_knowledge_platform.RetrievalTests.test_metadata_before_and_after_search) ... Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/xl/tlps88sn1vj2655jyvrzkm_00000gn/T/jieba.cache
+Loading model cost 0.180 seconds.
+Prefix dict has been built successfully.
+ok
+test_invented_quote_rejected (tests.test_knowledge_platform.RetrievalTests.test_invented_quote_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.297s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_policy_context.PolicyConflictTests.test_conflict_outside_candidate_pool_cannot_be_hidden_by_top_k -v
+test_conflict_outside_candidate_pool_cannot_be_hidden_by_top_k (tests.test_policy_context.PolicyConflictTests.test_conflict_outside_candidate_pool_cannot_be_hidden_by_top_k) ... Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/xl/tlps88sn1vj2655jyvrzkm_00000gn/T/jieba.cache
+Loading model cost 0.187 seconds.
+Prefix dict has been built successfully.
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.252s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_after_sale_intake.IntakeTests.test_missing_fields_survive_restart_and_user_scope tests.test_after_sale_intake.IntakeTests.test_modify_invalidates_confirmed_action_and_reconfirmation_required -v
+test_missing_fields_survive_restart_and_user_scope (tests.test_after_sale_intake.IntakeTests.test_missing_fields_survive_restart_and_user_scope) ... ok
+test_modify_invalidates_confirmed_action_and_reconfirmation_required (tests.test_after_sale_intake.IntakeTests.test_modify_invalidates_confirmed_action_and_reconfirmation_required) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.083s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_dialogue_intake.DialogueIntakeTests.test_partial_change_proposal_restart_and_no_automatic_case -v
+test_partial_change_proposal_restart_and_no_automatic_case (tests.test_dialogue_intake.DialogueIntakeTests.test_partial_change_proposal_restart_and_no_automatic_case) ... INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 20260823_0001, 阶段 22 基线迁移：覆盖现有与治理表。
+INFO  [alembic.runtime.migration] Running upgrade 20260823_0001 -> 20261023_0002, Stage 23: trusted proposals, confirmations and evidence.
+ERROR
+
+======================================================================
+ERROR: test_partial_change_proposal_restart_and_no_automatic_case (tests.test_dialogue_intake.DialogueIntakeTests.test_partial_change_proposal_restart_and_no_automatic_case)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: table action_proposals already exists
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/mxc/.codex/worktrees/agent-boundary-fixes/xc_sx_agent/tests/test_dialogue_intake.py", line 11, in test_partial_change_proposal_restart_and_no_automatic_case
+    with DemoStack() as stack:
+  File "/Users/mxc/.codex/worktrees/agent-boundary-fixes/xc_sx_agent/app/scripts/demo_stack.py", line 130, in __enter__
+    upgrade_database(self.database_url)
+  File "/Users/mxc/.codex/worktrees/agent-boundary-fixes/xc_sx_agent/app/infrastructure/migrations/runtime.py", line 25, in upgrade_database
+    command.upgrade(alembic_config(database_url), revision)
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/command.py", line 487, in upgrade
+    script.run_env()
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/script/base.py", line 550, in run_env
+    util.load_python_file(self.dir, "env.py")
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/util/pyfiles.py", line 114, in load_python_file
+    module = load_module_py(module_id, path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/util/pyfiles.py", line 132, in load_module_py
+    spec.loader.exec_module(module)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/mxc/.codex/worktrees/agent-boundary-fixes/xc_sx_agent/app/infrastructure/migrations/env.py", line 52, in <module>
+    run_migrations_online()
+  File "/Users/mxc/.codex/worktrees/agent-boundary-fixes/xc_sx_agent/app/infrastructure/migrations/env.py", line 46, in run_migrations_online
+    context.run_migrations()
+  File "<string>", line 8, in run_migrations
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/runtime/environment.py", line 967, in run_migrations
+    self.get_context().run_migrations(**kw)
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/runtime/migration.py", line 621, in run_migrations
+    step.migration_fn(**kw)
+  File "/Users/mxc/.codex/worktrees/agent-boundary-fixes/xc_sx_agent/app/infrastructure/migrations/versions/20261023_0002_trusted_actions.py", line 13, in upgrade
+    op.create_table(
+  File "<string>", line 8, in create_table
+  File "<string>", line 3, in create_table
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/operations/ops.py", line 1323, in create_table
+    return operations.invoke(op)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/operations/base.py", line 448, in invoke
+    return fn(self, operation)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/operations/toimpl.py", line 140, in create_table
+    operations.impl.create_table(table, **kw)
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/ddl/impl.py", line 434, in create_table
+    self._exec(schema.CreateTable(table, **kw))
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/alembic/ddl/impl.py", line 252, in _exec
+    return conn.execute(construct, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+           ^^^^^
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/sql/ddl.py", line 188, in _execute_on_connection
+    return connection._execute_ddl(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1532, in _execute_ddl
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/mxc/VScode/test20260708/xc_sx_agent/.venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) table action_proposals already exists
+[SQL:
+CREATE TABLE action_proposals (
+	action_id VARCHAR(64) NOT NULL,
+	user_id VARCHAR(128) NOT NULL,
+	session_id VARCHAR(512) NOT NULL,
+	tool_name VARCHAR(80) NOT NULL,
+	arguments_hash VARCHAR(64) NOT NULL,
+	arguments_json TEXT NOT NULL,
+	business_version VARCHAR(64) NOT NULL,
+	status VARCHAR(32) NOT NULL,
+	expires_at VARCHAR(64) NOT NULL,
+	created_at VARCHAR(64) NOT NULL,
+	result_json TEXT NOT NULL,
+	PRIMARY KEY (action_id)
+)
+
+]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+----------------------------------------------------------------------
+Ran 1 test in 0.016s
+
+FAILED (errors=1)
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_trusted_actions.TrustedActionsTests.test_model_claim_is_proposal_not_execution_and_registry_cannot_bypass tests.test_trusted_actions.TrustedActionsTests.test_confirm_then_execute_and_repeat_replays_once tests.test_trusted_actions.TrustedActionsTests.test_other_user_and_session_cannot_confirm -v
+test_model_claim_is_proposal_not_execution_and_registry_cannot_bypass (tests.test_trusted_actions.TrustedActionsTests.test_model_claim_is_proposal_not_execution_and_registry_cannot_bypass) ... ok
+test_confirm_then_execute_and_repeat_replays_once (tests.test_trusted_actions.TrustedActionsTests.test_confirm_then_execute_and_repeat_replays_once) ... ok
+test_other_user_and_session_cannot_confirm (tests.test_trusted_actions.TrustedActionsTests.test_other_user_and_session_cannot_confirm) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.104s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_plan_execution.MultiAgentStrategyTests.test_routed_agent_executes_plan_with_its_tool_scope tests.test_plan_execution.MultiAgentStrategyTests.test_plan_cannot_use_tool_outside_routed_agent_scope -v
+test_routed_agent_executes_plan_with_its_tool_scope (tests.test_plan_execution.MultiAgentStrategyTests.test_routed_agent_executes_plan_with_its_tool_scope) ... ok
+test_plan_cannot_use_tool_outside_routed_agent_scope (tests.test_plan_execution.MultiAgentStrategyTests.test_plan_cannot_use_tool_outside_routed_agent_scope) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.016s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_handoff_execution.HandoffExecutionTests.test_take_release_invalidates_old_run_new_request_executes tests.test_platform_governance.ConversationHandoffTests.test_human_message_idempotency_and_conflict -v
+test_take_release_invalidates_old_run_new_request_executes (tests.test_handoff_execution.HandoffExecutionTests.test_take_release_invalidates_old_run_new_request_executes) ... ok
+test_human_message_idempotency_and_conflict (tests.test_platform_governance.ConversationHandoffTests.test_human_message_idempotency_and_conflict) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.129s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_async_runs.AsyncRunTests.test_two_workers_only_one_claim tests.test_async_runs.AsyncRunTests.test_expired_worker_is_fenced_and_model_retry_is_recorded tests.test_async_runs.AsyncRunTests.test_completed_write_is_replayed_without_duplicate_effect tests.test_async_runs.AsyncRunTests.test_inflight_write_goes_to_reconciliation_and_cannot_replay -v
+test_two_workers_only_one_claim (tests.test_async_runs.AsyncRunTests.test_two_workers_only_one_claim) ... ok
+test_expired_worker_is_fenced_and_model_retry_is_recorded (tests.test_async_runs.AsyncRunTests.test_expired_worker_is_fenced_and_model_retry_is_recorded) ... ok
+test_completed_write_is_replayed_without_duplicate_effect (tests.test_async_runs.AsyncRunTests.test_completed_write_is_replayed_without_duplicate_effect) ... ok
+test_inflight_write_goes_to_reconciliation_and_cannot_replay (tests.test_async_runs.AsyncRunTests.test_inflight_write_goes_to_reconciliation_and_cannot_replay) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.344s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_external_refund_recovery.ExternalRefundTests.test_timeout_stays_blocked_until_bound_provider_receipt_after_restart tests.test_external_refund_recovery.ExternalRefundTests.test_crash_before_case_sync_resumes_from_stored_receipt -v
+test_timeout_stays_blocked_until_bound_provider_receipt_after_restart (tests.test_external_refund_recovery.ExternalRefundTests.test_timeout_stays_blocked_until_bound_provider_receipt_after_restart) ... ok
+test_crash_before_case_sync_resumes_from_stored_receipt (tests.test_external_refund_recovery.ExternalRefundTests.test_crash_before_case_sync_resumes_from_stored_receipt) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.116s
+
+OK
+
+COMMAND /Users/mxc/VScode/test20260708/xc_sx_agent/.venv/bin/python -m unittest tests.test_agent_quality_cli.QualityTests -v
+test_policy_assertions_require_every_claim_and_fact_from_the_right_document (tests.test_agent_quality_cli.QualityTests.test_policy_assertions_require_every_claim_and_fact_from_the_right_document) ... ok
+test_review_and_split_guards_apply_before_execution (tests.test_agent_quality_cli.QualityTests.test_review_and_split_guards_apply_before_execution) ... ok
+test_review_receipt_is_bound_to_the_actual_project_and_all_gold_facts (tests.test_agent_quality_cli.QualityTests.test_review_receipt_is_bound_to_the_actual_project_and_all_gold_facts) ... ok
+test_two_batches_publish_the_pinned_release_without_touching_knowledge_head (tests.test_agent_quality_cli.QualityTests.test_two_batches_publish_the_pinned_release_without_touching_knowledge_head) ... Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/xl/tlps88sn1vj2655jyvrzkm_00000gn/T/jieba.cache
+Loading model cost 0.184 seconds.
+Prefix dict has been built successfully.
+ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 3.754s
+
+OK

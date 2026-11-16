@@ -56,7 +56,7 @@ python -m app.scripts.compare_retrieval \
 
 ## 结果与复现边界
 
-当前提交的 CI 会执行上述开发集脚本，其结果位于[最新运行](https://github.com/scallion7/xc_sx_agent/actions/runs/42813941711)的 `platform-acceptance` 产物；不要将当前运行状态与历史表格的数值合并。摘要的 `raw_artifact` 连接压缩完整轨迹与 SHA256，比较时同时核对源码树哈希、输入文件哈希、profile 哈希及标签状态。
+CI 会执行上述开发集脚本，结果位于各次运行的 `platform-acceptance` 产物。已核验基线 `37e2fd7` 对应 [Actions 43442455601](https://github.com/scallion7/xc_sx_agent/actions/runs/43442455601)，后续提交从[工作流](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)按 SHA 查找；不要将当前运行状态与历史表格的数值合并。摘要的 `raw_artifact` 连接压缩完整轨迹与 SHA256，比较时同时核对源码树哈希、输入文件哈希、profile 哈希及标签状态。
 
 自定义数据版本通过 `--dataset dataset-export.json` 指定；可另加 `--review review-approved.json` 应用与之匹配的完整真实审核。数据集导出和审核导出是两个文件。脚本没有 `--split holdout`、真实模型或自动发布开关，只接受 development；如果版本没有开发题，比较会被拒绝。版本准备见[数据集流程](versioned-datasets.md)。
 

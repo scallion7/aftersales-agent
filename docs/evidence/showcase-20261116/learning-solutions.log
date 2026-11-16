@@ -1,0 +1,18 @@
+test_learning_injected_reply (tests.test_architecture.ApplicationFactoryTests.test_learning_injected_reply) ... ok
+test_learning_invalid_search_arguments (tests.test_plan_execution.ToolContractTests.test_learning_invalid_search_arguments) ... ok
+test_learning_scope_matrix (tests.test_knowledge_platform.RetrievalTests.test_learning_scope_matrix) ... Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/xl/tlps88sn1vj2655jyvrzkm_00000gn/T/jieba.cache
+Loading model cost 0.179 seconds.
+Prefix dict has been built successfully.
+ok
+test_learning_stale_revision_does_not_overwrite (tests.test_after_sale_intake.IntakeTests.test_learning_stale_revision_does_not_overwrite) ... ok
+test_learning_pending_then_three_replays (tests.test_trusted_actions.TrustedActionsTests.test_learning_pending_then_three_replays) ... ok
+test_learning_human_reply_requires_current_owner (tests.test_platform_governance.ConversationHandoffTests.test_learning_human_reply_requires_current_owner) ... ok
+test_learning_fenced_owner_and_completed_replay (tests.test_async_runs.AsyncRunTests.test_learning_fenced_owner_and_completed_replay) ... ok
+test_learning_amount_mismatch_then_valid_receipt (tests.test_external_refund_recovery.ExternalRefundTests.test_learning_amount_mismatch_then_valid_receipt) ... ok
+test_learning_summary_tamper_is_rejected (tests.test_agent_quality_cli.QualityTests.test_learning_summary_tamper_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.567s
+
+OK

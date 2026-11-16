@@ -1,6 +1,6 @@
 # 五分钟演示
 
-[文档中心](../README.md) · [当前验收](../evaluation/acceptance.md)
+[文档中心](../README.md) · [当前验收](../evaluation/acceptance.md) · [三项演示与提词卡](../showcase/demo.md) · [录像素材](../showcase/recording.md)
 
 展示一条可观察的业务主线：查订单和政策、分轮补齐申请、确认具体操作、人工接管。五分钟从环境准备完成后计时；首次下载依赖与浏览器不计入演示。
 

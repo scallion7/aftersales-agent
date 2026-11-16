@@ -1,0 +1,11 @@
+{
+  "test": "tests.test_platform_http.BrowserTests.test_customer_and_operator_real_api",
+  "passed": true,
+  "step_ms": 900,
+  "video_size": {
+    "width": 1366,
+    "height": 1000
+  },
+  "model": "controlled loopback only",
+  "data": "synthetic"
+}

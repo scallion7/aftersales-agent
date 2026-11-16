@@ -12,7 +12,7 @@
 python -m app.scripts.evaluate_tasks --output test-results/task-baseline.json
 ```
 
-任务定义及哈希见 [tasks](../../app/evaluation/tasks/)，冻结版本为 `task-contract-v1`，包含 6 个 development 场景。每项任务、每种策略都启动独立 SQLite、API、Worker、受控 HTTP 模型进程。初态为空工单/退款操作，执行真实接口后，独立 grader 对照冻结期望检查终态，不能以回复文本里的“成功”判定通过。策略为 ReAct、Plan-and-Execute、multi 路由，完整矩阵为 6 × 3 = 18 次 trial；不与 unittest 的 468 项发现数混算。订单与售后 provider 为本地 mock，工具和数据库代码实际执行；该矩阵不连接真实支付或独立 HTTP 业务供应商。
+任务定义及哈希见 [tasks](../../app/evaluation/tasks/)，冻结版本为 `task-contract-v1`，包含 6 个 development 场景。每项任务、每种策略都启动独立 SQLite、API、Worker、受控 HTTP 模型进程。初态为空工单/退款操作，执行真实接口后，独立 grader 对照冻结期望检查终态，不能以回复文本里的“成功”判定通过。策略为 ReAct、Plan-and-Execute、multi 路由，完整矩阵为 6 × 3 = 18 次 trial；不与 unittest 的测试数混算，当前回归数量见[验收页](acceptance.md)。订单与售后 provider 为本地 mock，工具和数据库代码实际执行；该矩阵不连接真实支付或独立 HTTP 业务供应商。
 
 | 任务 | 关键断言 |
 |---|---|
@@ -31,7 +31,7 @@ python -m app.scripts.evaluate_tasks --output test-results/task-baseline.json
 
 ## 当前证据与边界回归
 
-最新提交的 [Actions 42813941711](https://github.com/scallion7/xc_sx_agent/actions/runs/42813941711) 在 `platform-browser` 作业运行此脚本，报告位于 `platform-acceptance` 产物。历史 1710/2010 tokens 是受控模型的模拟 usage，不能自动沿用为当前代码或真实模型的费用。运行输出会写入摘要 JSON 和同目录 `.raw.json.gz`；部分矩阵非零退出属于预期的完整性门禁行为。
+基线 `37e2fd7` 的 [Actions 43442455601](https://github.com/scallion7/xc_sx_agent/actions/runs/43442455601) 在 `platform-browser` 作业运行此脚本，报告位于 `platform-acceptance` 产物。后续提交按[工作流](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)中的 SHA 核对。历史 1710/2010 tokens 是受控模型的模拟 usage，不能自动沿用为当前代码或真实模型的费用。运行输出会写入摘要 JSON 和同目录 `.raw.json.gz`；部分矩阵非零退出属于预期的完整性门禁行为。
 
 冻结的 6 个场景并不囊括所有后续修复。多轮政策条件、未知副作用人工核对、失效提案及前端重试另有专项：
 

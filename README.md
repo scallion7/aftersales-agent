@@ -6,7 +6,7 @@
 
 项目将模型推理与确定性业务执行分开：LLM 负责理解、规划和解释，服务端负责身份校验、操作确认、权限、幂等、状态转换与审计。演示使用合成业务数据和受控模型，可在本地复现 API、Worker、数据库、MCP 与浏览器之间的完整交互。
 
-[快速演示](docs/guides/five-minute-demo.md) · [系统架构](docs/architecture/overview.md) · [验收证据](docs/evaluation/acceptance.md) · [文档中心](docs/README.md) · [维护者与工程演进](docs/CONTRIBUTIONS.md)
+[展示与面试](docs/showcase/README.md) · [分层教学](docs/learning/README.md) · [快速演示](docs/guides/five-minute-demo.md) · [系统架构](docs/architecture/overview.md) · [验收证据](docs/evaluation/acceptance.md) · [文档中心](docs/README.md)
 
 ![客户服务界面](docs/assets/workspace.png)
 
@@ -84,6 +84,20 @@ python -m app.scripts.demo_stack --smoke --directory app/sessions/smoke-demo
 - 默认余弦检索与版本化 SQL 知识平台可用；Chroma 后端因未修复安全公告停用。
 - 新平台表有租户作用域，但不能据此认为所有历史业务表已经支持共享数据库的 SaaS 多租户。
 - 恢复验收覆盖隔离部署、停写 PostgreSQL 与独立沙箱；持续写入 PITR、跨区域恢复和生产 SLA 尚无验收证据。
+
+## 简历展示与项目教学
+
+项目适合展示 Agent 应用开发、业务执行可靠性和评测交付能力。介绍个人职责时按实际承担范围选择条目；验证结果保留对应的提交、环境与数据口径。
+
+| 目的 | 入口与交付内容 |
+|---|---|
+| 快速了解项目 | [一页项目卡](docs/showcase/project-card.md)：业务问题、系统边界、关键设计与证据 |
+| 准备简历 | [简历材料](docs/showcase/resume.md)：Agent 应用与 AI 后端两种侧重、可核对的贡献条目 |
+| 准备面试 | [面试讲解](docs/showcase/interview.md)：3 分钟、10 分钟讲解和技术追问 |
+| 现场演示或播放录像 | [三项演示](docs/showcase/demo.md)、[录制素材](docs/showcase/recording.md)：正常办理、退款未知恢复、评测拒绝发布 |
+| 分层学习与授课 | [课程与实验](docs/learning/README.md)：基础、业务流程、可靠性三层，包含练习、验收与参考答案 |
+
+课程使用当前代码的隔离实验。第 1–34 期仍作为[历史演进资料](docs/history/README.md)保留，历史命令不代替现行实验步骤。真实模型效果评测待人工审核完成后另行开展。
 
 ## 代码与文档入口
 

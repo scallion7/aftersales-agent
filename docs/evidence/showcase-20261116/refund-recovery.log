@@ -1,0 +1,6 @@
+test_unknown_refund_restart_and_reconciliation (tests.test_complex_after_sale_http.ComplexAfterSaleHttpTests.test_unknown_refund_restart_and_reconciliation) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.835s
+
+OK

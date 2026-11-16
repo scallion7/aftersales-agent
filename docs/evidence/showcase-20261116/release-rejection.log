@@ -1,0 +1,10 @@
+test_two_batches_publish_the_pinned_release_without_touching_knowledge_head (tests.test_agent_quality_cli.QualityTests.test_two_batches_publish_the_pinned_release_without_touching_knowledge_head) ... Building prefix dict from the default dictionary ...
+Loading model from cache /var/folders/xl/tlps88sn1vj2655jyvrzkm_00000gn/T/jieba.cache
+Loading model cost 0.189 seconds.
+Prefix dict has been built successfully.
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 3.765s
+
+OK

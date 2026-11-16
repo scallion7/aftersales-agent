@@ -2,14 +2,16 @@
 
 Ecom Service Agent｜电商售后智能体平台。本文按读者要完成的任务组织阅读入口；所有命令默认从仓库根目录执行。项目介绍见[首页](../README.md)，结果与限制统一见[当前验收状态](evaluation/acceptance.md)。
 
-当前指南已按 2026-11-10 代码基线修订，涵盖身份绑定、政策上下文、人工结案、申请重试和客服操作并发控制。维护者与仓库贡献者为 [scallion7](https://github.com/scallion7)；署名与工程演进见[贡献说明](CONTRIBUTIONS.md)。
+2026-11-16 增加简历面试、演示素材与分层实验，入口按当前代码组织。各次功能验收保留自身日期与代码基线，最新状态按[验收页](evaluation/acceptance.md)及对应提交的 CI 核对。维护者与仓库贡献者为 [scallion7](https://github.com/scallion7)；署名与工程演进见[贡献说明](CONTRIBUTIONS.md)。
 
 ## 从这里开始
 
 | 你的目的 | 阅读顺序 |
 |---|---|
 | 首次运行 | [配置与安装](guides/configuration.md) → [五分钟演示](guides/five-minute-demo.md) |
-| 展示工程能力 | [五分钟演示](guides/five-minute-demo.md) → [工程演进](CONTRIBUTIONS.md) → [验收证据](evaluation/acceptance.md) |
+| 简历与面试 | [项目卡](showcase/project-card.md) → [简历材料](showcase/resume.md) → [讲解与追问](showcase/interview.md) |
+| 展示工程能力 | [三项演示](showcase/demo.md) → [录像与复录](showcase/recording.md) → [验收证据](evaluation/acceptance.md) |
+| 自学或授课 | [分层课程](learning/README.md) → [环境准备](learning/setup.md) → 按层完成实验与参考答案核对 |
 | 接手代码开发 | [系统架构](architecture/overview.md) → [可信执行](engineering/reliable-execution.md) → 下方对应主题 |
 | 诊断检索效果 | [离线评测协议](evaluation/offline-review.md) → [复核工作台](guides/review-workbench.md) → [检索实验](evaluation/retrieval-experiments.md) |
 | 部署与故障处理 | [部署清单](operations/deployment-checklist.md) → [隔离部署验收](operations/compose-acceptance.md) → [故障手册](operations/incident-runbook.md) |
@@ -22,6 +24,13 @@ Ecom Service Agent｜电商售后智能体平台。本文按读者要完成的�
 | [五分钟演示](guides/five-minute-demo.md) | 如何依次展示查询、政策证据、确认执行与客服接管？ |
 | [售后申请](guides/after-sale.md) | 如何补资料、关联证据、修改或撤回申请，如何接入申请 API？ |
 | [人工复核工作台](guides/review-workbench.md) | 如何核对原文、保存审核、处理冲突和导入导出？ |
+
+## 展示与教学 · showcase / learning
+
+- [展示与面试入口](showcase/README.md)：项目卡、简历表述、3 分钟和 10 分钟讲解、技术追问与证据映射。
+- [三个可复现演示](showcase/demo.md)：正常业务、退款结果未知后的恢复、评测不完整时拒绝发布。
+- [素材与复录](showcase/recording.md)：本批浏览器录像、截图、复录命令与使用说明。
+- [分层课程入口](learning/README.md)：三层九个实验、前置知识、动手任务、验收命令和参考答案。课程主路径使用受控本地服务，真实模型评测等待人工审核。
 
 ## 架构与工程 · architecture / engineering / decisions
 

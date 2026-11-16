@@ -1,0 +1,479 @@
+{
+  "date": "2026-11-16",
+  "base_commit": "37e2fd731f73fb01c5f88bee0aba24a4478b372f",
+  "scope": "Showcase and teaching documentation, regenerated controlled browser media; application and existing test source unchanged.",
+  "source_tree_sha256": "9711b292d0a86aa2363f3cf2ea037c141ba70eb959c994831cc027b2488580e2",
+  "source_hash_rule": "sorted tracked app,mcp_server,tests,requirements*.txt,pyproject.toml; utf8 path + NUL + bytes + NUL",
+  "environment": {
+    "python": "3.11",
+    "playwright": "1.55.0",
+    "chromium_build": "1187",
+    "database": "isolated SQLite",
+    "model": "controlled loopback only"
+  },
+  "unittest": {
+    "passed": 500,
+    "skipped": 0,
+    "test_seconds": 112.378,
+    "chromium_enabled": true
+  },
+  "coverage": {
+    "statements": 13499,
+    "missed": 2370,
+    "percent": 82,
+    "gate": 65,
+    "scope": "app statements, existing exclusions in pyproject.toml"
+  },
+  "commands": [
+    {
+      "name": "full-regression",
+      "command": [
+        "python",
+        "-m",
+        "coverage",
+        "run",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "seconds": 114.487
+    },
+    {
+      "name": "coverage",
+      "command": [
+        "python",
+        "-m",
+        "coverage",
+        "report",
+        "--fail-under=65"
+      ],
+      "exit_code": 0,
+      "seconds": 0.561
+    },
+    {
+      "name": "browser-recording",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "tests.test_platform_http.BrowserTests.test_customer_and_operator_real_api",
+        "-v"
+      ],
+      "exit_code": 0,
+      "seconds": 5.602
+    },
+    {
+      "name": "refund-recovery",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "tests.test_complex_after_sale_http.ComplexAfterSaleHttpTests.test_unknown_refund_restart_and_reconciliation",
+        "-v"
+      ],
+      "exit_code": 0,
+      "seconds": 2.344
+    },
+    {
+      "name": "release-rejection",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "tests.test_agent_quality_cli.QualityTests.test_two_batches_publish_the_pinned_release_without_touching_knowledge_head",
+        "-v"
+      ],
+      "exit_code": 0,
+      "seconds": 4.248
+    },
+    {
+      "name": "demo-smoke",
+      "command": [
+        "python",
+        "-m",
+        "app.scripts.demo_stack",
+        "--intake",
+        "--smoke",
+        "--directory",
+        "test-results/showcase-20261116/demo-stack"
+      ],
+      "exit_code": 0,
+      "seconds": 2.588
+    },
+    {
+      "name": "ruff",
+      "command": [
+        "ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.04
+    },
+    {
+      "name": "format",
+      "command": [
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.011
+    },
+    {
+      "name": "compile",
+      "command": [
+        "python",
+        "-m",
+        "compileall",
+        "-q",
+        "app",
+        "tests"
+      ],
+      "exit_code": 0,
+      "seconds": 0.037
+    },
+    {
+      "name": "openapi",
+      "command": [
+        "python",
+        "-m",
+        "app.scripts.validate_openapi"
+      ],
+      "exit_code": 0,
+      "seconds": 0.614
+    }
+  ],
+  "recording": {
+    "test": "tests.test_platform_http.BrowserTests.test_customer_and_operator_real_api",
+    "page_errors": 0,
+    "final_case_count": 1,
+    "format": "silent automated browser clips",
+    "visual_review": "workspace and workbench screenshots inspected",
+    "passed": true,
+    "step_ms": 900,
+    "video_size": {
+      "width": 1366,
+      "height": 1000
+    },
+    "model": "controlled loopback only",
+    "data": "synthetic",
+    "command": "python -m docs.showcase.record_demo --output test-results/showcase-recording-01",
+    "test_seconds": 20.677,
+    "playback": [
+      {
+        "file": "customer-demo.webm",
+        "duration": 19.28,
+        "width": 1366,
+        "height": 1000,
+        "decoded_frames": 9,
+        "error": null
+      },
+      {
+        "file": "operator-demo.webm",
+        "duration": 6.72,
+        "width": 1366,
+        "height": 1000,
+        "decoded_frames": 10,
+        "error": null
+      }
+    ],
+    "guard_checks": [
+      {
+        "args": [
+          "--output",
+          "test-results/showcase-20261116/paced-recording"
+        ],
+        "exit_code": 2,
+        "expected": 2
+      },
+      {
+        "args": [
+          "--output",
+          "test-results/showcase-20261116/invalid-delay",
+          "--step-ms",
+          "-1"
+        ],
+        "exit_code": 2,
+        "expected": 2
+      }
+    ]
+  },
+  "refund_recovery": {
+    "cases": 1,
+    "operations": 1,
+    "provider_refunds": 1
+  },
+  "real_model_calls": 0,
+  "original_human_review_completed": false,
+  "original_holdout_run": false,
+  "artifacts": {
+    "browser-recording.log": {
+      "bytes": 2131,
+      "sha256": "3fcba8e92a5ef0d4e47f4a0888426c12550a2a3a255ed6ce81a82512b83f4b9f"
+    },
+    "coverage.log": {
+      "bytes": 25001,
+      "sha256": "ac6b3b5842862a947a1ba61e7908bde5a65ac9786bc557f0a09b46d4c3ee70e0"
+    },
+    "customer-demo.webm": {
+      "bytes": 1196261,
+      "sha256": "34a8037d19c4e37613c07074f4b71c07bf0982ce3310171122004d3b7bd0930d"
+    },
+    "learning-baselines-initial.log": {
+      "bytes": 17522,
+      "sha256": "e6eccf11246fbff2420e57b6bab587726020f6a3e8eaa749a80f11499bae2918"
+    },
+    "learning-dialogue-retry.log": {
+      "bytes": 2185,
+      "sha256": "6c2507d5abba97b607d0721879c4d6927071abc9678f85c9396ad1c09de8c99e"
+    },
+    "learning-solutions.log": {
+      "bytes": 1550,
+      "sha256": "d9614c8a9d729191a7e4204d7ef0509a86fb04b7f5a4f3ff69409692f3593476"
+    },
+    "operator-demo.webm": {
+      "bytes": 654840,
+      "sha256": "62e96874876c146acc7f7004870a133ee8ca07598784bfe8d32860e4b11a193d"
+    },
+    "recording.json": {
+      "bytes": 249,
+      "sha256": "6d3e86c2dd4401d246b69104edd361f17595553211878e4e8e703503f23770a4"
+    },
+    "refund-recovery.log": {
+      "bytes": 261,
+      "sha256": "427696cf5174924ffe70c61033ea74ce7770417755fbfbf73d2dddc303715764"
+    },
+    "release-rejection.log": {
+      "bytes": 514,
+      "sha256": "23401db9c82c2377c6139af26cd9caaa97f995f048fb6910745e5637554e2cec"
+    },
+    "unknown-refund-recovery.json": {
+      "bytes": 55440,
+      "sha256": "6dd2b070e663492940a0ecf4821a57d05ae17055035b173efbd8833f1f968af0"
+    },
+    "workbench.png": {
+      "bytes": 133276,
+      "sha256": "82cbbc0bc224eeacdf0dd35a7f02522d3bd3d8ef2f04fd91ecae31372c643f8a"
+    },
+    "workspace.png": {
+      "bytes": 147132,
+      "sha256": "e76621ed97df62253e3a96c7f0ffe090b68a65904056dbe400679216d907f8b3"
+    }
+  },
+  "teaching_solutions": {
+    "passed": 9,
+    "seconds": 0.567,
+    "method": "Execute documented method blocks on the corresponding existing unittest classes, without editing tests. Formatting-only update preserved all 9 ASTs."
+  },
+  "teaching_baselines": {
+    "commands": 14,
+    "tests_final_passed": 31,
+    "first_attempt_note": "A verification-driver DATABASE_URL override interfered with DialogueIntake migration. Removing it restored the isolated DemoStack target; the single test passed in 4.974 seconds. The course documents this environment constraint.",
+    "final_retry_log": "learning-dialogue-retry.log",
+    "initial_commands": [
+      {
+        "source": "docs/learning/level-1-foundations.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_architecture.ApplicationFactoryTests",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.451
+      },
+      {
+        "source": "docs/learning/level-1-foundations.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_async_runs.AsyncRunTests.test_real_react_agent_and_gateway_run_offline",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.617
+      },
+      {
+        "source": "docs/learning/level-1-foundations.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_plan_execution.ToolContractTests",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.514
+      },
+      {
+        "source": "docs/learning/level-1-foundations.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_platform_governance.ConnectorTests.test_signed_identity_wrong_tenant_permission_and_expiry",
+          "tests.test_platform_governance.ConnectorTests.test_override_and_unapproved_write_rejected",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.652
+      },
+      {
+        "source": "docs/learning/level-1-foundations.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_knowledge_platform.RetrievalTests.test_metadata_before_and_after_search",
+          "tests.test_knowledge_platform.RetrievalTests.test_invented_quote_rejected",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.46
+      },
+      {
+        "source": "docs/learning/level-1-foundations.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_policy_context.PolicyConflictTests.test_conflict_outside_candidate_pool_cannot_be_hidden_by_top_k",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.684
+      },
+      {
+        "source": "docs/learning/level-2-workflows.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_after_sale_intake.IntakeTests.test_missing_fields_survive_restart_and_user_scope",
+          "tests.test_after_sale_intake.IntakeTests.test_modify_invalidates_confirmed_action_and_reconfirmation_required",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.594
+      },
+      {
+        "source": "docs/learning/level-2-workflows.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_dialogue_intake.DialogueIntakeTests.test_partial_change_proposal_restart_and_no_automatic_case",
+          "-v"
+        ],
+        "returncode": 1,
+        "seconds": 0.226
+      },
+      {
+        "source": "docs/learning/level-2-workflows.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_trusted_actions.TrustedActionsTests.test_model_claim_is_proposal_not_execution_and_registry_cannot_bypass",
+          "tests.test_trusted_actions.TrustedActionsTests.test_confirm_then_execute_and_repeat_replays_once",
+          "tests.test_trusted_actions.TrustedActionsTests.test_other_user_and_session_cannot_confirm",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.623
+      },
+      {
+        "source": "docs/learning/level-2-workflows.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_plan_execution.MultiAgentStrategyTests.test_routed_agent_executes_plan_with_its_tool_scope",
+          "tests.test_plan_execution.MultiAgentStrategyTests.test_plan_cannot_use_tool_outside_routed_agent_scope",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.532
+      },
+      {
+        "source": "docs/learning/level-2-workflows.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_handoff_execution.HandoffExecutionTests.test_take_release_invalidates_old_run_new_request_executes",
+          "tests.test_platform_governance.ConversationHandoffTests.test_human_message_idempotency_and_conflict",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.756
+      },
+      {
+        "source": "docs/learning/level-3-reliability.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_async_runs.AsyncRunTests.test_two_workers_only_one_claim",
+          "tests.test_async_runs.AsyncRunTests.test_expired_worker_is_fenced_and_model_retry_is_recorded",
+          "tests.test_async_runs.AsyncRunTests.test_completed_write_is_replayed_without_duplicate_effect",
+          "tests.test_async_runs.AsyncRunTests.test_inflight_write_goes_to_reconciliation_and_cannot_replay",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.885
+      },
+      {
+        "source": "docs/learning/level-3-reliability.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_external_refund_recovery.ExternalRefundTests.test_timeout_stays_blocked_until_bound_provider_receipt_after_restart",
+          "tests.test_external_refund_recovery.ExternalRefundTests.test_crash_before_case_sync_resumes_from_stored_receipt",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 0.642
+      },
+      {
+        "source": "docs/learning/level-3-reliability.md",
+        "command": [
+          "python",
+          "-m",
+          "unittest",
+          "tests.test_agent_quality_cli.QualityTests",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 4.22
+      }
+    ],
+    "initial_log_normalization": "Trailing whitespace and final blank lines removed for Git whitespace checks; initial failure and successful retry preserved."
+  },
+  "documentation_commands": {
+    "markdown_files": 12,
+    "bash_blocks": 28,
+    "python_blocks": 9,
+    "unittest_selectors": 27,
+    "learner_methods": 9
+  },
+  "static_final": {
+    "ruff": "passed",
+    "format": "388 files already formatted (Python and Markdown)",
+    "markdown_files": 73,
+    "local_links_images": 941,
+    "openapi_paths": 104,
+    "plan_quality_cases_passed": 40,
+    "diff_check": "passed"
+  },
+  "recorder_source_sha256": "4b81f5bc7ee944caa0060b09c8fe86a8ce7afdf5c882bb3fc724017b8abe1bf9"
+}

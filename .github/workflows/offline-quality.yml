@@ -37,21 +37,21 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_DB: xc_sx_agent
-          POSTGRES_USER: xc_agent
-          POSTGRES_PASSWORD: xc_agent_test
+          POSTGRES_DB: aftersales_agent
+          POSTGRES_USER: aftersales_agent
+          POSTGRES_PASSWORD: aftersales_agent_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U xc_agent -d xc_sx_agent"
+          --health-cmd "pg_isready -U aftersales_agent -d aftersales_agent"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10
     strategy:
       matrix:
         database:
-          - sqlite:////tmp/ecom-service-agent-ci.db
-          - postgresql+psycopg://xc_agent:xc_agent_test@127.0.0.1:5432/xc_sx_agent
+          - sqlite:////tmp/aftersales-agent-ci.db
+          - postgresql+psycopg://aftersales_agent:aftersales_agent_test@127.0.0.1:5432/aftersales_agent
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -103,10 +103,10 @@ jobs:
         with:
           name: dependency-sbom
           path: sbom.json
-      - run: docker build -t ecom-service-agent:ci .
+      - run: docker build -t aftersales-agent:ci .
       - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
-          image-ref: ecom-service-agent:ci
+          image-ref: aftersales-agent:ci
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           format: json

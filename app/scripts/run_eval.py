@@ -131,7 +131,7 @@ def main():
     )
 
     print("=" * 78)
-    print("  Ecom Service Agent · Agent 评估")
+    print("  AfterSales Agent · Agent 评估")
     print(f"  模式      : {args.mode}")
     print(f"  数据集    : {dataset_path}")
     print(f"  LLM judge : {'开启' if args.judge else '关闭（仅规则）'}")

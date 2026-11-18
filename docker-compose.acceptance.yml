@@ -1,11 +1,16 @@
 # Disposable integration acceptance only. Never use the default production project.
 services:
   postgres:
+    environment:
+      POSTGRES_DB: aftersales_agent
+      POSTGRES_USER: aftersales_agent
+      POSTGRES_PASSWORD: aftersales_agent_test
     ports: ["127.0.0.1:55432:5432"]
   api:
     depends_on:
       model: {condition: service_healthy}
     environment: &acceptance
+      DATABASE_URL: &acceptance_database postgresql+psycopg://aftersales_agent:aftersales_agent_test@postgres:5432/aftersales_agent
       OPENAI_API_KEY: controlled-offline
       OPENAI_BASE_URL: http://model:9126/v1
       KNOWLEDGE_EMBEDDING_MODE: local_hash
@@ -20,5 +25,14 @@ services:
       TELEMETRY_ENABLED: "true"
   worker:
     environment: *acceptance
+  refund-worker:
+    environment:
+      DATABASE_URL: *acceptance_database
+  seed:
+    environment:
+      DATABASE_URL: *acceptance_database
+  trace-workbench:
+    environment:
+      DATABASE_URL: *acceptance_database
   inventory:
     ports: ["127.0.0.1:9125:9125"]

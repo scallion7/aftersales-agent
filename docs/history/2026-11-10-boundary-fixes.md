@@ -4,7 +4,7 @@
 
 > 交付快照：本页记录此次修复及其验收时点。后续用法以主题指南为准，原始日志和测量值不随文档更新重写。
 
-主体修复提交为 [`7222467`](https://github.com/scallion7/xc_sx_agent/commit/722246758b87315feff0876be803e2e1ee9a08fa)，基于 `2526710`。七项问题按身份与数据安全、恢复正确性、检索和交互边界处理：
+主体修复提交为 [`7222467`](https://github.com/scallion7/aftersales-agent/commit/722246758b87315feff0876be803e2e1ee9a08fa)，基于 `2526710`。七项问题按身份与数据安全、恢复正确性、检索和交互边界处理：
 
 | 问题 | 修复后的行为 |
 |---|---|
@@ -20,14 +20,14 @@
 
 ## CI 发现的客服工作台竞态
 
-首轮 CI 中，接管后仍在进行的知识列表刷新可能晚于人工回复完成，覆盖“人工回复已发送”的状态；更早点击发送还可能使用接管前的会话值。补充提交 [`c5aee67`](https://github.com/scallion7/xc_sx_agent/commit/c5aee6716723ae5a4243497db919e094d3b238a5) 为工作台操作增加统一忙碌锁，覆盖接管请求及其完整刷新，并对新生成控件继承锁状态。
+首轮 CI 中，接管后仍在进行的知识列表刷新可能晚于人工回复完成，覆盖“人工回复已发送”的状态；更早点击发送还可能使用接管前的会话值。补充提交 [`c5aee67`](https://github.com/scallion7/aftersales-agent/commit/c5aee6716723ae5a4243497db919e094d3b238a5) 为工作台操作增加统一忙碌锁，覆盖接管请求及其完整刷新，并对新生成控件继承锁状态。
 
 回归测试分别暂扣接管请求和后续知识刷新请求，验证两阶段均不能发送、旧会话没有消息、完成刷新后目标会话恰好收到一条回复。测试不依赖固定等待时长。
 
 ## 对应证据
 
 - 提交前本地批次：[checks.json](../evidence/boundary-fixes-20261110/checks.json)、[单测日志](../evidence/boundary-fixes-20261110/unittest.log)、[覆盖率](../evidence/boundary-fixes-20261110/coverage.log)。该批次为 467 项无跳过，早于新增工作台回归。
-- 最终代码：`c5aee67`；[Actions 42813941711](https://github.com/scallion7/xc_sx_agent/actions/runs/42813941711) 的 9 项作业全部通过，[结果快照](../evidence/boundary-fixes-20261110/ci.json)。
+- 最终代码：`c5aee67`；[Actions 42813941711](https://github.com/scallion7/aftersales-agent/actions/runs/42813941711) 的 9 项作业全部通过，[结果快照](../evidence/boundary-fixes-20261110/ci.json)。
 - 三个 Python 版本各发现 468 项测试，执行通过 459 项，按配置跳过 9 项浏览器测试；专门浏览器作业执行 18 项（含 9 项浏览器与 9 项 HTTP）全部通过。三版本 app 语句覆盖率均为 83%。
 - SQLite/PostgreSQL 迁移、供应链检查、PostgreSQL 持续负载和完整 Compose 部署恢复均由该次 CI 通过。
 

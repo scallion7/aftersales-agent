@@ -160,9 +160,9 @@ def create_agent(
             after_sale_service=after_sale_service,
         )
 
-    from app.agent.chat import EcomAgent
+    from app.agent.chat import AfterSalesAgent
 
-    return EcomAgent(
+    return AfterSalesAgent(
         session_path=session_path,
         config=runtime_config,
         client=client,

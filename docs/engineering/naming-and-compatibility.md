@@ -8,6 +8,7 @@
 
 | 旧入口 | 当前推荐入口 | 兼容方式 |
 |---|---|---|
+| `app.agent.chat.EcomAgent` | [app.agent.chat.AfterSalesAgent](../../app/agent/chat.py) | 两个名称指向同一个类，已有导入继续可用 |
 | `app.agent.rag.backends.numpy_backend.NumpyBackend` | [cosine_backend.CosineBackend](../../app/agent/rag/backends/cosine_backend.py) | 同一个类的别名，构造参数和 JSON 索引格式不变；包级导出也保留 |
 | `RAG_BACKEND=numpy`、`--backend numpy` | `RAG_BACKEND=cosine`、`--backend cosine` | 仍接受旧值；默认值和示例改为 `cosine` |
 | `numpy_backend._cosine` | [similarity.cosine_similarity](../../app/agent/rag/similarity.py) | 同一个函数的别名；JSON 检索与 SQL 混合检索共用实现 |
@@ -28,7 +29,9 @@
 - `COLLABORATION_ENABLED`、数据库所有权字段和任务快照键保留，服务类改名不改变旧 Worker 读取的数据。
 - 旧测试模块仍可显式运行；全量 `discover` 只运行职责命名的模块一次，避免测试数量虚增。兼容别名暂无移除计划，移除前应单独发布迁移说明。
 
-已发布 Alembic 文件、revision/down_revision、`STAGE26_DOWNGRADE_BLOCKED` 错误码及历史证据名称保留。仓库 `xc_sx_agent`、默认数据库、Compose 用户及库名、已有 API 路径不因职责改名而迁移。`.stage-deps/` 继续忽略，防止本地依赖被纳入提交。当前运行代码和 CI 临时数据使用职责名称，文档链接检查维护主题导航。
+项目展示名为 **AfterSales Agent**，仓库名为 [aftersales-agent](https://github.com/scallion7/aftersales-agent)。默认 SQLite 数据库仍位于 `app/sessions/xc_sx_agent.db`；既有 PostgreSQL 库名与用户、Chroma 集合、API 路径及已发布的 Alembic revision ID 继续用于读取现有数据。生产 OIDC 的 audience 按身份提供方和部署的既有配置填写。[配置指南](../guides/configuration.md)
+
+已发布的 `STAGE26_DOWNGRADE_BLOCKED` 错误码仍可用于识别迁移失败原因。历史证据沿用生成时的标识。`.stage-deps/` 继续忽略，防止本地依赖被纳入提交。
 
 ## 身份升级：稳定主体与显式旧账号映射
 

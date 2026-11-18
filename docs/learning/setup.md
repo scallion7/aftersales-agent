@@ -2,13 +2,13 @@
 
 [课程路线](README.md) · [文档中心](../README.md) · [当前验收](../evaluation/acceptance.md)
 
-使用独立的学习检出和 Python 3.11 虚拟环境。下面的 Bash/Zsh 命令均从仓库根目录执行；Windows 环境创建与激活方式见[配置指南](../guides/configuration.md)。首次安装依赖需要网络，完成安装后的九个主实验不需要真实模型服务。人工金标准审核、真实模型效果与生产环境验证统一列为[后续自费验证](../evaluation/acceptance.md#project-scope)，当前学习环境无需准备这些资源。
+使用独立的学习检出和 Python 3.11 虚拟环境。从准备存放项目的父目录开始克隆，进入 `aftersales-agent` 后，在仓库根目录运行后续 Bash/Zsh 命令。Windows 环境创建与激活方式见[配置指南](../guides/configuration.md)。首次安装依赖需要网络，完成安装后的九个主实验不需要真实模型服务。人工金标准审核、真实模型效果与生产环境验证统一列为[后续自费验证](../evaluation/acceptance.md#project-scope)，当前学习环境无需准备这些资源。
 
 ## 准备环境
 
 ```bash
-git clone https://github.com/scallion7/xc_sx_agent.git
-cd xc_sx_agent
+git clone https://github.com/scallion7/aftersales-agent.git
+cd aftersales-agent
 git switch -c codex/learning-labs
 python3.11 -m venv .venv
 source .venv/bin/activate

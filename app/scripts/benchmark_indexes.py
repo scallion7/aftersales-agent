@@ -22,7 +22,7 @@ from sqlalchemy import insert
 
 
 def measure(size, repeats):
-    with tempfile.TemporaryDirectory(prefix="ecom-index-scale-") as folder:
+    with tempfile.TemporaryDirectory(prefix="aftersales-index-scale-") as folder:
         config = Settings(
             _env_file=None,
             environment="test",

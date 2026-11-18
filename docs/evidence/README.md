@@ -2,9 +2,11 @@
 
 核验日期：2026-11-18。本目录保存已产生的原始结果；当前结论见[验收状态](../evaluation/acceptance.md)，复现方法见[文档中心](../README.md)。目录名称中的 round、阶段和日期是产物批次标识，保留用于追溯。
 
+项目现名为 AfterSales Agent。历史 CI 快照、日志、截图与录像保存生成时的仓库地址和界面名称，可按提交 SHA、运行编号或文件哈希与当时版本对应。[录制素材与原始清单](../showcase/recording.md)
+
 ## 功能修复基线的远端验收
 
-归档代码基线 [`c5aee67`](https://github.com/scallion7/xc_sx_agent/commit/c5aee6716723ae5a4243497db919e094d3b238a5) 对应 [Actions 42813941711](https://github.com/scallion7/xc_sx_agent/actions/runs/42813941711)，**9/9 作业成功**；结果快照见 [ci.json](boundary-fixes-20261110/ci.json)。Python 3.10/3.11/3.12 各发现 468 项，执行 459 项通过、跳过 9 项浏览器测试；独立浏览器作业的 18 项包含 9 项浏览器和 9 项 HTTP 测试，全部通过。app 语句覆盖率为 83%，不同作业的重复用例不相加为新的独立样本。
+归档代码基线 [`c5aee67`](https://github.com/scallion7/aftersales-agent/commit/c5aee6716723ae5a4243497db919e094d3b238a5) 对应 [Actions 42813941711](https://github.com/scallion7/aftersales-agent/actions/runs/42813941711)，**9/9 作业成功**；结果快照见 [ci.json](boundary-fixes-20261110/ci.json)。Python 3.10/3.11/3.12 各发现 468 项，执行 459 项通过、跳过 9 项浏览器测试；独立浏览器作业的 18 项包含 9 项浏览器和 9 项 HTTP 测试，全部通过。app 语句覆盖率为 83%，不同作业的重复用例不相加为新的独立样本。
 
 | CI 产物 | 内容 |
 |---|---|
@@ -13,12 +15,13 @@
 | `sustained-postgres-evidence` | 15 秒 PostgreSQL 负载与故障契约、1000 chunk 索引一致性 |
 | `dependency-sbom` | 锁文件对应的 SBOM；依赖审计与镜像扫描结果另查同作业日志 |
 
-这些产物从对应运行页面获取，受 Actions 保存期限约束。后续文档或代码提交的 CI 在 [Actions 工作流](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml) 按提交 SHA 查看。本目录中的旧报告不会因新 CI 通过而变成新运行的证据。
+这些产物从对应运行页面获取，受 Actions 保存期限约束。后续文档或代码提交的 CI 在 [Actions 工作流](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml) 按提交 SHA 查看。本目录中的旧报告不会因新 CI 通过而变成新运行的证据。
 
 ## 最近的本地批次
 
 | 目录 | 阅读入口 | 生成时的证据身份 |
 |---|---|---|
+| [aftersales-rename-20261118](aftersales-rename-20261118/) | [改名验收与素材哈希](aftersales-rename-20261118/checks.json)、[当前演示](../showcase/recording.md) | 新名称下的浏览器回归、原政策问答复验和展示素材 |
 | [policy-transfer-20261118](policy-transfer-20261118/) | [57 条逐题结果](policy-transfer-20261118/cases.json)、[验收记录](policy-transfer-20261118/verification.json)、[问题与引用对照表](../evaluation/policy-transfer.md) | 以 `33c7aae` 为基线，检验跨商品适用范围、付款状态与会话追问 |
 | [policy-paraphrases-20261118](policy-paraphrases-20261118/) | [复测清单](policy-paraphrases-20261118/checks.json)、[32 道补充开发题](policy-paraphrases-20261118/challenge.json)、[逐题原因](../evaluation/retrieval-experiments.md#policy-paraphrases) | 以 `39f69db` 为基线，比较三道误拒题、同义问法及超出条款范围的反例 |
 | [agent-boundaries-20261118](agent-boundaries-20261118/) | [本地验证清单](agent-boundaries-20261118/checks.json)、[检索开发集对比](agent-boundaries-20261118/retrieval-comparison.json) | 换货人工履约与历史退款核对、政策回答、会话恢复、SQL 风控回滚和同一批开发题的检索结果 |
@@ -44,7 +47,7 @@
 | [ci-20261025](ci-20261025/) | 345 项回归、锁文件与依赖范围审计、产物哈希 |
 | [platform](platform/) | 阶段 27–34 的早期验收、540 次受控任务、容量演练、界面截图和录像 |
 
-旧提交 `7565683` 的 [Actions 42054871319](https://github.com/scallion7/xc_sx_agent/actions/runs/42054871319) 为当时的 8/8 作业结果；更早批次说明见[历史验收台账](../history/2026-11-05-acceptance-ledger.md)。早期 platform 的 holdout 曾参与诊断，不能作为 review-v1 的独立保留集。
+旧提交 `7565683` 的 [Actions 42054871319](https://github.com/scallion7/aftersales-agent/actions/runs/42054871319) 为当时的 8/8 作业结果；更早批次说明见[历史验收台账](../history/2026-11-05-acceptance-ledger.md)。早期 platform 的 holdout 曾参与诊断，不能作为 review-v1 的独立保留集。
 
 ## 阅读规则
 

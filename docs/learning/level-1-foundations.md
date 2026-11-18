@@ -10,7 +10,7 @@
 
 **前置。** Python 类、上下文管理器、unittest 断言。
 
-**代码入口。** [应用装配](../../app/bootstrap.py)的 `create_agent`、[EcomAgent](../../app/agent/chat.py)、[响应模型](../../app/schemas/response.py)、[工厂测试](../../tests/test_architecture.py)的 `ApplicationFactoryTests` 与 `FakeOpenAI`。
+**代码入口。** [应用装配](../../app/bootstrap.py)的 `create_agent`、[AfterSalesAgent](../../app/agent/chat.py)、[响应模型](../../app/schemas/response.py)、[工厂测试](../../tests/test_architecture.py)的 `ApplicationFactoryTests` 与 `FakeOpenAI`。
 
 **基线验证。**
 

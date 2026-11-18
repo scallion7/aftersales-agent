@@ -35,7 +35,7 @@ class OidcIdentityTests(unittest.TestCase):
     def provider_for(self, issuer=ISSUER, bindings=None):
         return OidcJwtProvider(
             issuer=issuer,
-            audience="xc-agent",
+            audience="aftersales-agent",
             jwks_loader=lambda _: self.jwks,
             identity_bindings=bindings,
         )
@@ -210,7 +210,7 @@ class OidcIdentityTests(unittest.TestCase):
         config = self.config(
             auth_mode="oidc",
             oidc_issuer=ISSUER,
-            oidc_audience="xc-agent",
+            oidc_audience="aftersales-agent",
             oidc_jwks_path=str(jwks_path),
             oidc_identity_map_path=path,
         )
@@ -239,7 +239,7 @@ class OidcIdentityTests(unittest.TestCase):
             environment="production",
             auth_mode="oidc",
             oidc_issuer=ISSUER,
-            oidc_audience="xc-agent",
+            oidc_audience="aftersales-agent",
             oidc_jwks_path="operator-jwks.json",
             openai_api_key="offline-validation-only",
             commerce_seed_demo_data=False,

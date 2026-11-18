@@ -145,7 +145,7 @@ def apply_review(manifest, cases, review, *, documents=None):
 
 @contextmanager
 def offline_retriever(documents):
-    with tempfile.TemporaryDirectory(prefix="ecom-review-") as directory:
+    with tempfile.TemporaryDirectory(prefix="aftersales-review-") as directory:
         config = Settings(
             environment="test",
             _env_file=None,

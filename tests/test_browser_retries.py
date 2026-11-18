@@ -120,7 +120,7 @@ class BrowserRetryTests(unittest.TestCase):
             config = {
                 "AUTH_MODE": "oidc",
                 "OIDC_ISSUER": issuer,
-                "OIDC_AUDIENCE": "xc-agent",
+                "OIDC_AUDIENCE": "aftersales-agent",
                 "OIDC_JWKS_PATH": str(jwks),
             }
             with (

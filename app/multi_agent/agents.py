@@ -12,7 +12,7 @@ from app.prompts.agents import COMPLAINT_PROMPT, POSTSALE_PROMPT, PRESALE_PROMPT
 
 AGENT_CONFIGS = {
     "presale": {
-        "name": "小夕-售前",
+        "name": "AfterSales Agent · 售前咨询",
         "prompt": PRESALE_PROMPT,
         "tools": {
             "query_product",
@@ -22,7 +22,7 @@ AGENT_CONFIGS = {
         },
     },
     "postsale": {
-        "name": "小夕-售后",
+        "name": "AfterSales Agent · 售后服务",
         "prompt": POSTSALE_PROMPT,
         "tools": {
             "query_order",
@@ -38,7 +38,7 @@ AGENT_CONFIGS = {
         },
     },
     "complaint": {
-        "name": "小夕-投诉",
+        "name": "AfterSales Agent · 投诉处理",
         "prompt": COMPLAINT_PROMPT,
         "tools": {
             "query_order",

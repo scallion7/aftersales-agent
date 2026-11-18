@@ -1,0 +1,70 @@
+{
+  "repository": "scallion7/aftersales-agent",
+  "github_repository_id": 1296227532,
+  "base_commit": "bdebec80814c628d0cfe8de9013cc2d335979a47",
+  "app_source_sha256": "fcf34abfd8c31484a838f84dbf46f84d861cd3bb965b686644dfc6d141f8a473",
+  "python": "3.11.15",
+  "browser": "Chromium (Playwright), browser tests enabled",
+  "local_tests": {
+    "tests": 554,
+    "passed": 554,
+    "skipped": 0,
+    "seconds": 121.961,
+    "app_statement_coverage_pct": 84,
+    "statements": 14296,
+    "missed": 2339
+  },
+  "policy_regression": {
+    "public_search": 40,
+    "dialogues": 6,
+    "dialogue_turns": 17,
+    "passed": 57,
+    "method": "Existing labelled synthetic regression cases, local hash retrieval and a controlled model gateway."
+  },
+  "api_paths": 104,
+  "recording": {
+    "test": "tests.test_platform_http.BrowserTests.test_customer_and_operator_real_api",
+    "passed": true,
+    "step_ms": 900,
+    "video_size": {
+      "width": 1366,
+      "height": 1000
+    },
+    "model": "controlled loopback only",
+    "data": "synthetic"
+  },
+  "media": {
+    "after-sale.png": {
+      "sha256": "e5e418b14ccb16d2c4be0eac81359b031ea1619f51a0540be43475c5a3ed024c",
+      "width": 1440,
+      "height": 1206
+    },
+    "customer-demo.webm": {
+      "sha256": "0b7b2aba163a9cb2991642b37b7fdaab85ca5d09dae1b67b93a728998fb04ff3",
+      "width": 1366,
+      "height": 1000,
+      "chromium_decoded": true
+    },
+    "operator-demo.webm": {
+      "sha256": "ddb4b9db0ce56a3e70d059f23ebbf8369fd99d06b4f246256421ff26cb447e4c",
+      "width": 1366,
+      "height": 1000,
+      "chromium_decoded": true
+    },
+    "review.png": {
+      "sha256": "eb5d9fdbea638a301401992c075b214d33a7cf680d7d24c7cab40938e092d876",
+      "width": 1440,
+      "height": 1050
+    },
+    "workbench.png": {
+      "sha256": "29d1a86676dd1ce2c5b4af57e595f7faa4d18fe3a65e75835ab7287e5a189064",
+      "width": 1366,
+      "height": 1386
+    },
+    "workspace.png": {
+      "sha256": "04b523ba4ef5ab99c3214f4da7ca16e82230073fc79ba293e0042dc099fa6a93",
+      "width": 1366,
+      "height": 1439
+    }
+  }
+}

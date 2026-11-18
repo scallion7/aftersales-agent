@@ -26,7 +26,7 @@ FILES = [
     "docker-compose.sandbox.yml",
     "docker-compose.acceptance.yml",
 ]
-SOURCE = "postgresql+psycopg://xc_agent:xc_agent_dev@127.0.0.1:55432/xc_sx_agent"
+SOURCE = "postgresql+psycopg://aftersales_agent:aftersales_agent_test@127.0.0.1:55432/aftersales_agent"
 TARGET = SOURCE.rsplit("/", 1)[0] + "/acceptance_restore"
 
 
@@ -42,7 +42,7 @@ def until(check, timeout=90):
 
 class Acceptance:
     def __init__(self, directory):
-        self.project = "ecom-acceptance-" + uuid4().hex[:12]
+        self.project = "aftersales-agent-acceptance-" + uuid4().hex[:12]
         self.directory = directory
         self.command = ["docker", "compose", "--project-name", self.project]
         for path in FILES:

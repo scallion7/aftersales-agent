@@ -12,6 +12,14 @@
 
 审核工作台、生产发布门禁、供应商适配器等机制的实现与受控回归属于当前范围；真实审核、付费评测和生产联调的实际开展属于范围外。范围调整不放宽已有审核与发布条件，也不把受控测试结果转换为模型准确率或业务收益。下面各日期的验收记录保留当时环境与结果；范围外事项集中列于文末的后续自费验证清单。
 
+<a id="aftersales-agent-rename"></a>
+
+## 2026-11-18 AfterSales Agent 改名复验
+
+仓库已更名为 `scallion7/aftersales-agent`。GitHub 仓库 ID 仍为 `1296227532`。API 标题、网页、CLI、MCP 服务标识、客服提示词及示例商城知识文档已同步。Python 新入口为 `app.agent.chat.AfterSalesAgent`，原 `EcomAgent` 导入指向同一个类。[兼容范围](../engineering/naming-and-compatibility.md) · [原部署接续](../operations/deployment-checklist.md)
+
+本地启用 Chromium 后 **554 项回归全部通过，零跳过，app 语句覆盖率 84%**。沿用原有合成政策和受控模型网关，40 道单轮题与 6 段对话的 17 轮仍为 **57/57**。客户与客服短片已在新界面复录，两段 WebM 均通过 Chromium 解码。[本次验收及素材哈希](../evidence/aftersales-rename-20261118/checks.json) · [演示录像](../showcase/recording.md)
+
 <a id="policy-transfer-20261118"></a>
 
 ## 2026-11-18 跨商品、付款状态与多轮追问
@@ -49,9 +57,9 @@
 
 ## 2026-11-16 依赖安全补丁复验
 
-展示材料提交 `e7e1eed` 的 [CI 43850705491](https://github.com/scallion7/xc_sx_agent/actions/runs/43850705491) 在精确依赖审计中发现 `opentelemetry-api 1.45.1` 的 CVE-2026-126360，因此该次运行不能记为全绿。按[上游公告](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-mf5v-w3w3-f6cg)，将 API/SDK 同步锁定到 `1.45.2`、semantic-conventions 到 `0.66b2`，同时提高 SDK 支持范围的安全下限。其他锁定版本保持不变。
+展示材料提交 `e7e1eed` 的 [CI 43850705491](https://github.com/scallion7/aftersales-agent/actions/runs/43850705491) 在精确依赖审计中发现 `opentelemetry-api 1.45.1` 的 CVE-2026-126360，因此该次运行不能记为全绿。按[上游公告](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-mf5v-w3w3-f6cg)，将 API/SDK 同步锁定到 `1.45.2`、semantic-conventions 到 `0.66b2`，同时提高 SDK 支持范围的安全下限。其他锁定版本保持不变。
 
-更新后的本地环境逐项匹配 58 个锁定包，`pip check` 通过。两份依赖审计分别覆盖 58/53 个包，均未发现已知漏洞。再次启用 Chromium 运行完整回归，**500 项通过、无跳过，108.695 秒，app 语句覆盖率 82%**。审计 JSON、完整回归压缩日志、覆盖率及锁文件哈希见[补丁复验清单](../evidence/dependency-patch-20261116/checks.json)。这次复验使用受控服务，没有开展真实模型或原冻结保留集评测；后续 CI 按[工作流](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)中的提交 SHA 核对。
+更新后的本地环境逐项匹配 58 个锁定包，`pip check` 通过。两份依赖审计分别覆盖 58/53 个包，均未发现已知漏洞。再次启用 Chromium 运行完整回归，**500 项通过、无跳过，108.695 秒，app 语句覆盖率 82%**。审计 JSON、完整回归压缩日志、覆盖率及锁文件哈希见[补丁复验清单](../evidence/dependency-patch-20261116/checks.json)。这次复验使用受控服务，没有开展真实模型或原冻结保留集评测；后续 CI 按[工作流](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml)中的提交 SHA 核对。
 
 ## 2026-11-16 展示材料与分层教学
 
@@ -61,7 +69,7 @@
 
 教学中的 14 条基线命令共 31 项测试最终通过；九个参考方法从文档代码块加载到对应测试类，**9/9 通过**，未加入仓库原有测试集合。文档命令、代码片段和本地链接均完成检查。复录工具另验证已有目录拒绝覆盖和非法间隔参数拒绝，视频参数与实际播放尺寸单独核对。
 
-客户与客服的两段无配音录像、两张截图、退款 HTTP 轨迹、检查结果及 SHA-256 见[本批证据](../evidence/showcase-20261116/checks.json)。录像使用受控模型和合成数据，展示范围及复录步骤见[素材说明](../showcase/recording.md)。本批不重新测量 PostgreSQL 持续负载或生产性能；推送后的多版本、数据库、容器与浏览器验证按[工作流](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)中对应提交 SHA 查阅。
+客户与客服的两段无配音录像、两张截图、退款 HTTP 轨迹、检查结果及 SHA-256 见[本批证据](../evidence/showcase-20261116/checks.json)。录像使用受控模型和合成数据，展示范围及复录步骤见[素材说明](../showcase/recording.md)。本批不重新测量 PostgreSQL 持续负载或生产性能；推送后的多版本、数据库、容器与浏览器验证按[工作流](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml)中对应提交 SHA 查阅。
 
 原 32 题真实人工审核尚未完成，原 16 题保留集和真实模型评测未开展；这些工作归入[当前项目范围](#project-scope)之外的后续自费验证。课程中的自动化审核 fixture 和演示数据不计入真实审核进度，本批付费模型调用为 0。
 
@@ -75,7 +83,7 @@
 
 ## 2026-11-10 历史基线
 
-核验日期：2026-11-10。已归档的功能修复 CI 基线为 [`c5aee67`](https://github.com/scallion7/xc_sx_agent/commit/c5aee6716723ae5a4243497db919e094d3b238a5)，对应 [Actions 42813941711](https://github.com/scallion7/xc_sx_agent/actions/runs/42813941711) **9/9 作业成功**；结构化快照见 [ci.json](../evidence/boundary-fixes-20261110/ci.json)。固定提交的 CI、文档修订本地验收和历史性能测量分别列出，不合并不同环境或代码版本的数字。后续提交的状态查看 [Actions 工作流](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)，并按提交 SHA 核对。
+核验日期：2026-11-10。已归档的功能修复 CI 基线为 [`c5aee67`](https://github.com/scallion7/aftersales-agent/commit/c5aee6716723ae5a4243497db919e094d3b238a5)，对应 [Actions 42813941711](https://github.com/scallion7/aftersales-agent/actions/runs/42813941711) **9/9 作业成功**；结构化快照见 [ci.json](../evidence/boundary-fixes-20261110/ci.json)。固定提交的 CI、文档修订本地验收和历史性能测量分别列出，不合并不同环境或代码版本的数字。后续提交的状态查看 [Actions 工作流](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml)，并按提交 SHA 核对。
 
 ## 功能修复基线的 CI
 
@@ -132,7 +140,7 @@ OIDC 旧账号需按[配置与迁移说明](../guides/configuration.md)核验主
 
 ## 历史结果仍可追溯
 
-旧实现 `7565683` 的 [Actions 42054871319](https://github.com/scallion7/xc_sx_agent/actions/runs/42054871319) 曾通过 8/8 作业，包含 Python 3.10–3.12、双数据库、供应链、浏览器与 Compose。该结果不代表当前改动的 CI 状态。
+旧实现 `7565683` 的 [Actions 42054871319](https://github.com/scallion7/aftersales-agent/actions/runs/42054871319) 曾通过 8/8 作业，包含 Python 3.10–3.12、双数据库、供应链、浏览器与 Compose。该结果不代表当前改动的 CI 状态。
 
 18 项任务基线、三条复杂售后 HTTP 工作流和 64 组检索配置比较保留在[历史证据](../evidence/README.md)。本次没有重写旧日志、冻结数据或原第 1–34 期说明，也未重新宣称检索质量提升。
 

@@ -18,7 +18,7 @@ COMMERCE_SEED_DEMO_DATA=false
 
 AUTH_MODE=oidc
 OIDC_ISSUER=https://identity.example/
-OIDC_AUDIENCE=ecom-api
+OIDC_AUDIENCE=aftersales-agent
 OIDC_JWKS_PATH=/run/secrets/oidc-jwks.json
 OIDC_REQUIRED_SCOPES=chat:use
 OIDC_ALGORITHMS=RS256
@@ -33,11 +33,36 @@ production 会拒绝占位模型密钥、默认开发 Token、mock/sandbox Provi
 
 真实订单、物流、退款和补偿适配器分别实现 `OrderProvider`、`LogisticsProvider`、`RefundProvider`、`CompensationProvider`，通过 `create_runtime(...)` 装配，再传给 `create_app(runtime=...)`。API 与 Worker 都须使用相同的装配逻辑；直接运行默认 CLI 不会获得自定义 Provider。供应商须持久化识别幂等键并支持结果查询，副作用调用不能套用通用读请求重试。
 
+模板中的 `OIDC_AUDIENCE` 适用于身份提供方已登记 `aftersales-agent` 的新服务。升级现有部署时应沿用身份提供方实际签发的 audience、issuer、密钥配置和映射文件路径。
+
 OIDC 的内部身份来自经过验证的完整 issuer/sub，`preferred_username` 仅供显示；JWT 通过 `X-API-Key` 头传入。已有显示名账号必须按[OIDC 迁移步骤](../guides/configuration.md#oidc-配置和旧账号迁移)核验 `OIDC_IDENTITY_MAP_PATH`，所有实例长期使用同一映射文件。不要仅凭同名认领旧订单或删除映射来切换身份。
 
 默认 JWKS 加载器读取本地文件；远程刷新需自定义 `OidcJwtProvider` 并注入 `create_app(auth_provider=...)`。上线前实际验证 issuer、audience、scope、签名、过期 Token 和密钥轮换；`/ready` 不替代这些验证。
 
 ## 2. 备份、迁移与启动
+
+### 在新 clone 接管原 Compose 部署
+
+Compose 默认以仓库目录名命名项目，新 clone 到 `aftersales-agent/` 后会创建同名项目。PostgreSQL、HTTP 商务沙箱和库存 MCP 的命名卷都归属于各自的 Compose 项目。已有部署原地更新时可沿用原启动命令；如果切换到旁边的新 checkout，先在同一 Docker 主机上查原项目和卷：
+
+```bash
+docker compose ls --all
+docker volume ls --filter label=com.docker.compose.volume=postgres_data
+```
+
+下面以原卷 `xc_sx_agent_postgres_data` 为例。在新目录中取其项目标签，按实际输出设置项目名，然后核对列出的卷与原部署启用的服务。
+
+```bash
+docker volume inspect xc_sx_agent_postgres_data --format '{{index .Labels "com.docker.compose.project"}}'
+# 此例中上一条命令输出 xc_sx_agent
+export COMPOSE_PROJECT_NAME=xc_sx_agent
+docker volume ls --filter "label=com.docker.compose.project=$COMPOSE_PROJECT_NAME"
+docker compose ps --all
+```
+
+将查得的 `COMPOSE_PROJECT_NAME` 写入新目录的部署环境或 `.env`，同时迁入原部署的凭据、覆盖文件、profile、绑定挂载和副本数配置。原来显式使用 `-p` 的部署继续使用相同参数。完成备份和停写后，在相同项目设置下执行原来的 `docker compose … up -d --build` 命令，再通过原身份读取一条已有工单，核对订单及退款状态。切换期间保留原卷，清理旧容器时勿使用 `down -v`。
+
+常规 Compose 的 `xc_sx_agent` 数据库和 `xc_agent` 角色沿用原始卷初始化标识。PostgreSQL 在已有数据目录中跳过初始化，单改 `POSTGRES_DB`、`POSTGRES_USER` 或 `POSTGRES_PASSWORD` 无法迁移库或修改已有角色凭据。原部署使用自定义凭据和 URL 时，API、Agent/退款 Worker、种子服务、迁移和运维工具应继续连接同一库。一次性验收另用独立项目及 `aftersales_agent` 数据库。
 
 旧库先备份，暂停受影响的写入，再升至当前 head（`20261109_0009`）。迁移发现重复活跃工单等历史冲突时会拒绝升级，应核对关联审批、退款和审计后修复根因；不要删除账本或修改旧迁移文件绕过保护。自动建表不能升级旧库。
 

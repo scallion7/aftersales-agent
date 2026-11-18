@@ -2,7 +2,7 @@
 
 [文档中心](../README.md) · [当前验收](../evaluation/acceptance.md) · [分层教学](../learning/README.md)
 
-Ecom Service Agent 是面向电商售后的 Agent 应用工程项目。本目录把业务问题、设计取舍、可运行演示和验证证据组织成一套展示材料，维护者为 [scallion7](https://github.com/scallion7)。适合大模型应用、Agent 与 AI 后端方向的简历和技术交流。
+AfterSales Agent 是面向电商售后的 Agent 应用工程项目。本目录把业务问题、设计取舍、可运行演示和验证证据组织成一套展示材料，维护者为 [scallion7](https://github.com/scallion7)。适合大模型应用、Agent 与 AI 后端方向的简历和技术交流。
 
 当前项目聚焦系统搭建、技术探索与受控工程验证。人工审核、真实模型效果评测和生产环境验证为**后续自费验证，当前项目范围外**，具体状态与条件见[项目范围](../evaluation/acceptance.md#project-scope)。
 
@@ -26,7 +26,7 @@ Ecom Service Agent 是面向电商售后的 Agent 应用工程项目。本目录
 
 ## 展示数据的使用约定
 
-本套材料以项目实现及已有验收为依据。简历引用 2026-11-16 的 500 项本地测试和 82% app 语句覆盖率；27 格受控评测保留 2026-11-13 的日期、环境和用途。文档整理不视为新测量，运行结果统一在[验收状态](../evaluation/acceptance.md)记录。
+简历中的本地回归与覆盖率引用 2026-11-18 的验收记录，CI 结果可按对应提交核对。27 格受控评测沿用 2026-11-13 的运行环境和用途。[本地验证记录](../evidence/policy-transfer-20261118/verification.json) · [验收状态](../evaluation/acceptance.md)
 
 原 32 题真实人工审核尚未完成，原 16 题冻结保留集和真实模型效果评测未运行，均作为后续自费验证的状态记录。课程与录屏使用隔离演示数据，批准记录只用于检查工程流程；已验证的工程行为与真实模型效果、生产容量分别说明。
 

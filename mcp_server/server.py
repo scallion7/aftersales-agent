@@ -20,7 +20,7 @@ from app.agent.tools.order import query_order as _query_order
 from app.agent.tools.product import query_product as _query_product
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("ecom-tools", host="127.0.0.1", port=9123)
+mcp = FastMCP("AfterSales Agent", host="127.0.0.1", port=9123)
 
 
 @mcp.tool()
@@ -59,7 +59,7 @@ def apply_refund(order_id: str, reason: str) -> str:
 
 @mcp.tool()
 def search_knowledge(query: str, top_k: int = 3, policy_type: str = "") -> str:
-    """检索并夕夕的政策与帮助文档（退换货政策、配送说明、会员权益、FAQ）。
+    """检索示例商城的政策与帮助文档（退换货政策、配送说明、会员权益、FAQ）。
     当顾客询问规则、流程、时效、是否支持等政策类问题时使用。
     返回 Top-K 命中片段及来源文档，请基于检索结果回答，不要编造政策。
     """

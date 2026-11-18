@@ -25,7 +25,7 @@ from app.platform.common import PlatformError, encode
 def postgres_environment(url):
     """Use libpq env + an ephemeral passfile, remove inherited credential variables."""
     url = make_url(url)
-    with tempfile.TemporaryDirectory(prefix="ecom-pg-") as directory:
+    with tempfile.TemporaryDirectory(prefix="aftersales-pg-") as directory:
         env = {k: v for k, v in os.environ.items() if not k.startswith("PG")}
         env.update(
             PGHOST=url.host or "localhost",

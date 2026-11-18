@@ -546,6 +546,7 @@ class ConnectorTests(PlatformTestCase):
         with trace.span(
             "api.request", attributes={"user_id": "private", "operation": "safe"}
         ) as parent:
+            self.assertEqual(parent.instrumentation_scope.name, "aftersales-agent")
             carrier = trace.carrier()
             trace_id = f"{parent.get_span_context().trace_id:032x}"
         with trace.span("run.execute", carrier=carrier):

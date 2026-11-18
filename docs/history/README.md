@@ -2,7 +2,7 @@
 
 本目录保留阶段设计和当时的验收结果。历史名称、测试数、命令和“后续计划”属于对应阶段，可能已被之后的实现替代。当前操作请先阅读[文档导航](../README.md)、[演示指南](../guides/five-minute-demo.md)和[验收状态](../evaluation/acceptance.md)。
 
-根目录旧跳转页已清理，见[路径迁移对照](path-migrations.md)。原有分期正文与原始证据保持不变；新增历史快照只调整归档后的相对链接与状态提示。
+早期教学中的「小夕」是虚构电商平台「并夕夕」的客服角色，旧首页以 Ecom-Service-Agent 为题。章节保留当时的叙述与代码示例。当前项目名为 AfterSales Agent，项目链接指向现行仓库。[项目首页](https://github.com/scallion7/aftersales-agent) · [旧文档路径对照](path-migrations.md)
 
 ## 近期交付与验收快照
 

@@ -1,12 +1,14 @@
+# Compose uses the checkout directory (or an explicit -p) as its volume namespace.
 services:
   postgres:
     image: postgres:17-alpine
     environment:
+      # Existing PostgreSQL volumes were initialized with this database and login.
       POSTGRES_DB: xc_sx_agent
       POSTGRES_USER: xc_agent
       POSTGRES_PASSWORD: xc_agent_dev
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U xc_agent -d xc_sx_agent"]
+      test: ["CMD-SHELL", 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
       interval: 5s
       timeout: 3s
       retries: 10

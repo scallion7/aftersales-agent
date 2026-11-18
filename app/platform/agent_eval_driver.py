@@ -15,13 +15,15 @@ from app.infrastructure.database import (
 from app.platform.budget import SharedBudget
 from app.platform.common import PlatformError
 from app.platform.evaluation_clock import on_policy_day
+from app.platform.evaluation_contract import CONTROLLED_FINGERPRINT
 
-CONTROLLED_FINGERPRINT = "xc-sx-controlled-demo-v1"
+# Reports produced before the rename still carry the original demo fingerprint.
+_CONTROLLED_FINGERPRINTS = (CONTROLLED_FINGERPRINT, "xc-sx-controlled-demo-v1")
 
 
 def check_live_receipts(responses):
     if not responses or any(
-        r.get("system_fingerprint") == CONTROLLED_FINGERPRINT for r in responses
+        r.get("system_fingerprint") in _CONTROLLED_FINGERPRINTS for r in responses
     ):
         raise PlatformError("CONTROLLED_OR_MISSING_MODEL_RECEIPT", 422)
 

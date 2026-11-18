@@ -33,7 +33,7 @@ def token(private, *, kid="key-1", **changes):
     now = datetime.now(timezone.utc)
     claims = {
         "iss": "https://issuer.example",
-        "aud": "xc-agent",
+        "aud": "aftersales-agent",
         "sub": "subject-1",
         "preferred_username": "user-1",
         "scope": "chat:use session:read",
@@ -50,7 +50,7 @@ class OidcProviderTests(unittest.TestCase):
         self.private, self.jwks = key_material()
         self.provider = OidcJwtProvider(
             issuer="https://issuer.example",
-            audience="xc-agent",
+            audience="aftersales-agent",
             jwks_loader=lambda _force: self.jwks,
         )
 
@@ -62,6 +62,19 @@ class OidcProviderTests(unittest.TestCase):
         self.assertEqual(context.display_name, "user-1")
         self.assertEqual(context.provider, "oidc")
         self.assertIn("chat:use", context.permissions)
+
+    def test_existing_provider_audience_remains_explicit(self):
+        audience = "already-registered-api"
+        existing = OidcJwtProvider(
+            issuer="https://issuer.example",
+            audience=audience,
+            jwks_loader=lambda _: self.jwks,
+        )
+        previous = existing.authenticate(token(self.private, aud=audience))
+        self.assertEqual(
+            previous.user_id, self.provider.authenticate(token(self.private)).user_id
+        )
+        self.assertIsNone(existing.authenticate(token(self.private)))
 
     def test_admin_role_maps_management_permissions(self):
         context = self.provider.authenticate(token(self.private, roles=["admin"]))
@@ -83,7 +96,7 @@ class OidcProviderTests(unittest.TestCase):
         alternate = jwt.encode(
             {
                 "iss": "https://issuer.example",
-                "aud": "xc-agent",
+                "aud": "aftersales-agent",
                 "sub": "subject-1",
                 "scope": "chat:use",
                 "exp": datetime.now(timezone.utc) + timedelta(minutes=5),
@@ -107,7 +120,7 @@ class OidcProviderTests(unittest.TestCase):
 
         provider = OidcJwtProvider(
             issuer="https://issuer.example",
-            audience="xc-agent",
+            audience="aftersales-agent",
             jwks_loader=loader,
         )
         self.assertIsNotNone(provider.authenticate(token(self.private)))
@@ -124,7 +137,7 @@ class OidcProviderTests(unittest.TestCase):
 
         provider = OidcJwtProvider(
             issuer="https://issuer.example",
-            audience="xc-agent",
+            audience="aftersales-agent",
             jwks_loader=loader,
             cache_seconds=1,
             clock=lambda: now,

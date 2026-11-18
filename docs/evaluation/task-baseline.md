@@ -31,7 +31,7 @@ python -m app.scripts.evaluate_tasks --output test-results/task-baseline.json
 
 ## 当前证据与边界回归
 
-基线 `37e2fd7` 的 [Actions 43442455601](https://github.com/scallion7/xc_sx_agent/actions/runs/43442455601) 在 `platform-browser` 作业运行此脚本，报告位于 `platform-acceptance` 产物。后续提交按[工作流](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)中的 SHA 核对。历史 1710/2010 tokens 是受控模型的模拟 usage，不能自动沿用为当前代码或真实模型的费用。运行输出会写入摘要 JSON 和同目录 `.raw.json.gz`；部分矩阵非零退出属于预期的完整性门禁行为。
+基线 `37e2fd7` 的 [Actions 43442455601](https://github.com/scallion7/aftersales-agent/actions/runs/43442455601) 在 `platform-browser` 作业运行此脚本，报告位于 `platform-acceptance` 产物。后续提交按[工作流](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml)中的 SHA 核对。历史 1710/2010 tokens 是受控模型的模拟 usage，不能自动沿用为当前代码或真实模型的费用。运行输出会写入摘要 JSON 和同目录 `.raw.json.gz`；部分矩阵非零退出属于预期的完整性门禁行为。
 
 冻结的 6 个场景并不囊括所有后续修复。多轮政策条件、未知副作用人工核对、失效提案及前端重试另有专项：
 

@@ -165,22 +165,26 @@ class QualityTests(unittest.TestCase):
                 }
             ]
             require_production_evidence(report, source)
-            with self.assertRaisesRegex(
-                PlatformError, "CONTROLLED_OR_MISSING_MODEL_RECEIPT"
+            from app.scripts.demo_model import complete
+
+            current = complete({"messages": [{"role": "user", "content": "你好"}]})
+            self.assertEqual(
+                current["system_fingerprint"], "aftersales-agent-controlled-demo-v1"
+            )
+            for receipt in (
+                current,
+                {"system_fingerprint": "xc-sx-controlled-demo-v1"},
             ):
-                require_production_evidence(
-                    report
-                    | {
-                        "cases": [
-                            {
-                                "raw_model_responses": [
-                                    {"system_fingerprint": "xc-sx-controlled-demo-v1"}
-                                ]
-                            }
-                        ]
-                    },
-                    source,
-                )
+                with (
+                    self.subTest(fingerprint=receipt["system_fingerprint"]),
+                    self.assertRaisesRegex(
+                        PlatformError, "CONTROLLED_OR_MISSING_MODEL_RECEIPT"
+                    ),
+                ):
+                    require_production_evidence(
+                        report | {"cases": [{"raw_model_responses": [receipt]}]},
+                        source,
+                    )
             workspace.save(
                 pid, case["id"], annotation | {"status": "draft"}, 2, "fixture-two"
             )

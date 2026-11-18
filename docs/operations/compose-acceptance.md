@@ -15,7 +15,7 @@ python -m app.scripts.accept_deployment --output test-results/deployment-01/depl
 
 `--output` 必填。每次选择新目录，脚本会创建报告父目录，但不会覆盖已有数据库备份。失败后检查本次报告与日志，下一次用新目录保留原证据。
 
-脚本加载 `docker-compose.yml`、`docker-compose.platform.yml`、`docker-compose.sandbox.yml`、`docker-compose.acceptance.yml` 并开启 integration profile，创建随机 `ecom-acceptance-*` 项目，拒绝复用已有容器。所有 Compose 命令固定该项目名，收尾只对该项目执行 `down --volumes --remove-orphans`。它不是升级现有服务的命令；不要改成现有部署的项目名。
+脚本加载 `docker-compose.yml`、`docker-compose.platform.yml`、`docker-compose.sandbox.yml`、`docker-compose.acceptance.yml` 并开启 integration profile，创建随机 `aftersales-agent-acceptance-*` 项目和独立的 `aftersales_agent` PostgreSQL 数据库与角色，拒绝复用已有容器。所有 Compose 命令固定该项目名，收尾只对该项目执行 `down --volumes --remove-orphans`。它不是升级现有服务的命令；不要改成现有部署的项目名。
 
 | 端点 | 入口与用途 |
 |---|---|

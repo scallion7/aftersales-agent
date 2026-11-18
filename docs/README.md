@@ -1,6 +1,6 @@
 # 文档中心
 
-Ecom Service Agent｜电商售后智能体平台。本文按读者要完成的任务组织阅读入口；所有命令默认从仓库根目录执行。项目介绍见[首页](../README.md)，结果与限制统一见[当前验收状态](evaluation/acceptance.md)。
+AfterSales Agent｜电商售后智能体平台。本文按读者要完成的任务组织阅读入口；所有命令默认从仓库根目录执行。项目介绍见[首页](../README.md)，结果与限制统一见[当前验收状态](evaluation/acceptance.md)。
 
 2026-11-16 增加简历面试、演示素材与分层实验，入口按当前代码组织。各次功能验收保留自身日期与代码基线，最新状态按[验收页](evaluation/acceptance.md)及对应提交的 CI 核对。维护者为 [scallion7](https://github.com/scallion7)；工程演进见[项目演进](CONTRIBUTIONS.md)。
 
@@ -69,7 +69,7 @@ Ecom Service Agent｜电商售后智能体平台。本文按读者要完成的�
 - [维护者与工程演进](CONTRIBUTIONS.md)：工程范围、代码与提交依据。
 - [历史归档](history/README.md)：阶段 1–34、近期交付快照与历次验收台账；历史说明不充当当前操作指南。
 - [旧路径迁移对照](history/path-migrations.md)：根目录旧跳转页与两份综合说明的去向。
-- [界面素材](assets/)：当前指南使用的截图；旧录像和截图仍保留在 `evidence/platform/`。
+- [界面素材](assets/)：指南使用的截图。先前验收的录像与原始截图按批次收录在[验收证据](evidence/README.md)。
 
 ## 随代码维护的说明
 
@@ -88,4 +88,4 @@ Ecom Service Agent｜电商售后智能体平台。本文按读者要完成的�
 3. 原始 `evidence/` 文件保留生成时的提交、环境与哈希，不改写旧测试数、不覆盖轨迹；新增证据另建目录，并更新证据索引。
 4. 更改路径时更新仓库内链接和迁移对照。移除的旧路径不再提供跳转；外部引用需要更新，旧 Git 提交仍可查阅。
 5. 每份当前指南链接回本导航和验收状态；检查 `python -m app.scripts.validate_docs` 与 `git diff --check`。命令、配置、API 和权限还需核对对应实现；链接通过不等于结论已验证。业务技能和知识语料分别验证，不能通过改写数据让旧测评结果看起来更新。
-6. 展示名使用 Ecom Service Agent；不因文档整理改动 API、配置键、迁移编号、数据格式或历史原文。范围外的自费验证须另行确定预算与执行范围，结果以实际证据记录。
+6. 展示名使用 **AfterSales Agent**，仓库链接使用 [scallion7/aftersales-agent](https://github.com/scallion7/aftersales-agent)。涉及既有数据库、API、代码导入与历史证据时，按[兼容说明](engineering/naming-and-compatibility.md)核对实际标识。范围外的自费验证须另行确定预算与执行范围，结果以实际证据记录。

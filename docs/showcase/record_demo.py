@@ -1,6 +1,7 @@
-"""Record the existing controlled browser scenario at a presentation-friendly pace.
+"""Record the controlled AfterSales Agent customer and operator browser scenario.
 
-Run from the repository root with python -m docs.showcase.record_demo.
+From the repository root, run:
+    python -m docs.showcase.record_demo --output test-results/showcase-recording-01
 The output directory must be new. No application configuration is changed.
 """
 
@@ -17,7 +18,9 @@ from playwright.sync_api import Browser, BrowserType
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--step-ms", type=int, default=900)
     args = parser.parse_args()

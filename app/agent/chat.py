@@ -30,7 +30,7 @@ from app.security import GuardrailEngine
 from app.services.commerce import CommerceService
 
 
-class EcomAgent(BaseConversationAgent):
+class AfterSalesAgent(BaseConversationAgent):
     """支持 ReAct 与 Plan-and-Execute 的电商客服 Agent。"""
 
     def __init__(
@@ -382,3 +382,7 @@ class EcomAgent(BaseConversationAgent):
     def _reset_runtime_state(self) -> None:
         self.latest_plan_execution = None
         self.pending_plan_execution = None
+
+
+# Previous releases exported this name; both imports use the same implementation.
+EcomAgent = AfterSalesAgent

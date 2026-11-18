@@ -1,8 +1,8 @@
-# Ecom Service Agent｜电商售后智能体平台
+# AfterSales Agent｜电商售后智能体平台
 
-[![Offline Quality](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml/badge.svg)](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)
+[![Offline Quality](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml/badge.svg)](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml)
 
-面向订单咨询与售后办理的 Agent 应用。用户可以查询订单、获取政策证据、分轮补充申请并确认具体操作；客服可以接管会话、审批工单、管理知识版本与核对异常任务。
+AfterSales Agent 面向电商订单咨询与售后办理。顾客可以查询订单、核对政策原文，分轮补充售后申请，并在退货或换货操作执行前确认订单和参数。客服可以接管会话、审批工单，在退款结果未知时按原交易对账。
 
 项目将模型推理与确定性业务执行分开：LLM 负责理解、规划和解释，服务端负责身份校验、操作确认、权限、幂等、状态转换与审计。演示使用合成业务数据和受控模型，可在本地复现 API、Worker、数据库、MCP 与浏览器之间的完整交互。
 
@@ -12,7 +12,7 @@
 
 ![客户服务界面](docs/assets/workspace.png)
 
-*本地受控模型演示截图，页面由真实 API 和 Worker 驱动；不代表真实模型服务或线上业务。*
+*客户工作台演示使用合成订单及受控模型。截图中的政策引用和工单由本地 API 与 Worker 产生。*
 
 ## 业务流程
 
@@ -47,11 +47,11 @@ flowchart LR
 
 ## 快速启动
 
-推荐 Python 3.11。在仓库根目录执行：
+推荐 Python 3.11。先在项目父目录克隆仓库，进入 `aftersales-agent` 后创建虚拟环境并启动演示。
 
 ```bash
-git clone https://github.com/scallion7/xc_sx_agent.git
-cd xc_sx_agent
+git clone https://github.com/scallion7/aftersales-agent.git
+cd aftersales-agent
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements-lock.txt
@@ -79,7 +79,9 @@ python -m app.scripts.demo_stack --smoke --directory app/sessions/smoke-demo
 
 ## 验证与范围
 
-启用 Chromium 后，本地 **550 项回归全部通过，零跳过，app 语句覆盖率 84%**。政策问答用 40 道新单轮题和 6 段对话的 17 轮复测，逐项符合预期的数量从 32/57 提高到 **57/57**。此前 16 道开发题与 32 道补充题仍在两份配置、四种检索模式下全部通过。换货回归同时核对工单、退款记录和待发送指令。[本轮逐题对照](docs/evaluation/policy-transfer.md) · [政策同义问法](docs/evaluation/acceptance.md#policy-paraphrases-20261118) · [换货与会话恢复](docs/evaluation/acceptance.md#agent-boundaries-20261118)
+改名后启用 Chromium，本地 **554 项回归全部通过，零跳过，app 语句覆盖率 84%**。[改名复验](docs/evaluation/acceptance.md#aftersales-agent-rename)
+
+政策问答用 40 道新单轮题和 6 段对话的 17 轮复测，逐项符合预期的数量从 32/57 提高到 **57/57**。此前 16 道开发题与 32 道补充题仍在两份配置、四种检索模式下全部通过。换货回归同时核对工单、退款记录和待发送指令。[政策问答逐题对照](docs/evaluation/policy-transfer.md) · [政策同义问法](docs/evaluation/acceptance.md#policy-paraphrases-20261118) · [换货与会话恢复](docs/evaluation/acceptance.md#agent-boundaries-20261118)
 
 本地验收覆盖数据库迁移与恢复、人工接管、令牌续签、退款超时查单、审批阈值固定和多进程日志清理。Agent 政策质量开发集包含 9 个业务家族：ReAct、Plan-and-Execute 和多 Agent 共 27 格，逐题校验关键事实、引用及转人工原因，并在临时目标库验证发布。详细结果见[当前验收](docs/evaluation/acceptance.md)。
 

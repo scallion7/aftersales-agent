@@ -1,4 +1,4 @@
-Ecom Service Agent 数据库迁移
+AfterSales Agent 数据库迁移
 
 从仓库根目录运行，DATABASE_URL 指向需要管理的数据库：
   python -m app.scripts.manage_migrations current

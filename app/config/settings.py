@@ -82,6 +82,7 @@ class Settings(BaseSettings):
     kb_index_path: str = "app/sessions/kb_index.json"
     # ChromaBackend 的持久化目录与 collection 名
     chroma_persist_dir: str = "app/sessions/chroma"
+    # Preserve the identity of persisted collections when upgrading an existing index.
     chroma_collection: str = "ecom_kb"
     policy_rag_min_score: float = 0.2
 
@@ -122,6 +123,7 @@ class Settings(BaseSettings):
 
     # 持久化与服务化
     persistence_backend: str = "sql"  # sql(SQLite/PostgreSQL) / json
+    # A new filename would create an empty database on upgrade.
     database_url: str = "sqlite:///app/sessions/xc_sx_agent.db"
     database_auto_create: bool = True
     commerce_seed_demo_data: bool = True

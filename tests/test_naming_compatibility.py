@@ -143,6 +143,11 @@ class BackendCompatibilityTests(unittest.TestCase):
 
 
 class EntryPointCompatibilityTests(unittest.TestCase):
+    def test_agent_rename_preserves_the_public_import(self):
+        from app.agent.chat import AfterSalesAgent, EcomAgent
+
+        self.assertIs(EcomAgent, AfterSalesAgent)
+
     def test_governed_service_aliases_preserve_class_identity(self):
         from app.platform.collaboration import Collaboration
         from app.platform.connectors import GovernedMCPToolCaller, GovernedRemote

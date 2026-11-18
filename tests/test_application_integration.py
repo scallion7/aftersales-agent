@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import asyncio
 import json
 import tempfile
 import unittest
@@ -102,6 +103,15 @@ class DummySkill:
 
 
 class ToolRegistryTests(unittest.TestCase):
+    def test_cli_and_mcp_names(self):
+        from main import _build_parser
+        from mcp_server.server import mcp
+
+        self.assertIn("AfterSales Agent", _build_parser().format_help())
+        self.assertEqual(mcp.name, "AfterSales Agent")
+        tools = {tool.name for tool in asyncio.run(mcp.list_tools())}
+        self.assertTrue({"query_order", "query_product", "search_knowledge"} <= tools)
+
     def test_registries_are_instance_isolated_and_user_scoped(self):
         with tempfile.TemporaryDirectory() as tmp:
             config = make_config(tmp)
@@ -522,6 +532,10 @@ class ApiTests(unittest.TestCase):
     def test_auth_chat_session_isolation_sse_metrics_and_admin(self):
         self.assertEqual(self.client.get("/health").status_code, 200)
         self.assertEqual(
+            self.client.get("/openapi.json").json()["info"]["title"],
+            "AfterSales Agent API",
+        )
+        self.assertEqual(
             self.client.post(
                 "/v1/chat",
                 json={"message": "你好", "session_id": "s1"},
@@ -600,7 +614,7 @@ class ApiTests(unittest.TestCase):
             0,
         )
         self.assertIn(
-            "Ecom Service Agent · 运行管理台",
+            "AfterSales Agent · 运行管理台",
             self.client.get("/admin").text,
         )
         orders = self.client.get(

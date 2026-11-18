@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 from uuid import uuid4
 
+from app.platform.evaluation_contract import CONTROLLED_FINGERPRINT
 from fastapi import FastAPI
 
 app = FastAPI(title="Controlled offline model (no quality claim)")
@@ -183,7 +184,7 @@ def complete(body: dict):
     result = {
         "id": "chatcmpl-" + uuid4().hex,
         "object": "chat.completion",
-        "system_fingerprint": "xc-sx-controlled-demo-v1",
+        "system_fingerprint": CONTROLLED_FINGERPRINT,
         "created": int(time.time()),
         "model": body.get("model", "demo-small"),
         "choices": [

@@ -47,5 +47,5 @@ OpenAI SDK 的 `response_format` 配合 Pydantic BaseModel，让模型直接输�
 
 多轮对话管理——怎么维护上下文、怎么控制历史长度、token成本怎么优化
 
-项目仓库：https://github.com/scallion7/xc_sx_agent
+项目仓库：https://github.com/scallion7/aftersales-agent
 关注我，跟着一起做，做完直接写简历

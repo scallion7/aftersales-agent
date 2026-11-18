@@ -2,7 +2,7 @@
 
 [文档中心](../README.md) · [当前验收](../evaluation/acceptance.md) · [部署清单](../operations/deployment-checklist.md)
 
-以下命令从仓库根目录执行，Shell 示例使用 Bash/Zsh。推荐 Python 3.11；CI 另外验证 Python 3.10 和 3.12。展示名为 Ecom Service Agent，仓库、部分路径与数据库仍使用 `xc_sx_agent`。
+以下命令从仓库根目录执行，Shell 示例使用 Bash/Zsh。AfterSales Agent 推荐使用 Python 3.11，CI 另行验证 Python 3.10 和 3.12。
 
 ## 选择运行方式
 
@@ -70,6 +70,8 @@ Linux CI 使用 `python -m playwright install --with-deps chromium` 同时安装
 
 ## OIDC 配置和旧账号迁移
 
+新部署示例使用 `aftersales-agent` 作为注册 audience。已有部署继续使用身份提供方签发的 audience、issuer 和原映射文件。
+
 默认适配器要求 `OIDC_ISSUER`、`OIDC_AUDIENCE`、`OIDC_JWKS_PATH`。`OIDC_REQUIRED_SCOPES` 和 `OIDC_ALGORITHMS` 使用空格分隔；默认分别为 `chat:use`、`RS256`，JWKS 缓存默认 300 秒。默认 JWKS 加载器读取本地 JSON 文件；若需要远程刷新，使用自定义 `OidcJwtProvider` 并通过 `create_app(auth_provider=...)` 注入。
 
 内部账号 ID 来自经验证的完整 `iss` 与 `sub`：`oidc_` 加 SHA-256。`preferred_username` 只作为显示名，不授予历史账号权限。同名、改名、长用户名及主体中的路径字符都不会改变这条授权规则；issuer 按完整字符串精确校验，末尾 `/` 不自动删除。
@@ -91,7 +93,7 @@ Linux CI 使用 `python -m playwright install --with-deps chromium` 同时安装
 }
 ```
 
-设置 `OIDC_IDENTITY_MAP_PATH=/etc/ecom/oidc-identities.json`，在所有实例加载同一份文件并重启，再核对迁移账户的历史订单、会话与权限。文件按精确 issuer/sub 继续使用原内部 ID，不改写历史业务引用；它属于长期身份配置，须纳入受控备份，不能在迁移后随意删除。
+设置 `OIDC_IDENTITY_MAP_PATH=/etc/aftersales-agent/oidc-identities.json`，在所有实例加载同一份文件并重启，再核对迁移账户的历史订单、会话与权限。文件按精确 issuer/sub 继续使用原内部 ID，不改写历史业务引用；它属于长期身份配置，须纳入受控备份，不能在迁移后随意删除。
 
 格式严格要求版本 1 和 `bindings` 数组；主体、目标旧 ID 均一对一。旧 ID 只允许 1–80 位字母、数字、`_`、`-`，不能占用 `oidc_` 前缀。重复主体/目标、路径字符、额外字段或不可读文件会阻止启动。无法核验的旧账号保持隔离。
 
@@ -99,13 +101,17 @@ static 账号也不能使用 `oidc_` 命名空间。OIDC 模式不启用未使�
 
 ## 数据库和独立进程
 
+从新 clone 继续使用旧 PostgreSQL、沙箱或库存卷，请按[原 Compose 项目接管步骤](../operations/deployment-checklist.md#在新-clone-接管原-compose-部署)核对并固定原项目名。
+
+应用、Alembic 及沙箱的数据库隔离检查共用默认路径 `app/sessions/xc_sx_agent.db`，已有 SQLite 库可原地升级。若从另一个 checkout 运行，请把 `DATABASE_URL` 设为指向原库的绝对 SQLite URL，并在 API、Worker、迁移进程的启动环境中导出同一值。直接执行 `python -m alembic check` 从进程环境或 `alembic.ini` 取值。也应沿用原 `SESSION_DIR`、配置文件和索引目录等持久路径。
+
 以下仅是新建的可丢弃 SQLite 示例；每条命令明确限定目标，不把该 URL 全局传给测试：
 
 ```bash
-DATABASE_URL=sqlite:////tmp/ecom-migration-demo-01.db DATABASE_AUTO_CREATE=false python -m app.scripts.manage_migrations upgrade
-DATABASE_URL=sqlite:////tmp/ecom-migration-demo-01.db DATABASE_AUTO_CREATE=false python -m alembic check
-DATABASE_URL=sqlite:////tmp/ecom-migration-demo-01.db DATABASE_AUTO_CREATE=false python -m app.scripts.database_smoke
-DATABASE_URL=sqlite:////tmp/ecom-migration-demo-01.db DATABASE_AUTO_CREATE=false python -m app.scripts.platform_smoke
+DATABASE_URL=sqlite:////tmp/aftersales-agent-migration-demo-01.db DATABASE_AUTO_CREATE=false python -m app.scripts.manage_migrations upgrade
+DATABASE_URL=sqlite:////tmp/aftersales-agent-migration-demo-01.db DATABASE_AUTO_CREATE=false python -m alembic check
+DATABASE_URL=sqlite:////tmp/aftersales-agent-migration-demo-01.db DATABASE_AUTO_CREATE=false python -m app.scripts.database_smoke
+DATABASE_URL=sqlite:////tmp/aftersales-agent-migration-demo-01.db DATABASE_AUTO_CREATE=false python -m app.scripts.platform_smoke
 ```
 
 `upgrade` 默认升至 head；`manage_migrations check` 判断修订是否到 head，`alembic check` 判断模型与迁移是否有结构漂移，两者用途不同。smoke 会写入合成记录，只在隔离数据库运行；平台 smoke 和任务核对 smoke 清理各自作用域的临时账本，不删除真实审计。

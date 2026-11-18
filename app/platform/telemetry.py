@@ -76,7 +76,7 @@ class Telemetry:
             sampler=TraceIdRatioBased(config.telemetry_sample_rate)
         )
         self.provider.add_span_processor(SimpleSpanProcessor(Exporter()))
-        self.tracer = self.provider.get_tracer("xc-sx-agent", "27-34")
+        self.tracer = self.provider.get_tracer("aftersales-agent", "27-34")
 
     @contextmanager
     def span(self, name, *, carrier=None, attributes=None):

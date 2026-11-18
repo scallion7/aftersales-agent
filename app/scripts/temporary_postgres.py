@@ -35,7 +35,7 @@ class TemporaryPostgres:
     def __enter__(self):
         if not (self.bin_dir / "initdb").is_file():
             raise RuntimeError("PostgreSQL binaries unavailable; specify --pg-bin")
-        self.temp = tempfile.TemporaryDirectory(prefix="ecom-isolated-pg-")
+        self.temp = tempfile.TemporaryDirectory(prefix="aftersales-isolated-pg-")
         self.root = Path(self.temp.name)
         self.data = self.root / "data"
         password = secrets.token_urlsafe(24)
@@ -48,7 +48,7 @@ class TemporaryPostgres:
                 "-D",
                 str(self.data),
                 "-U",
-                "xc_bench",
+                "aftersales_bench",
                 "--auth-host=scram-sha-256",
                 "--auth-local=trust",
                 "--pwfile=" + str(pwfile),
@@ -61,7 +61,7 @@ class TemporaryPostgres:
                 f"-h 127.0.0.1 -p {self.port} -k {self.root} -c max_connections=120"
             )
             self.start()
-            self.database_url = f"postgresql+psycopg://xc_bench:{password}@127.0.0.1:{self.port}/postgres"
+            self.database_url = f"postgresql+psycopg://aftersales_bench:{password}@127.0.0.1:{self.port}/postgres"
             self.version = self.command("postgres", "--version").stdout.strip()
             return self
         except BaseException:

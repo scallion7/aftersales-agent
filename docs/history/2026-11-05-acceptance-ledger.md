@@ -28,7 +28,7 @@
 | 任务级基线 | 6 类 × ReAct / Plan-and-Execute / multi = 18/18 通过；模拟 usage 共 2010 tokens；[摘要](../evidence/review-round1/task-baseline.json)、[原始证据](../evidence/review-round1/task-baseline.raw.json.gz) |
 | 接口与静态检查 | OpenAPI 90 个路径、Ruff、编译与文档链接检查；保留全部既有接口，旧迁移和原冻结材料未修改 |
 
-CI 已增加复核浏览器、带诊断的离线评测、任务基线及 SQLite/PostgreSQL 复核 SQL smoke；该轮提交的结果通过[当前分支 Actions](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)核验，不能用下文旧提交通过记录代替。
+CI 已增加复核浏览器、带诊断的离线评测、任务基线及 SQLite/PostgreSQL 复核 SQL smoke；该轮提交的结果通过[当前分支 Actions](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml)核验，不能用下文旧提交通过记录代替。
 
 本轮没有替用户批准任何真实复核材料，没有运行新 holdout，没有调用付费模型。浏览器截图中已批准的题目来自可丢弃测试数据库。工作台功能、离线契约通过与人工金标准完成是三种不同状态；详见[范围与操作说明](2026-11-05-review-and-task-baseline.md)。
 
@@ -43,7 +43,7 @@ CI 已增加复核浏览器、带诊断的离线评测、任务基线及 SQLite/
 
 ### 前一轮 CI 与部署证据
 
-实现提交 [`157159d`](https://github.com/scallion7/xc_sx_agent/commit/157159db24b1487bf403351d80f7fe37f3185967) 的 [Actions 运行 41482524125](https://github.com/scallion7/xc_sx_agent/actions/runs/41482524125) **8/8 作业通过**：[作业清单](../evidence/reliability/ci.json)。覆盖 Python 3.10–3.12、SQLite/PostgreSQL 迁移、真实浏览器、容量/故障演练、依赖审计与镜像扫描，以及新增完整 Compose 验收。
+实现提交 [`157159d`](https://github.com/scallion7/aftersales-agent/commit/157159db24b1487bf403351d80f7fe37f3185967) 的 [Actions 运行 41482524125](https://github.com/scallion7/aftersales-agent/actions/runs/41482524125) **8/8 作业通过**：[作业清单](../evidence/reliability/ci.json)。覆盖 Python 3.10–3.12、SQLite/PostgreSQL 迁移、真实浏览器、容量/故障演练、依赖审计与镜像扫描，以及新增完整 Compose 验收。
 
 [部署原始报告](../evidence/reliability/deployment.json)来自该作业的 artifact，模型为受控 HTTP，付费调用 0：
 
@@ -60,7 +60,7 @@ CI 已增加复核浏览器、带诊断的离线评测、任务基线及 SQLite/
 
 ## 已完成的功能与依赖验收基线
 
-提交 [`7d720b6`](https://github.com/scallion7/xc_sx_agent/commit/7d720b6cba0a86663524aeae3a5934dd7d9a3b4c) 的 [Actions 运行 40175352228](https://github.com/scallion7/xc_sx_agent/actions/runs/40175352228) 已完成，**7/7 作业通过**。
+提交 [`7d720b6`](https://github.com/scallion7/aftersales-agent/commit/7d720b6cba0a86663524aeae3a5934dd7d9a3b4c) 的 [Actions 运行 40175352228](https://github.com/scallion7/aftersales-agent/actions/runs/40175352228) 已完成，**7/7 作业通过**。
 
 | 项目 | 已验证范围 | 证据 |
 |---|---|---|
@@ -96,13 +96,13 @@ CI 已增加复核浏览器、带诊断的离线评测、任务基线及 SQLite/
 
 ## 文档与展示整理的检查
 
-第一轮整理当前说明、历史归档、页面/CLI/API 展示名称及 CI 产物名称；本地 30 项相关回归通过（11.580 秒，含 Chromium），README 的 smoke 命令与迁移/drift/smoke 命令已实际执行，81 路由 OpenAPI 校验、Ruff 和编译检查通过。[本轮检查记录](../evidence/docs-round1/checks.json)与[测试日志](../evidence/docs-round1/targeted-tests.log)单独保存。对应提交继续执行相同质量门禁；通过 [当前分支 Actions](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml) 查看该提交结果，不沿用旧提交的成功状态。
+第一轮整理当前说明、历史归档、页面/CLI/API 展示名称及 CI 产物名称；本地 30 项相关回归通过（11.580 秒，含 Chromium），README 的 smoke 命令与迁移/drift/smoke 命令已实际执行，81 路由 OpenAPI 校验、Ruff 和编译检查通过。[本轮检查记录](../evidence/docs-round1/checks.json)与[测试日志](../evidence/docs-round1/targeted-tests.log)单独保存。对应提交继续执行相同质量门禁；通过 [当前分支 Actions](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml) 查看该提交结果，不沿用旧提交的成功状态。
 
 当前展示截图见 [客户服务](../assets/workspace.png) 与 [客服工作台](../assets/workbench.png)；历史截图与录像继续保留在 `evidence/platform/`，不覆盖原始哈希证据。
 
 ### 本轮 CI 时序问题与补充检查
 
-文档提交 `6fb6658` 的 [运行 40178221025](https://github.com/scallion7/xc_sx_agent/actions/runs/40178221025) 有 6 个作业通过，Python 3.12 在既有退款 HTTP 测试失败：正常请求共用 150ms 超时，返回 `unknown` 而非预期成功。使用 300ms 提交后延迟[复现了原失败](../evidence/docs-round1/timeout-reproduction.log)。正常路径改用 5 秒测试超时；故障用例单独设置 0.5 秒超时与 2 秒响应延迟，成功、单次退款和对账断言保持不变。补充的 [13 项 HTTP 回归全部通过](../evidence/docs-round1/http-regression.log)，21.259 秒。本次仅调整测试时序，不改变生产超时配置；后续修复提交 `4ce5160` 的 [Actions 运行 40178664536](https://github.com/scallion7/xc_sx_agent/actions/runs/40178664536) 已完成，7/7 作业通过。
+文档提交 `6fb6658` 的 [运行 40178221025](https://github.com/scallion7/aftersales-agent/actions/runs/40178221025) 有 6 个作业通过，Python 3.12 在既有退款 HTTP 测试失败：正常请求共用 150ms 超时，返回 `unknown` 而非预期成功。使用 300ms 提交后延迟[复现了原失败](../evidence/docs-round1/timeout-reproduction.log)。正常路径改用 5 秒测试超时；故障用例单独设置 0.5 秒超时与 2 秒响应延迟，成功、单次退款和对账断言保持不变。补充的 [13 项 HTTP 回归全部通过](../evidence/docs-round1/http-regression.log)，21.259 秒。本次仅调整测试时序，不改变生产超时配置；后续修复提交 `4ce5160` 的 [Actions 运行 40178664536](https://github.com/scallion7/aftersales-agent/actions/runs/40178664536) 已完成，7/7 作业通过。
 
 ## 第二轮代码与模块命名整理
 
@@ -117,10 +117,10 @@ CI 已增加复核浏览器、带诊断的离线评测、任务基线及 SQLite/
 | 计划性能门禁 | 现有阈值检查通过；不作为真实模型或生产性能结果 | [计划基准](../evidence/naming-round2/plan-benchmark.log) |
 | SQLite 迁移与平台 smoke | 升级至 `20261025_0006`、无 schema drift、知识/预算/所有权检查通过 | [迁移日志](../evidence/naming-round2/migration.log) |
 
-Ruff、格式、编译、文档链接及旧模块显式运行检查均已通过。命名兼容策略和保留的历史标识见[说明](../engineering/naming-and-compatibility.md)。本轮远端 Python 多版本、PostgreSQL、浏览器、镜像与安全扫描结果，按本次提交查看 [GitHub Actions](https://github.com/scallion7/xc_sx_agent/actions/workflows/offline-quality.yml)，不以旧 CI 结果代替。
+Ruff、格式、编译、文档链接及旧模块显式运行检查均已通过。命名兼容策略和保留的历史标识见[说明](../engineering/naming-and-compatibility.md)。本轮远端 Python 多版本、PostgreSQL、浏览器、镜像与安全扫描结果，按本次提交查看 [GitHub Actions](https://github.com/scallion7/aftersales-agent/actions/workflows/offline-quality.yml)，不以旧 CI 结果代替。
 
 ### 本轮首轮 CI 诊断
 
-[运行 41479809711](https://github.com/scallion7/xc_sx_agent/actions/runs/41479809711) 的浏览器/容量/故障演练和两种数据库迁移成功；新增部署作业因 Ubuntu 默认 apt 源缺少 PostgreSQL 17 客户端停止，尝试 PGDG 源后遇到上游下载连接中断，最终改为同一 PostgreSQL 17 镜像内的真实客户端适配器。锁定依赖审计发现 pypdf 6.21.2 的 7 条漏洞公告，按扫描给出的修复版本升级到 6.21.4，并提高运行依赖下限；未添加忽略漏洞规则。最终结果以修复提交的 CI 为准。
+[运行 41479809711](https://github.com/scallion7/aftersales-agent/actions/runs/41479809711) 的浏览器/容量/故障演练和两种数据库迁移成功；新增部署作业因 Ubuntu 默认 apt 源缺少 PostgreSQL 17 客户端停止，尝试 PGDG 源后遇到上游下载连接中断，最终改为同一 PostgreSQL 17 镜像内的真实客户端适配器。锁定依赖审计发现 pypdf 6.21.2 的 7 条漏洞公告，按扫描给出的修复版本升级到 6.21.4，并提高运行依赖下限；未添加忽略漏洞规则。最终结果以修复提交的 CI 为准。
 
 部署调试还发现并修复了两个验收缺口：旧库夹具需要显式关闭自动建表，以免绕过迁移后产生重复表；库存 Compose 服务需要真实 MCP 握手健康检查，不能沿用 API 的 `/ready` 或仅禁用检查。最终完整部署作业已覆盖这些路径。

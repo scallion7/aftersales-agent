@@ -10,7 +10,7 @@
 
 **技术栈**　Python、FastAPI、SQLAlchemy、PostgreSQL、RAG、MCP、Playwright、Docker Compose、GitHub Actions。
 
-**项目简介**　面向订单咨询与售后办理，搭建集政策检索、多轮申请、工具执行和人工协作于一体的 Agent 平台，探索模型推理与确定性业务执行的协作机制，并通过受控环境验证任务恢复、业务一致性和评测发布流程。
+**项目简介**　AfterSales Agent 面向订单咨询与售后办理，搭建集政策检索、多轮申请、工具执行和人工协作于一体的 Agent 平台，探索模型推理与确定性业务执行的协作机制，并通过受控环境验证任务恢复、业务一致性和评测发布流程。
 
 ## 一页简历 · 三条精简版
 
@@ -18,7 +18,7 @@
 - **有依据的政策问答**　结合 BM25、向量检索与 RRF 排名融合，按商品、付款状态和当前订单核对政策原文。在合成政策、本地哈希检索和受控模型网关下，40 道单轮题和 6 段对话的 17 轮中，符合预期的结果由 **32/57 提高到 57/57**。[逐题结果](../evaluation/policy-transfer.md)
 - **退款可靠执行**　通过 SQL 持久化任务、Worker 租约、幂等键和退款对账处理重复确认、进程中断与回执丢失。在 PostgreSQL 并发回归中，8 个 Worker 争抢同一任务，仅 1 个领取成功。同一退款的 10 次回调仅 1 次生效。[并发验证记录](../evidence/agent-boundaries-20261118/postgres.json)
 
-**工程验证**　启用 Chromium 的本地回归 **550 项全部通过，零跳过，app 语句覆盖率 84%**。对应提交 `e0271e8` 的 GitHub CI **9/9 作业通过**。[本地验收](../evidence/policy-transfer-20261118/verification.json) · [CI 运行](https://github.com/scallion7/xc_sx_agent/actions/runs/44317537941)
+**工程验证**　启用 Chromium 的本地回归 **554 项全部通过，零跳过，app 语句覆盖率 84%**。此前政策问答修复提交 `e0271e8` 的 GitHub CI **9/9 作业通过**。[本地验收](../evidence/aftersales-rename-20261118/checks.json) · [CI 运行](https://github.com/scallion7/aftersales-agent/actions/runs/44317537941)
 
 ### 展开技术细节时可选
 
@@ -30,13 +30,13 @@
 
 - 基于 FastAPI 与 SQL 存储构建持久化 Agent 任务和独立 Worker，通过租约、fencing、状态 CAS 与事件记录支持进程退出后的任务接管，控制过期 Worker 的本地状态提交。
 - 实现可信操作提案、工单唯一约束和退款对账；HTTP 商务路径使用 Outbox/Inbox，普通外部适配器沿用稳定业务键查单，对超时和不完整回执保留待核对状态，避免盲目重复提交。
-- 建立 SQLite/PostgreSQL 迁移、浏览器交互与故障恢复验证。本地启用 Chromium 后，550 项回归全部通过，零跳过，app 语句覆盖率 84%。GitHub CI 的 9 个作业全部通过，覆盖 Python 3.10–3.12、双数据库迁移及 Compose 验收。
+- 建立 SQLite/PostgreSQL 迁移、浏览器交互与故障恢复验证。本地启用 Chromium 后，554 项回归全部通过，零跳过，app 语句覆盖率 84%。GitHub CI 的 9 个作业全部通过，覆盖 Python 3.10–3.12、双数据库迁移及 Compose 验收。
 
-2026-11-18 的本地验收使用 Python 3.11.15。覆盖率统计主测试进程中 `app` 的语句，排除 `app/scripts/*`。政策问答的 57 项按预期处理和引用逐项判定，部分失败题参与了修复。全部使用合成数据，标签未经独立人工审核。[本地验证记录](../evidence/policy-transfer-20261118/verification.json) · [政策问答原始结果](../evidence/policy-transfer-20261118/cases.json) · [项目卡](project-card.md)
+2026-11-18 的本地验收使用 Python 3.11.15。覆盖率统计主测试进程中 `app` 的语句，排除 `app/scripts/*`。政策问答的 57 项按预期处理和引用逐项判定，部分失败题参与了修复。全部使用合成数据，标签未经独立人工审核。[本地验证记录](../evidence/aftersales-rename-20261118/checks.json) · [政策问答原始结果](../evidence/policy-transfer-20261118/cases.json) · [项目卡](project-card.md)
 
 ## 版面有限时的短版
 
-> 搭建电商售后 Agent 平台，接入业务工具与 MCP，支持多轮申请、用户确认和退款对账。按商品、付款状态和订单核对政策原文，合成政策与受控模型下的 40 道单轮题及 17 个对话轮次由 32/57 提高到 57/57。本地 550 项回归全部通过，零跳过，app 语句覆盖率 84%。
+> 搭建电商售后 Agent 平台，接入业务工具与 MCP，支持多轮申请、用户确认和退款对账。按商品、付款状态和订单核对政策原文，合成政策与受控模型下的 40 道单轮题及 17 个对话轮次由 32/57 提高到 57/57。本地 554 项回归全部通过，零跳过，app 语句覆盖率 84%。
 
 ## 每条简历要点准备四项依据
 

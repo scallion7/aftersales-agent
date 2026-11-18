@@ -27,7 +27,7 @@ INTENT_LABELS = {
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Ecom Service Agent · 电商售后智能体平台"
+        description="AfterSales Agent · 电商售后智能体平台"
     )
     parser.add_argument(
         "--mode",
@@ -86,7 +86,7 @@ def main(argv: list[str] | None = None) -> int:
     mode = "Multi-Agent 协作模式" if resolved_mode == "multi" else "ReAct + MCP + RAG"
 
     print("=" * 50)
-    print(f"  Ecom Service Agent · 客户服务({mode})")
+    print(f"  AfterSales Agent · 客户服务({mode})")
     print("  支持工具调用 + 政策检索 + 用户记忆 + 技能编排")
     print(
         "  输入 quit/exit 退出, reset 重置, memory 查看记忆, "

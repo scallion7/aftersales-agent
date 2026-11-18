@@ -39,7 +39,7 @@ def state(stack):
 
 def trial(case, strategy, remaining):
     started = time.perf_counter()
-    with tempfile.TemporaryDirectory(prefix="ecom-task-") as directory:
+    with tempfile.TemporaryDirectory(prefix="aftersales-task-") as directory:
         stack = DemoStack(directory)
         # Shared SQL quota reserves every model call before dispatch, even on failure.
         stack.env["MODEL_TOKEN_BUDGET"] = str(remaining)

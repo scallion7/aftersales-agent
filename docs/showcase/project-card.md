@@ -1,10 +1,10 @@
-# Ecom Service Agent 项目卡
+# AfterSales Agent 项目卡
 
 [展示材料](README.md) · [文档中心](../README.md) · [当前验收](../evaluation/acceptance.md)
 
 ## 项目定位
 
-**Ecom Service Agent｜面向电商售后的可恢复智能体平台**
+**AfterSales Agent｜面向电商售后的可恢复智能体平台**
 
 面向订单咨询、政策问答与售后办理，将多轮申请、政策证据、具体操作确认、持久化任务、退款对账和人工接管连接成完整业务流程。模型负责理解、规划与解释，服务端负责身份、授权、业务规则、状态和审计。
 
@@ -46,13 +46,13 @@
 
 | 已有记录 | 使用口径 |
 |---|---|
-| 2026-11-16 本地 500 项回归通过，无跳过 | Python 3.11、项目锁定依赖、启用 Chromium；包含单元、集成和浏览器测试 |
-| 同次 app 语句覆盖率 82% | 沿用 coverage 配置，不包含 `app/scripts/*` 及独立进程；门禁下限为 65% |
+| 2026-11-18 本地 554 项回归通过，无跳过 | Python 3.11、项目锁定依赖、启用 Chromium；包含单元、集成和浏览器测试 |
+| 同次 app 语句覆盖率 84% | 沿用 coverage 配置，不包含 `app/scripts/*` 及独立进程；门禁下限为 65% |
 | 2026-11-13 的 9 个开发家族 × 3 个策略共 27 格通过 | 使用受控 HTTP 模型，验证回答评分和配置发布流程；首次错误回复曾被门禁拦截 |
 | 2026-11-13 的 18 项 HTTP 任务契约通过 | 检查工具调用及数据库终态，使用合成业务和 mock 商务 Provider |
-| `deaa9a9` 的 CI 为 9/9 作业成功 | 覆盖 Python 3.10–3.12、迁移、浏览器、供应链、Compose 和短时负载 |
+| `e0271e8` 的 CI 为 9/9 作业成功 | 覆盖 Python 3.10–3.12、迁移、浏览器、供应链、Compose 和短时负载 |
 
-原始摘要见[2026-11-16 本地复验](../evidence/dependency-patch-20261116/checks.json)和[2026-11-13 受控评测清单](../evidence/release-workflow-20261113/checks.json)，远端状态见[固定提交的 CI](https://github.com/scallion7/xc_sx_agent/actions/runs/43853072534)。这些是已有验证记录，文档修订不构成新的测试运行；不同日期、环境和测试集合的数字不可相加为项目总样本量。
+原始摘要见[2026-11-18 本地复验](../evidence/aftersales-rename-20261118/checks.json)和[2026-11-13 受控评测清单](../evidence/release-workflow-20261113/checks.json)，远端状态见[固定提交的 CI](https://github.com/scallion7/aftersales-agent/actions/runs/44317537941)。这些是已有验证记录，文档修订不构成新的测试运行；不同日期、环境和测试集合的数字不可相加为项目总样本量。
 
 ## 演示与后续自费验证
 

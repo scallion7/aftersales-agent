@@ -157,7 +157,8 @@ class BrowserTests(unittest.TestCase):
             errors = []
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(stack.url + "/workspace")
-            expect(page).to_have_title("Ecom Service Agent · 客户服务")
+            expect(page).to_have_title("AfterSales Agent · 客户服务")
+            expect(page.get_by_text("AfterSales Agent", exact=True)).to_be_visible()
             page.locator("#token").fill("demo-user")
             page.locator("#connect").click()
             expect(page.locator("#status")).to_contain_text("会话已连接")
@@ -200,7 +201,7 @@ class BrowserTests(unittest.TestCase):
             admin = context.new_page()
             admin.on("pageerror", lambda error: errors.append(str(error)))
             admin.goto(stack.url + "/workbench")
-            expect(admin).to_have_title("Ecom Service Agent · 客服工作台")
+            expect(admin).to_have_title("AfterSales Agent · 客服工作台")
             admin.locator("#token").fill("demo-admin")
             admin.locator("#refresh").click()
             expect(admin.locator("#status")).to_contain_text("待办已刷新")

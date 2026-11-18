@@ -11,12 +11,48 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
+import yaml
 from app.platform.common import PlatformError
 from app.platform.recovery import postgres_command
-from app.scripts import benchmark_platform
+from app.scripts import accept_deployment, benchmark_platform
+from sqlalchemy.engine import make_url
 
 
 class OperationalGateTests(unittest.TestCase):
+    def test_full_compose_stack_uses_its_postgres_identity(self):
+        root = Path(__file__).resolve().parents[1]
+        environments = {}
+        for name in accept_deployment.FILES:
+            services = yaml.safe_load((root / name).read_text())["services"]
+            for service, settings in services.items():
+                environments.setdefault(service, {}).update(
+                    settings.get("environment", {})
+                )
+            if name not in {
+                "docker-compose.sandbox.yml",
+                "docker-compose.acceptance.yml",
+            }:
+                continue
+            with self.subTest(overlay=name):
+                postgres = environments["postgres"]
+                url = make_url(environments["api"]["DATABASE_URL"])
+                self.assertEqual(url.host, "postgres")
+                self.assertEqual(url.database, postgres["POSTGRES_DB"])
+                self.assertEqual(url.username, postgres["POSTGRES_USER"])
+                self.assertEqual(url.password, postgres["POSTGRES_PASSWORD"])
+                for service in ("worker", "refund-worker", "seed", "trace-workbench"):
+                    self.assertEqual(
+                        make_url(environments[service]["DATABASE_URL"]), url, service
+                    )
+                if name == "docker-compose.acceptance.yml":
+                    client_url = make_url(accept_deployment.SOURCE)
+                    self.assertEqual(url.database, "aftersales_agent")
+                    self.assertEqual(client_url.set(host="postgres", port=5432), url)
+                else:
+                    self.assertEqual(
+                        (url.database, url.username), ("xc_sx_agent", "xc_agent")
+                    )
+
     def test_all_capacity_requests_fail_and_report_is_saved_before_exit(self):
         class Stack:
             def __init__(self):

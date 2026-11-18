@@ -22,7 +22,7 @@ Skill 就是解决上述问题的。Anthropic 搞了个 Agent Skills 开放标�
 
 
 
-项目仓库：https://github.com/scallion7/xc_sx_agent
+项目仓库：https://github.com/scallion7/aftersales-agent
 
 
 

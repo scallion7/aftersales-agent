@@ -91,7 +91,7 @@ def _install_openapi_contract(app: FastAPI) -> None:
             title=app.title,
             version=app.version,
             description=(
-                "电商售后 Agent API，提供对话任务、可信操作确认、售后申请、"
+                "AfterSales Agent 提供对话任务、可信操作确认、售后申请、"
                 "人工协作与知识治理。受认证保护的接口通过 X-API-Key 接收"
                 "静态令牌或 OIDC JWT；供应商回调使用独立签名校验。"
                 "响应附带 X-Request-ID、X-Trace-ID 和限流信息。"

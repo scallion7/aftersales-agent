@@ -11,6 +11,7 @@ def application():
     url = os.environ.get(
         "SANDBOX_DATABASE_URL", "sqlite:///app/sessions/commerce-sandbox.db"
     )
+    # Compare against the same persistent default as Settings and Alembic.
     application_url = os.environ.get(
         "DATABASE_URL", "sqlite:///app/sessions/xc_sx_agent.db"
     )

@@ -7,6 +7,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 
 from app.platform.common import PlatformError, encode
 
+CONTROLLED_FINGERPRINT = "aftersales-agent-controlled-demo-v1"
+
 
 class EvaluationPlan(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)

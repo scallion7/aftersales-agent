@@ -37,7 +37,7 @@ def staged_files(paths, *, replace=False):
         for target in targets:
             target.parent.mkdir(parents=True, exist_ok=True)
             directory = stack.enter_context(
-                TemporaryDirectory(dir=target.parent, prefix=".ecom-stage-")
+                TemporaryDirectory(dir=target.parent, prefix=".aftersales-stage-")
             )
             stages.append(Path(directory) / target.name)
         yield stages

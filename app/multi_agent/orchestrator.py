@@ -32,7 +32,7 @@ from app.services.commerce import CommerceService
 
 
 class MultiAgentOrchestrator(BaseConversationAgent):
-    """多 Agent 编排器，对外接口与 EcomAgent 一致。"""
+    """多 Agent 编排器，对外接口与 AfterSalesAgent 一致。"""
 
     def __init__(
         self,

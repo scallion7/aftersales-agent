@@ -33,6 +33,8 @@ class KnowledgeService:
     ):
         self.config = config
         self.last_result = None
+        self.followup_query = ""
+        self.followup_clarification = ""
         self.context_resolver = None
         self._retriever = retriever
         self._reranker = reranker or PolicyReranker()
@@ -111,6 +113,20 @@ class KnowledgeService:
             from app.platform.evaluation_clock import observe_lookup, policy_day
             from app.platform.retrieval import HybridRetrieval
 
+            if self.followup_clarification:
+                self.last_result = {
+                    "success": False,
+                    "query": query,
+                    "outcome": "needs_clarification",
+                    "grounded": False,
+                    "requires_human": True,
+                    "context": {},
+                    "clarification": self.followup_clarification,
+                    "results": [],
+                    "citations": [],
+                }
+                observe_lookup(self.last_result)
+                return self.last_result
             context = {
                 k: v
                 for k, v in {
@@ -138,13 +154,21 @@ class KnowledgeService:
                         "results": [],
                         "citations": [],
                     }
+                    if exc.code == "KNOWLEDGE_ORDER_SELECTION_REQUIRED":
+                        self.last_result["clarification"] = (
+                            "请确认这次要查询的订单号，我再按这笔订单核实政策。"
+                        )
+                    elif exc.code == "KNOWLEDGE_CONTEXT_RECONFIRM_REQUIRED":
+                        self.last_result["clarification"] = (
+                            "请重新确认这次要核实的订单或商品信息。"
+                        )
                     return self.last_result
             elif order_id:
                 raise PlatformError("KNOWLEDGE_ORDER_CONTEXT_REQUIRED", 422)
             if policy_type:
                 context["policy_type"] = policy_type
             self.last_result = HybridRetrieval(self.config).search(
-                query,
+                self.followup_query or query,
                 top_k=top_k,
                 rerank=self.config.rag_rerank_enabled,
                 context=context,

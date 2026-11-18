@@ -170,7 +170,7 @@ class HybridRetrieval:
                     self.service.embedder.model,
                     TOKENIZER_VERSION,
                     self.profile.fingerprint,
-                    "policy-conflicts-v2-evidence-terms-v3-product-scope",
+                    "policy-conflicts-v2-evidence-terms-v4-product-payment",
                 ],
                 context={
                     "filters": context or {},

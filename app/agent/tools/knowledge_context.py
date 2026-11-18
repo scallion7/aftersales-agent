@@ -47,19 +47,29 @@ class KnowledgeContext:
         if previous.get("blocked_turn_id") == turn_id:
             raise PlatformError("KNOWLEDGE_CONTEXT_RECONFIRM_REQUIRED", 422)
         previous_order = previous.get("order_id", "")
-        mentioned_orders = set(re.findall(r"\bORD-[A-Za-z0-9-]+", message))
+        mentioned_orders = set(
+            re.findall(r"(?<![A-Za-z0-9_-])ORD-[A-Za-z0-9-]+", message)
+        )
         mentioned_orders.update(
             re.findall(
                 r"订单(?:号)?\s*[:：]?\s*([A-Za-z0-9][A-Za-z0-9_-]{0,79})", message
             )
         )
-        if (
-            previous_order
-            and not order_id
-            and (
-                mentioned_orders - {previous_order}
-                or any(word in message for word in ("另一笔", "另一个订单", "换个订单"))
-            )
+        if order_id and mentioned_orders:
+            selected = {
+                candidate
+                for candidate in mentioned_orders
+                if explicitly_stated(message, candidate)
+            }
+            if selected != {order_id}:
+                self._block(turn_id, "KNOWLEDGE_ORDER_SELECTION_REQUIRED")
+        switches_order = any(
+            explicitly_stated(message, word)
+            for word in ("另一笔", "另一个订单", "换个订单")
+        )
+        if previous_order and (
+            (not order_id and mentioned_orders - {previous_order})
+            or (order_id in ("", previous_order) and switches_order)
         ):
             self._block(turn_id, "KNOWLEDGE_ORDER_SELECTION_REQUIRED")
         chosen = order_id or previous_order

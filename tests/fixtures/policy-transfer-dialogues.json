@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "documents": {
+    "clothes": "未拆吊牌的服饰在签收十二天内可申请退换。",
+    "bag": "未拆吊牌的书包在签收五天内可申请退换。",
+    "balance": "预售订单尾款超过日期仍未支付，不自动扣款。"
+  },
+  "dialogues": [
+    {
+      "id": "replace-product-twice",
+      "turns": [
+        {"user": "卫衣吊牌还在，收货后多少天可以退货？", "query": "卫衣吊牌完整，签收后的退货期限是多久？", "draft_document": "clothes", "expect": "answerable", "document": "clothes"},
+        {"user": "那书包呢？", "query": "书包退货期限", "draft_document": "clothes", "expect": "answerable", "document": "bag"},
+        {"user": "如果换成台灯呢？", "query": "书包未拆吊牌签收后多久可退", "draft_document": "bag", "expect": "no_evidence"}
+      ]
+    },
+    {
+      "id": "paid-balance-correction",
+      "turns": [
+        {"user": "预售尾款还没支付，超过日期会自动扣钱吗？", "query": "预售尾款未付，逾期后系统会自动扣款吗？", "draft_document": "balance", "expect": "answerable", "document": "balance"},
+        {"user": "我刚查清，尾款其实已经付清，还会再扣一次吗？", "query": "未付预售尾款会不会自动扣钱", "draft_document": "balance", "expect": "no_evidence"},
+        {"user": "如果确实没付，过期后呢？", "query": "逾期未付", "draft_document": "balance", "expect": "answerable", "document": "balance"}
+      ]
+    },
+    {
+      "id": "restore-action-and-tag",
+      "turns": [
+        {"user": "衬衫的吊牌完整，签收后多久可以退货？", "query": "未剪吊牌的衬衫签收后多久能退货？", "draft_document": "clothes", "expect": "answerable", "document": "clothes"},
+        {"user": "那换货呢？", "restore": true, "query": "换货", "draft_document": "clothes", "expect": "answerable", "document": "clothes"},
+        {"user": "吊牌我后来剪掉了呢？", "query": "吊牌完整的服饰签收后多久能换货", "draft_document": "clothes", "expect": "no_evidence"}
+      ]
+    },
+    {
+      "id": "unrelated-order-lookup",
+      "turns": [
+        {"user": "羽绒服保留吊牌，签收后几天可以换货？", "query": "羽绒服未拆吊牌签收后几天可换货？", "draft_document": "clothes", "expect": "answerable", "document": "clothes"},
+        {"user": "另外帮我查订单 ORD-20240125-006 的状态。", "order_id": "ORD-20240125-006", "draft": "已为您查询订单状态。", "expect": "not_requested"},
+        {"user": "谢谢，暂时没有其他事了。", "draft": "不客气。", "expect": "not_requested"}
+      ]
+    },
+    {
+      "id": "separate-and-resumed-session",
+      "turns": [
+        {"session": "first", "user": "裤子吊牌完整，签收后多久可以退货？", "query": "未拆吊牌的裤子签收多少天内可申请退货？", "draft_document": "clothes", "expect": "answerable", "document": "clothes"},
+        {"session": "other", "user": "它还能办吗？", "query": "未拆吊牌的服饰签收后多久能退货", "draft_document": "clothes", "expect": "needs_clarification"},
+        {"session": "first", "restore": true, "user": "那换货也行吗？", "query": "换货", "draft_document": "clothes", "expect": "answerable", "document": "clothes"}
+      ]
+    },
+    {
+      "id": "unidentified-other-product",
+      "turns": [
+        {"user": "毛衣吊牌完整，签收后多少天可以申请换货？", "query": "毛衣吊牌没有剪，签收后多久可以换货？", "draft_document": "clothes", "expect": "answerable", "document": "clothes"},
+        {"user": "那另一个商品呢？", "query": "服饰吊牌完好签收后多久能换", "draft_document": "clothes", "expect": "needs_clarification"}
+      ]
+    }
+  ]
+}

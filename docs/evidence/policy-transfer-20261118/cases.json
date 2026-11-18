@@ -1,0 +1,2101 @@
+{
+  "baseline": "33c7aae26ffe85d8135c8072e185e53e9c025a53",
+  "method": "Synthetic, prelabelled inputs. HTTP hybrid retrieval with local-hash embeddings, default profile. Dialogue runs use the real Agent with a controlled model gateway and persisted sessions. All conditions and document IDs are fixture-specific.",
+  "product_original_test_file_sha256": "464ef25bbcc8dd4fff5454501756db636a2d0f938a1192294a6734fec4486923",
+  "product_labelled_cases_sha256": "1e25352e91369f6a92f06f5919dc6243459dd8b246deb4543070d1ae7c77caaf",
+  "fixture_sha256": {
+    "tests/test_policy_product_transfer.py": "200f59e98c5034d73574959121f0f628ffc8682614f31dd900c0cb34749a04c2",
+    "tests/fixtures/policy-transfer-payments.json": "fec0e8623306d5615d5d5a1c75c1c0f1d911cc618d310ef193f1b3efcaa74497",
+    "tests/fixtures/policy-transfer-dialogues.json": "4298f0ac8e4468251976e122cf494572e9f74f95eeb166e8c133922ebbcd80e0",
+    "tests/fixtures/policy-transfer-controls.json": "41bd66370acdbf3d9a85f785fed0ca690855831c7789813eec8ada52b56118ea"
+  },
+  "counts": {
+    "product": {
+      "before": {
+        "false_refusal": 5,
+        "pass": 11
+      },
+      "after": {
+        "pass": 16
+      }
+    },
+    "payment": {
+      "before": {
+        "false_refusal": 8,
+        "pass": 8
+      },
+      "after": {
+        "pass": 16
+      }
+    },
+    "dialogue": {
+      "before": {
+        "pass": 9,
+        "false_refusal": 4,
+        "false_acceptance": 2,
+        "answered_without_clarifying": 2
+      },
+      "after": {
+        "pass": 17
+      }
+    },
+    "additional": {
+      "before": {
+        "false_refusal": 4,
+        "pass": 4
+      },
+      "after": {
+        "pass": 8
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "t01",
+      "group": "product",
+      "question": "签收第六天，护膝的吊牌还挂着，能退货吗？",
+      "product_context": null,
+      "rationale": "护膝明确列入十八天退货范围。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t02",
+      "group": "product",
+      "question": "护腕吊牌保留着，收货十五天能申请退货吗？",
+      "product_context": null,
+      "rationale": "护腕是同一条款列明的另一子类。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t03",
+      "group": "product",
+      "question": "运动护具未拆吊牌，签收后退货期限是多少天？",
+      "product_context": null,
+      "rationale": "条款直接规定运动护具的签收退货期限。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t04",
+      "group": "product",
+      "question": "护膝收纳袋的吊牌完整，签收第三天还能换货吗？",
+      "product_context": null,
+      "rationale": "收纳袋专属条款允许四天内换货。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d02"
+        ],
+        "quotes": [
+          "未拆吊牌的护膝收纳袋在签收四天内可申请换货。"
+        ]
+      },
+      "before": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d02"
+        ],
+        "quotes": [
+          "未拆吊牌的护膝收纳袋在签收四天内可申请换货。"
+        ]
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d02"
+        ],
+        "quotes": [
+          "未拆吊牌的护膝收纳袋在签收四天内可申请换货。"
+        ]
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t05",
+      "group": "product",
+      "question": "护膝收纳袋保留吊牌，签收第二天能申请退货吗？",
+      "product_context": null,
+      "rationale": "主品退货条款不涵盖收纳袋，收纳袋仅有换货依据。",
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t06",
+      "group": "product",
+      "question": "刚签收两天，护膝吊牌没有剪，能申请换货吗？",
+      "product_context": null,
+      "rationale": "护膝只有退货依据，不能引用收纳袋的换货条款。",
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t07",
+      "group": "product",
+      "question": "签收第五天，保温壶的吊牌还在，能退货吗？",
+      "product_context": null,
+      "rationale": "壶本体可在十二天内退。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d03"
+        ],
+        "quotes": [
+          "未拆吊牌的保温壶在签收十二天内可申请退货。"
+        ]
+      },
+      "before": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d03"
+        ],
+        "quotes": [
+          "未拆吊牌的保温壶在签收十二天内可申请退货。"
+        ]
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d03"
+        ],
+        "quotes": [
+          "未拆吊牌的保温壶在签收十二天内可申请退货。"
+        ]
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t08",
+      "group": "product",
+      "question": "保温壶替换盖吊牌未拆，收货第五天可以换货吗？",
+      "product_context": null,
+      "rationale": "替换盖可在六天内换。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d04"
+        ],
+        "quotes": [
+          "未拆吊牌的保温壶替换盖在签收六天内可申请换货。"
+        ]
+      },
+      "before": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d04"
+        ],
+        "quotes": [
+          "未拆吊牌的保温壶替换盖在签收六天内可申请换货。"
+        ]
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d04"
+        ],
+        "quotes": [
+          "未拆吊牌的保温壶替换盖在签收六天内可申请换货。"
+        ]
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t09",
+      "group": "product",
+      "question": "保温壶替换盖未拆吊牌，签收三天能退货吗？",
+      "product_context": null,
+      "rationale": "替换盖只能找到换货规则，壶本体退货规则不能迁用。",
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t10",
+      "group": "product",
+      "question": "保温壶未拆吊牌，签收三天能换货吗？",
+      "product_context": null,
+      "rationale": "壶身没有换货依据，替换盖的规则不能迁用。",
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t11",
+      "group": "product",
+      "question": "风衣吊牌还在，收货第七天可以申请换货吗？",
+      "product_context": "风衣",
+      "rationale": "订单、问句及风衣专属换货条款一致。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d05"
+        ],
+        "quotes": [
+          "未拆吊牌的风衣在签收九天内可申请换货。"
+        ]
+      },
+      "before": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d05"
+        ],
+        "quotes": [
+          "未拆吊牌的风衣在签收九天内可申请换货。"
+        ]
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d05"
+        ],
+        "quotes": [
+          "未拆吊牌的风衣在签收九天内可申请换货。"
+        ]
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t12",
+      "group": "product",
+      "question": "风衣防尘罩吊牌没拆，签收两天可以退货吗？",
+      "product_context": "风衣防尘罩",
+      "rationale": "订单与独立出售的防尘罩退货条款一致。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d06"
+        ],
+        "quotes": [
+          "未拆吊牌的风衣防尘罩在签收三天内可申请退货。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d06"
+        ],
+        "quotes": [
+          "未拆吊牌的风衣防尘罩在签收三天内可申请退货。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t13",
+      "group": "product",
+      "question": "风衣吊牌完整，签收两天能申请换货吗？",
+      "product_context": "风衣防尘罩",
+      "rationale": "订单是防尘罩，不能给风衣本体的换货结论。",
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t14",
+      "group": "product",
+      "question": "护腕吊牌没摘，签收第五天可以申请退货吗？",
+      "product_context": "护膝",
+      "rationale": "虽有同一品类条款，所问具体商品与订单冲突。",
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t15",
+      "group": "product",
+      "question": "吊牌还挂着，签收第五天可以退货吗？",
+      "product_context": "护腕",
+      "rationale": "问句省略商品，订单补足了处于明确范围的护腕。",
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "t16",
+      "group": "product",
+      "question": "风衣防尘罩未拆吊牌，签收两天可以换货吗？",
+      "product_context": null,
+      "rationale": "防尘罩只有退货条款，不能从名称中的风衣推断换货。",
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-01",
+      "group": "payment",
+      "question": "预售尾款只付了一部分，系统会再扣尾款吗？",
+      "rationale": "分次到账政策明确涵盖未付余款与自动补扣。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-installment"
+        ],
+        "quotes": [
+          "预售尾款只支付了一部分时，客服人工核对尚欠的余款，系统不会自动补扣尾款。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-installment"
+        ],
+        "quotes": [
+          "预售尾款只支付了一部分时，客服人工核对尚欠的余款，系统不会自动补扣尾款。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-02",
+      "group": "payment",
+      "question": "预售尾款显示待结算，系统会再扣尾款吗？",
+      "rationale": "清算期间不再扣款。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-clearing"
+        ],
+        "quotes": [
+          "预售尾款支付状态为待结算时，平台等待支付渠道返回清算结果，期间不再扣款。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-clearing"
+        ],
+        "quotes": [
+          "预售尾款支付状态为待结算时，平台等待支付渠道返回清算结果，期间不再扣款。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-03",
+      "group": "payment",
+      "question": "预售尾款那笔付款已撤回成功，系统会再扣尾款吗？",
+      "rationale": "撤回成功后仅说明由买家重新支付。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-reversal"
+        ],
+        "quotes": [
+          "预售尾款的付款交易已经撤回成功时，买家需要在订单页重新支付尾款，平台不会自动扣款。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-reversal"
+        ],
+        "quotes": [
+          "预售尾款的付款交易已经撤回成功时，买家需要在订单页重新支付尾款，平台不会自动扣款。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-04",
+      "group": "payment",
+      "question": "预售尾款已全部付清并到账，系统会再扣尾款吗？",
+      "rationale": "全部结清后有独立的防重复扣款条款。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "before": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-05",
+      "group": "payment",
+      "question": "预售尾款支付失败，系统会再扣尾款吗？",
+      "rationale": "仅失败不等于成功撤回，四份政策都未覆盖此状态。",
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-06",
+      "group": "payment",
+      "question": "预售尾款撤回申请还在审批，系统会再扣尾款吗？",
+      "rationale": "尚在申请的撤回未满足成功撤回前提。",
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-07",
+      "group": "payment",
+      "question": "预售尾款一分钱也没付，系统会再扣尾款吗？",
+      "rationale": "未支付过任何金额不符合部分支付、清算、撤回或结清。",
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-08",
+      "group": "payment",
+      "question": "预售尾款只交了一半，剩下那笔由客服人工核对吗？",
+      "rationale": "部分付款的剩余金额由客服处理。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-installment"
+        ],
+        "quotes": [
+          "预售尾款只支付了一部分时，客服人工核对尚欠的余款，系统不会自动补扣尾款。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-installment"
+        ],
+        "quotes": [
+          "预售尾款只支付了一部分时，客服人工核对尚欠的余款，系统不会自动补扣尾款。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-09",
+      "group": "payment",
+      "question": "预售尾款支付显示待结算，是不是要等支付渠道的清算结果？",
+      "rationale": "清算条款直接说明所等结果。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-clearing"
+        ],
+        "quotes": [
+          "预售尾款支付状态为待结算时，平台等待支付渠道返回清算结果，期间不再扣款。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-clearing"
+        ],
+        "quotes": [
+          "预售尾款支付状态为待结算时，平台等待支付渠道返回清算结果，期间不再扣款。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-10",
+      "group": "payment",
+      "question": "预售尾款的交易已成功撤回，我应该在哪里重新支付这笔尾款？",
+      "rationale": "撤回条款明确给出订单页。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-reversal"
+        ],
+        "quotes": [
+          "预售尾款的付款交易已经撤回成功时，买家需要在订单页重新支付尾款，平台不会自动扣款。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-reversal"
+        ],
+        "quotes": [
+          "预售尾款的付款交易已经撤回成功时，买家需要在订单页重新支付尾款，平台不会自动扣款。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-11",
+      "group": "payment",
+      "question": "预售尾款已结清到账，平台还会发尾款催缴提醒吗？",
+      "rationale": "结清条款对尾款提醒有明确规定。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-12",
+      "group": "payment",
+      "question": "预售尾款只付了一部分，系统会再扣会员费吗？",
+      "rationale": "扣费对象换成会员费，不能引用补扣尾款条款。",
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-13",
+      "group": "payment",
+      "question": "预售尾款已全部付清并到账，平台还会发运费催缴提醒吗？",
+      "rationale": "提醒指向运费，非结清条款中的尾款提醒。",
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-14",
+      "group": "payment",
+      "question": "预售尾款支付显示待结算，支付渠道保证几小时内完成清算？",
+      "rationale": "条款说明等待清算，未承诺时长。",
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-15",
+      "group": "payment",
+      "question": "预售尾款已经不是待结算了，系统会再扣尾款吗？",
+      "rationale": "排除了待结算却没有给出当前状态，不能假定已经到账。",
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "pay-16",
+      "group": "payment",
+      "question": "预售尾款先显示失败，随后已经全部付清并到账，系统会再扣尾款吗？",
+      "rationale": "问题明确给出失败后的当前状态为全部到账。",
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D1.1",
+      "group": "dialogue",
+      "question": "卫衣吊牌还在，收货后多少天可以退货？",
+      "dialogue": "replace-product-twice",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "clothes"
+        ],
+        "reply_contains": "未拆吊牌的服饰在签收十二天内可申请退换。"
+      },
+      "before": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "卫衣吊牌完整，签收后的退货期限是多久？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "卫衣吊牌完整，签收后的退货期限是多久？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D1.2",
+      "group": "dialogue",
+      "question": "那书包呢？",
+      "dialogue": "replace-product-twice",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "bag"
+        ],
+        "reply_contains": "未拆吊牌的书包在签收五天内可申请退换。"
+      },
+      "before": {
+        "reply": "未找到适用政策证据，请人工核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "书包退货期限",
+        "tool_outcome": "no_evidence",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "no_evidence"
+      },
+      "after": {
+        "reply": "未拆吊牌的书包在签收五天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "bag"
+        ],
+        "requires_human": false,
+        "tool_query": "书包吊牌还在，收货后多少天可以退货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D1.3",
+      "group": "dialogue",
+      "question": "如果换成台灯呢？",
+      "dialogue": "replace-product-twice",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": []
+      },
+      "before": {
+        "reply": "未拆吊牌的书包在签收五天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "bag",
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "书包未拆吊牌签收后多久可退",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "未找到适用政策证据，请人工核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "台灯吊牌还在，收货后多少天可以退货？",
+        "tool_outcome": "no_evidence",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "no_evidence"
+      },
+      "verdict_before": "false_acceptance",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D2.1",
+      "group": "dialogue",
+      "question": "预售尾款还没支付，超过日期会自动扣钱吗？",
+      "dialogue": "paid-balance-correction",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "balance"
+        ],
+        "reply_contains": "预售订单尾款超过日期仍未支付，不自动扣款。"
+      },
+      "before": {
+        "reply": "预售订单尾款超过日期仍未支付，不自动扣款。",
+        "follow_up": null,
+        "documents": [
+          "balance"
+        ],
+        "requires_human": false,
+        "tool_query": "预售尾款未付，逾期后系统会自动扣款吗？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "预售订单尾款超过日期仍未支付，不自动扣款。",
+        "follow_up": null,
+        "documents": [
+          "balance"
+        ],
+        "requires_human": false,
+        "tool_query": "预售尾款未付，逾期后系统会自动扣款吗？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D2.2",
+      "group": "dialogue",
+      "question": "我刚查清，尾款其实已经付清，还会再扣一次吗？",
+      "dialogue": "paid-balance-correction",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": []
+      },
+      "before": {
+        "reply": "未找到适用政策证据，请人工核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "未付预售尾款会不会自动扣钱",
+        "tool_outcome": "no_evidence",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "no_evidence"
+      },
+      "after": {
+        "reply": "未找到适用政策证据，请人工核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "预售尾款已经付清，超过日期会重复自动扣钱吗？",
+        "tool_outcome": "no_evidence",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "no_evidence"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D2.3",
+      "group": "dialogue",
+      "question": "如果确实没付，过期后呢？",
+      "dialogue": "paid-balance-correction",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "balance"
+        ],
+        "reply_contains": "预售订单尾款超过日期仍未支付，不自动扣款。"
+      },
+      "before": {
+        "reply": "未找到适用政策证据，请人工核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "逾期未付",
+        "tool_outcome": "no_evidence",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "no_evidence"
+      },
+      "after": {
+        "reply": "预售订单尾款超过日期仍未支付，不自动扣款。",
+        "follow_up": null,
+        "documents": [
+          "balance"
+        ],
+        "requires_human": false,
+        "tool_query": "预售尾款没付，超过日期会自动扣钱吗？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D3.1",
+      "group": "dialogue",
+      "question": "衬衫的吊牌完整，签收后多久可以退货？",
+      "dialogue": "restore-action-and-tag",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "clothes"
+        ],
+        "reply_contains": "未拆吊牌的服饰在签收十二天内可申请退换。"
+      },
+      "before": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "未剪吊牌的衬衫签收后多久能退货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "未剪吊牌的衬衫签收后多久能退货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D3.2",
+      "group": "dialogue",
+      "question": "那换货呢？",
+      "dialogue": "restore-action-and-tag",
+      "session": "default",
+      "restored": true,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "clothes"
+        ],
+        "reply_contains": "未拆吊牌的服饰在签收十二天内可申请退换。"
+      },
+      "before": {
+        "reply": "未找到适用政策证据，请人工核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "换货",
+        "tool_outcome": "no_evidence",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "no_evidence"
+      },
+      "after": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "衬衫的吊牌完整，签收后多久可以换货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D3.3",
+      "group": "dialogue",
+      "question": "吊牌我后来剪掉了呢？",
+      "dialogue": "restore-action-and-tag",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "no_evidence",
+        "documents": []
+      },
+      "before": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "吊牌完整的服饰签收后多久能换货",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "未找到适用政策证据，请人工核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "衬衫的吊牌剪掉，签收后多久可以换货？",
+        "tool_outcome": "no_evidence",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "no_evidence"
+      },
+      "verdict_before": "false_acceptance",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D4.1",
+      "group": "dialogue",
+      "question": "羽绒服保留吊牌，签收后几天可以换货？",
+      "dialogue": "unrelated-order-lookup",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "clothes"
+        ],
+        "reply_contains": "未拆吊牌的服饰在签收十二天内可申请退换。"
+      },
+      "before": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "羽绒服未拆吊牌签收后几天可换货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "羽绒服未拆吊牌签收后几天可换货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D4.2",
+      "group": "dialogue",
+      "question": "另外帮我查订单 ORD-20240125-006 的状态。",
+      "dialogue": "unrelated-order-lookup",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "not_requested",
+        "documents": [],
+        "reply_equals": "已为您查询订单状态。"
+      },
+      "before": {
+        "reply": "已为您查询订单状态。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": false,
+        "tool_query": null,
+        "tool_outcome": null,
+        "tool_calls": [
+          "query_order"
+        ],
+        "order_status": "delivered",
+        "proposals": 0,
+        "outcome": "not_requested"
+      },
+      "after": {
+        "reply": "已为您查询订单状态。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": false,
+        "tool_query": null,
+        "tool_outcome": null,
+        "tool_calls": [
+          "query_order"
+        ],
+        "order_status": "delivered",
+        "proposals": 0,
+        "outcome": "not_requested"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D4.3",
+      "group": "dialogue",
+      "question": "谢谢，暂时没有其他事了。",
+      "dialogue": "unrelated-order-lookup",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "not_requested",
+        "documents": [],
+        "reply_equals": "不客气。"
+      },
+      "before": {
+        "reply": "不客气。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": false,
+        "tool_query": null,
+        "tool_outcome": null,
+        "tool_calls": [],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "not_requested"
+      },
+      "after": {
+        "reply": "不客气。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": false,
+        "tool_query": null,
+        "tool_outcome": null,
+        "tool_calls": [],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "not_requested"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D5.1",
+      "group": "dialogue",
+      "question": "裤子吊牌完整，签收后多久可以退货？",
+      "dialogue": "separate-and-resumed-session",
+      "session": "first",
+      "restored": false,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "clothes"
+        ],
+        "reply_contains": "未拆吊牌的服饰在签收十二天内可申请退换。"
+      },
+      "before": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "未拆吊牌的裤子签收多少天内可申请退货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "未拆吊牌的裤子签收多少天内可申请退货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D5.2",
+      "group": "dialogue",
+      "question": "它还能办吗？",
+      "dialogue": "separate-and-resumed-session",
+      "session": "other",
+      "restored": false,
+      "expected": {
+        "outcome": "needs_clarification",
+        "documents": []
+      },
+      "before": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "未拆吊牌的服饰签收后多久能退货",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "请说明您指的是哪件商品，以及想办理什么业务，我再为您核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "未拆吊牌的服饰签收后多久能退货",
+        "tool_outcome": "needs_clarification",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "needs_clarification"
+      },
+      "verdict_before": "answered_without_clarifying",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D5.3",
+      "group": "dialogue",
+      "question": "那换货也行吗？",
+      "dialogue": "separate-and-resumed-session",
+      "session": "first",
+      "restored": true,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "clothes"
+        ],
+        "reply_contains": "未拆吊牌的服饰在签收十二天内可申请退换。"
+      },
+      "before": {
+        "reply": "未找到适用政策证据，请人工核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "换货",
+        "tool_outcome": "no_evidence",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "no_evidence"
+      },
+      "after": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "裤子吊牌完整，签收后多久可以换货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D6.1",
+      "group": "dialogue",
+      "question": "毛衣吊牌完整，签收后多少天可以申请换货？",
+      "dialogue": "unidentified-other-product",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "answerable",
+        "documents": [
+          "clothes"
+        ],
+        "reply_contains": "未拆吊牌的服饰在签收十二天内可申请退换。"
+      },
+      "before": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "毛衣吊牌没有剪，签收后多久可以换货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "毛衣吊牌没有剪，签收后多久可以换货？",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "D6.2",
+      "group": "dialogue",
+      "question": "那另一个商品呢？",
+      "dialogue": "unidentified-other-product",
+      "session": "default",
+      "restored": false,
+      "expected": {
+        "outcome": "needs_clarification",
+        "documents": []
+      },
+      "before": {
+        "reply": "未拆吊牌的服饰在签收十二天内可申请退换。",
+        "follow_up": null,
+        "documents": [
+          "clothes"
+        ],
+        "requires_human": false,
+        "tool_query": "服饰吊牌完好签收后多久能换",
+        "tool_outcome": "answerable",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "answerable"
+      },
+      "after": {
+        "reply": "请说明您指的是哪件商品，以及想办理什么业务，我再为您核实。",
+        "follow_up": null,
+        "documents": [],
+        "requires_human": true,
+        "tool_query": "服饰吊牌完好签收后多久能换",
+        "tool_outcome": "needs_clarification",
+        "tool_calls": [
+          "search_knowledge"
+        ],
+        "order_status": null,
+        "proposals": 0,
+        "outcome": "needs_clarification"
+      },
+      "verdict_before": "answered_without_clarifying",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "C01",
+      "group": "additional",
+      "question": "护具说明书上写着护腕。我这个护腕吊牌完好，签收后退货期限有几天？",
+      "rationale": "运动护具条款明列护腕和签收后的退货期限。",
+      "first_recheck": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "first_recheck_passed": false,
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d01"
+        ],
+        "quotes": [
+          "运动护具（包括护膝、护腕）吊牌完整时，签收十八天内可申请退货。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "C02",
+      "group": "additional",
+      "question": "给保温壶单买的替换盖，吊牌没拆，收货后退货的期限有多长？",
+      "rationale": "替换盖只有换货期限，保温壶本体的退货期限不适用。",
+      "first_recheck": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "first_recheck_passed": true,
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "C03",
+      "group": "additional",
+      "question": "我买的是风衣防尘罩，吊牌还在，签收后退货期限是几天？",
+      "rationale": "防尘罩独立出售，有专属的三天退货条款。",
+      "first_recheck": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "first_recheck_passed": false,
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d06"
+        ],
+        "quotes": [
+          "未拆吊牌的风衣防尘罩在签收三天内可申请退货。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "d06"
+        ],
+        "quotes": [
+          "未拆吊牌的风衣防尘罩在签收三天内可申请退货。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "C04",
+      "group": "additional",
+      "question": "运动护具的吊牌完整，签收后多少天内能换货？",
+      "rationale": "这份运动护具政策只规定退货。",
+      "first_recheck": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "first_recheck_passed": true,
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "C05",
+      "group": "additional",
+      "question": "预售尾款先支付失败，后来全额付清并到账，还会再催我交尾款吗？",
+      "rationale": "当前尾款已到账，结清条款明确停止催缴。",
+      "first_recheck": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "first_recheck_passed": false,
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "ledger-settled"
+        ],
+        "quotes": [
+          "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "C06",
+      "group": "additional",
+      "question": "预售尾款显示待结算，明天中午前肯定能完成清算吗？",
+      "rationale": "清算条款没有承诺完成时间。",
+      "first_recheck": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "first_recheck_passed": true,
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "C07",
+      "group": "additional",
+      "question": "预售尾款只支付了一部分，系统会自动补扣剩余尾款吗？",
+      "rationale": "条款明确部分支付时不会自动补扣。",
+      "first_recheck": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "ledger-installment"
+        ],
+        "quotes": [
+          "预售尾款只支付了一部分时，客服人工核对尚欠的余款，系统不会自动补扣尾款。"
+        ]
+      },
+      "first_recheck_passed": true,
+      "expected": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "ledger-installment"
+        ],
+        "quotes": [
+          "预售尾款只支付了一部分时，客服人工核对尚欠的余款，系统不会自动补扣尾款。"
+        ]
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "answerable",
+        "grounded": true,
+        "documents": [
+          "ledger-installment"
+        ],
+        "quotes": [
+          "预售尾款只支付了一部分时，客服人工核对尚欠的余款，系统不会自动补扣尾款。"
+        ]
+      },
+      "verdict_before": "false_refusal",
+      "verdict_after": "pass"
+    },
+    {
+      "id": "C08",
+      "group": "additional",
+      "question": "我付的是预售定金，显示待结算，平台这时还会再扣定金吗？",
+      "rationale": "四份付款条款都只适用于尾款。",
+      "first_recheck": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "first_recheck_passed": true,
+      "expected": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "before": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "after": {
+        "outcome": "no_evidence",
+        "grounded": false,
+        "documents": [],
+        "quotes": []
+      },
+      "verdict_before": "pass",
+      "verdict_after": "pass"
+    }
+  ]
+}

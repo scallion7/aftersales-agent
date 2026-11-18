@@ -22,7 +22,11 @@ from app.agent.after_sale import (
     RiskRouter,
 )
 from app.agent.memory import MemoryManager
-from app.agent.policy_turn import requires_policy_evidence, scoped_policy_quotes
+from app.agent.policy_turn import (
+    requires_policy_evidence,
+    resolve_policy_followup,
+    scoped_policy_quotes,
+)
 from app.agent.skills import SkillManager
 from app.agent.storage import canonical_messages
 from app.agent.strategies import PlanExecutionResult
@@ -321,6 +325,8 @@ class BaseConversationAgent(ABC):
         self._knowledge_turn_id = run.run_id if run else uuid4().hex
         self._turn_plan = None
         self.tool_registry.knowledge_service.last_result = None
+        self.tool_registry.knowledge_service.followup_query = ""
+        self.tool_registry.knowledge_service.followup_clarification = ""
         with TraceContext(
             trace_id=current_trace_id(),
             session_id=self.session_path,
@@ -344,6 +350,32 @@ class BaseConversationAgent(ABC):
     ) -> tuple[str, CustomerServiceResponse | None]:
         decision = self.guardrails.inspect_input(user_input)
         if decision.allowed:
+            if (
+                self.config.knowledge_versioned_enabled
+                and self.config.knowledge_embedding_mode == "local_hash"
+            ):
+                query, clarification, changed_product = resolve_policy_followup(
+                    decision.sanitized_text,
+                    self._runtime_state.get("policy_question"),
+                    bool(self._runtime_state.get("policy_followup")),
+                )
+                if changed_product:
+                    scope = self._runtime_state.get("knowledge_context", {})
+                    if scope.get("order_id"):
+                        query = ""
+                        clarification = "请确认新商品对应的订单，我再按该订单核实政策。"
+                    else:
+                        for field in ("fields", "sources"):
+                            scope.get(field, {}).pop("product", None)
+                if len(query) > 4000:
+                    query, clarification = (
+                        "",
+                        "请简短说明本次需要核实的商品、款项和适用条件。",
+                    )
+                self.tool_registry.knowledge_service.followup_query = query
+                self.tool_registry.knowledge_service.followup_clarification = (
+                    clarification
+                )
             if decision.sanitized_text != user_input.strip():
                 self.event_bus.emit(
                     "security.redacted",
@@ -745,8 +777,16 @@ class BaseConversationAgent(ABC):
             )
             result.citations = []
             result.evidence_state = "not_requested"
+            active_question = getattr(knowledge, "followup_query", "") or user_input
+            clarification = getattr(knowledge, "followup_clarification", "")
+            if (
+                clarification
+                and (evidence or self._runtime_state.get("policy_followup"))
+                and not business_tool_used
+            ):
+                evidence = {"outcome": "needs_clarification", "citations": []}
             if evidence:
-                quotes = scoped_policy_quotes(user_input, evidence)
+                quotes = scoped_policy_quotes(active_question, evidence)
                 if quotes == []:
                     evidence = evidence | {"outcome": "no_evidence", "citations": []}
                 elif quotes and not self.config.answer_evidence_check_enabled:
@@ -759,7 +799,9 @@ class BaseConversationAgent(ABC):
                     result.requires_human = True
                     result.reply = {
                         "no_evidence": "未找到适用政策证据，请人工核实。",
-                        "needs_clarification": "请补充适用地域、渠道或商品信息后再核实政策。",
+                        "needs_clarification": clarification
+                        or evidence.get("clarification")
+                        or "请补充适用地域、渠道或商品信息后再核实政策。",
                         "policy_conflict": "政策证据存在冲突，已建议转人工核实。",
                     }[evidence["outcome"]]
                 if (
@@ -810,10 +852,22 @@ class BaseConversationAgent(ABC):
                 result.reply = "引用的政策证据已失效，请重新检索或转人工核实。"
             if result.evidence_state != "not_requested":
                 self._runtime_state["policy_followup"] = result.evidence_state
+                from app.platform.policy_evidence import analyze_policy_question
+
+                if (
+                    self.config.knowledge_embedding_mode == "local_hash"
+                    and not clarification
+                    and len(active_question) <= 4000
+                    and analyze_policy_question(active_question) is not None
+                ):
+                    self._runtime_state["policy_question"] = active_question
+                else:
+                    self._runtime_state.pop("policy_question", None)
                 if result.evidence_state != "answerable":
                     result.follow_up_question = None
             else:
                 self._runtime_state.pop("policy_followup", None)
+                self._runtime_state.pop("policy_question", None)
         else:
             result.citations = []
             result.evidence_state = "not_requested"

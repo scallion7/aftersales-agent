@@ -308,6 +308,26 @@ class PolicyDialogueTests(PlatformTestCase):
         self.assertEqual(response.evidence_state, "needs_clarification")
         self.assertEqual(tool["context"], {})
 
+    def test_stale_order_is_rejected_for_inline_ids_and_unnamed_order_changes(self):
+        for message in ("改查ORD-EMPTY的退货政策。", "我想改查另一笔订单的退货政策。"):
+            with self.subTest(message=message):
+                first, _, _ = self.turn(
+                    "查订单 ORD-OWNED 的退货政策。", {"order_id": "ORD-OWNED"}
+                )
+                self.assertEqual(first.evidence_state, "answerable")
+                same, _, _ = self.turn(
+                    "不是另一笔订单，还是按这单核实。", {"order_id": "ORD-OWNED"}
+                )
+                self.assertEqual(same.evidence_state, "answerable")
+                response, tool, state = self.turn(message, {"order_id": "ORD-OWNED"})
+                self.assertEqual(response.evidence_state, "needs_clarification")
+                self.assertIn("订单号", response.reply)
+                self.assertEqual(response.citations, [])
+                self.assertEqual(
+                    tool["error_code"], "KNOWLEDGE_ORDER_SELECTION_REQUIRED"
+                )
+                self.assertNotIn("order_id", state)
+
     def test_model_retry_cannot_omit_conflicting_field_to_revive_order_scope(self):
         self.turn("查询订单 ORD-OWNED 的退货政策。", {"order_id": "ORD-OWNED"})
         response, tool, state = self.turn("我说的是北京。", [{"region": "北京"}, {}])

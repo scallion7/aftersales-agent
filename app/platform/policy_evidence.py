@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from app.platform.payment_conditions import PaymentCondition
+
 # Only broaden a named garment to a policy for clothing in general. A policy
 # for one garment cannot be used for another garment or all clothing.
 _CLOTHING = frozenset("服装 服饰 衣物 衣服 成衣".split())
@@ -12,6 +14,18 @@ _GARMENTS = frozenset(
     "外套 上衣 大衣 风衣 夹克 衬衣 衬衫 卫衣 毛衣 羽绒服 连衣裙 裙子 裤子 牛仔裤 T恤".split()
 )
 _PRODUCT = re.compile("|".join(sorted(_CLOTHING | _GARMENTS, key=len, reverse=True)))
+_NOUN = r"[\u4e00-\u9fffA-Za-z0-9]{1,24}"
+_PRODUCT_EXAMPLES = re.compile(
+    rf"(?P<category>{_NOUN})[（(](?:包括|包含)(?P<examples>{_NOUN}(?:[、,，]{_NOUN})*)[）)]"
+)
+_REPORTED_PRODUCT = re.compile(
+    rf"(?:说明书|包装|商品标签|订单详情|清单)(?:上|中)?(?:写着|写明|注明|标注为|标为)[：:]?"
+    rf"(?P<label>{_NOUN})(?P<stop>[。；;，,])"
+)
+_PURCHASE_IDENTITY = re.compile(r"我(?:们)?(?:买|购买|购入)(?:到)?的(?:商品)?是")
+_CATEGORY_QUALIFIER = re.compile(
+    r".*(?:的|仅限|限定|专享|专属|指定|会员|用户|顾客|门店|渠道|区域|活动)"
+)
 _RETURN = re.compile(
     r"退换货?|退货|退回商品|换货|(?:能|可以|允许|还能|可不可以|申请|办理)(退|换)(?!货|换|款|钱|回)"
 )
@@ -22,7 +36,7 @@ _REMOVED = (
 _INTACT = re.compile(
     rf"{_TAG}(?:与|和)(?:{'|'.join(sorted(_CLOTHING, key=len, reverse=True))})(?:仍然|还|仍)?连(?:在一起|着)|"
     rf"(?:(?:保留(?:着)?|留着|有|带着)|(?:未|没(?:有)?){_REMOVED})(?:原装|原有)?{_TAG}"
-    rf"|{_TAG}(?:仍然|一直|还|仍|是|原样)?(?:挂(?:在原处|着)|保留|留(?:在原处|着)|还在|完好(?:无损)?|完整|齐全|未{_REMOVED}|没(?:有)?{_REMOVED}|在(?:原处)?)"
+    rf"|{_TAG}(?:仍然|一直|还|仍|是|原样)?(?:挂(?:在原处|着)|保留(?:着)?|留(?:在原处|着)|还在|完好(?:无损)?|完整|齐全|未{_REMOVED}|没(?:有)?{_REMOVED}|在(?:原处)?)"
 )
 _MISSING = re.compile(
     rf"(?:没有(?:保留)?|没(?:有)?留|未保留|{_REMOVED}(?:了)?){_TAG}"
@@ -107,8 +121,47 @@ def _tag_state(text):
 
 
 _TAG_STATES = re.compile(
-    f"(?P<missing>{_MISSING.pattern})|(?P<intact>{_INTACT.pattern})"
+    f"(?:(?P<missing>{_MISSING.pattern})|(?P<intact>{_INTACT.pattern}))(?:时)?"
 )
+
+
+def _return_subject(clause):
+    """Read a whole product noun from either side of a tag condition."""
+    tag = _TAG_STATES.search(clause)
+    if not tag:
+        return ""
+    if tag.start():
+        before = clause[: tag.start()]
+        return before if re.fullmatch(_NOUN, before) else ""
+    after = re.match(rf"的({_NOUN})(?=在(?:签收|收货|收到))", clause[tag.end() :])
+    return after[1] if after else ""
+
+
+def _listed_products(clause, query_terms):
+    tag = _TAG_STATES.match(clause)
+    start = tag.end() + 1 if tag and clause[tag.end() :].startswith("的") else 0
+    listing = _PRODUCT_EXAMPLES.match(clause, start)
+    if not listing:
+        return None
+    suffix = clause[listing.end() :]
+    if start and not _RECEIPT.match(suffix.removeprefix("在")):
+        return None
+    if not start and not _TAG_STATES.match(suffix):
+        return None
+    qualifier = _CATEGORY_QUALIFIER.match(listing["category"])
+    if qualifier and _words(qualifier[0]) - _FRAMING - query_terms:
+        return None
+    return listing
+
+
+def _return_wording(text):
+    def product_label(match):
+        label = match["label"]
+        if label in text[match.end() :]:
+            return " " + label + match["stop"]
+        return match.group()
+
+    return _PURCHASE_IDENTITY.sub(" ", _REPORTED_PRODUCT.sub(product_label, text))
 
 
 def _return_types(text):
@@ -145,6 +198,8 @@ class PolicyQuestion:
     payment_state: str = ""
     subject: frozenset[str] = frozenset()
     asks_location: bool = False
+    payment_condition: PaymentCondition | None = None
+    return_query: str = ""
 
     def check(self, text, *, context=None, metadata=None):
         """Return a retrieval relevance decision; the original quote retains its polarity."""
@@ -190,12 +245,38 @@ class PolicyQuestion:
             "kind": self.kind,
         }
 
-    def _check_clause(self, clause, product, declared):
+    def _check_clause(self, clause, product, declared, *, category=""):
         if _QUESTION_FORM.search(clause):
             return "question_without_rule"
+        if self.payment_condition:
+            return self.payment_condition.check(clause)
         if self.kind == "return":
-            named_products = set(_PRODUCT.findall(clause))
+            # Each explicitly listed member inherits the rule after the list.
+            # Check them separately so a trusted order for one member cannot
+            # confirm a question about its sibling. The citation stays intact.
+            examples = _listed_products(clause, self.terms)
+            if examples:
+                names = [
+                    examples["category"],
+                    *re.split("[、,，]", examples["examples"]),
+                ]
+                for name in names:
+                    variant = (
+                        clause[: examples.start()] + name + clause[examples.end() :]
+                    )
+                    reason = self._check_clause(
+                        variant, product, declared, category=examples["category"]
+                    )
+                    if reason == "supported":
+                        return "supported"
+                return "declared_product_scope_mismatch"
+            subject = _return_subject(clause)
+            if subject in {"商品", "本品"}:
+                subject = ""
+            named_products = {subject} if subject else set(_PRODUCT.findall(clause))
             requested = self.products
+            if subject and subject in self.return_query:
+                requested = {p for p in requested if p not in subject} | {subject}
             if product:
                 if requested and any(
                     not (
@@ -252,11 +333,17 @@ class PolicyQuestion:
             extra = _words(remainder) - _FRAMING - _RETURN_GRAMMAR
             if product:
                 extra.discard(product.lower())
+                if subject == product:
+                    extra -= _words(subject)
             if product and product in declared:
                 extra -= {"商品", "本品"}
             if extra - self.terms:
                 return "additional_clause_condition"
         elif self.kind in {"automatic_debit", "billing_detail"}:
+            # A general deadline may apply before any payment, but a qualified
+            # debit/approval must never silently inherit another payment state.
+            if "deadline" not in self.subject and PaymentCondition.parse(clause):
+                return "payment_condition_missing"
             if not self.subject.issubset(_billing_subject(clause)):
                 return "billing_subject_mismatch"
             if self.kind == "automatic_debit":
@@ -274,6 +361,8 @@ class PolicyQuestion:
             ):
                 return "deadline_source_missing"
         missing = self.terms - _words(clause)
+        if category:
+            missing -= _words(category)
         if self.kind == "return" and product and product in declared:
             # An exact document category can supply the noun if the text just
             # says "商品"; it cannot establish other conditions in the question.
@@ -343,7 +432,13 @@ def analyze_policy_question(text):
     actions = _return_types(text)
     if tags and actions:
         residue = _without(
-            text, _TAG_STATES, _PRODUCT, _RETURN, _RECEIPT, _WINDOW, _ELAPSED
+            _return_wording(text),
+            _TAG_STATES,
+            _PRODUCT,
+            _RETURN,
+            _RECEIPT,
+            _WINDOW,
+            _ELAPSED,
         )
         return PolicyQuestion(
             kind="return",
@@ -352,10 +447,22 @@ def analyze_policy_question(text):
             tags=frozenset(tags),
             terms=frozenset(_words(residue) - _FRAMING - _RETURN_GRAMMAR),
             needs_window=bool(_ELAPSED.search(text) or _WINDOW.search(text)),
+            return_query=text,
         )
     subject = _billing_subject(text)
     automatic = _AUTOMATIC.search(text) and _DEBIT.search(text)
     if automatic or ("presale" in subject and subject & {"balance", "deposit"}):
+        condition = PaymentCondition.parse(text)
+        if condition and ("deadline" not in subject or condition.actions):
+            return PolicyQuestion(
+                kind="payment_status",
+                products=frozenset(),
+                actions=frozenset(),
+                tags=frozenset(),
+                terms=condition.terms,
+                needs_window=False,
+                payment_condition=condition,
+            )
         state = (
             "unpaid" if _UNPAID.search(text) else "paid" if _PAID.search(text) else ""
         )
@@ -392,3 +499,18 @@ def analyze_policy_question(text):
                 asks_location=bool(_LOCATE.search(text)),
             )
     return None
+
+
+def replace_return_condition(text, *, tag="", action=""):
+    """Change one known return facet without dropping other customer conditions."""
+    if tag:
+        return _TAG_STATES.sub(tag, text)
+    if action:
+
+        def replace_action(match):
+            if match[1]:
+                return match.group()[:-1] + action
+            return action
+
+        return _RETURN.sub(replace_action, text)
+    return text

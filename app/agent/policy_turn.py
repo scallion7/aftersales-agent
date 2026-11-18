@@ -117,3 +117,110 @@ def scoped_policy_quotes(message, evidence):
         if quote not in quotes:
             quotes.append(quote)
     return quotes
+
+
+# These are complete elliptical forms. An extra condition must not disappear
+# merely because a few words in a customer message resemble a known edit.
+_ACTION_ONLY = re.compile(
+    r"(?:那(?:么)?|如果|要是|改成|换成)?(?:申请|办理)?(退换货?|退货|换货)"
+    r"(?:也|还)?(?:行|可以|能办|一样|适用)?(?:吗|呢|么)?"
+)
+_TAG_ONLY = re.compile(
+    r"(?:那|如果|要是)?(?:我)?(?:后来|已经|刚刚|刚)?(吊牌|商品标签)"
+    r"(?:我)?(?:后来|已经|刚刚|刚|被我|还|仍)?"
+    r"(没(?:有)?剪|未拆|完整|还在|剪掉|剪了|剪断|拆掉|摘掉|丢失)(?:了)?(?:呢|吗)?"
+)
+_PRODUCT_ONLY = re.compile(
+    r"(?:那(?:么)?|如果(?:是|换成)|要是(?:是|换成)?|换成|换作|改成)"
+    r"([\u3400-\u9fffA-Za-z0-9]{1,18}?)(?:呢|也一样吗|也适用吗)"
+)
+_UNSPECIFIED = re.compile(
+    r"(?:那|如果|要是)?(?:换成)?(?:另(?:一|外一)(?:个|种|件|款)(?:商品|产品|东西)?|"
+    r"其他(?:商品|产品|东西)|它|它们|那件|这个|那个)(?:也|还)?(?:能办|可以|能退|能换|适用)?(?:吗|呢)?"
+)
+_PAYMENT_DELTA = re.compile(
+    r"(?:我|刚刚|刚|查清|查过|看过|发现|确认|其实|确实|如果|假如|要是|那|现在|"
+    r"状态|显示|变成|变为|改成|刷新|刚才|预售|尾款|已经|仍然|还|未支付|逾期|过期|超过日期|后|系统|平台|"
+    r"再扣一次|重复扣款|自动扣款|自动扣钱|会不会|会|吗|呢|了|[，,。\s])+"
+)
+_PRODUCT_PROMPT = "请说明您指的是哪件商品，以及想办理什么业务，我再为您核实。"
+_CHANGE_PROMPT = "请补充商品或款项的具体情况，以及需要核实的规则。"
+_LOCATION_OR_ORDER = re.compile(r"门店|线上|线下|商城|地区|渠道|订单")
+
+
+def resolve_policy_followup(message, previous, had_policy_turn=False):
+    """Return (independent search question, clarification, product changed).
+
+    Only a customer's own immediately active policy question may supply
+    omitted facts. Ambiguous changes never borrow subjects from model text.
+    """
+    from app.platform.payment_conditions import (
+        parse_payment_state,
+        replace_payment_state,
+    )
+    from app.platform.policy_evidence import (
+        analyze_policy_question,
+        replace_return_condition,
+    )
+
+    short = message.strip().rstrip("？?。！! ")
+    if _UNSPECIFIED.fullmatch(short):
+        return "", _PRODUCT_PROMPT, False
+    if not previous:
+        if (
+            had_policy_turn
+            and not _LOCATION_OR_ORDER.search(short)
+            and any(
+                pattern.fullmatch(short)
+                for pattern in (_PRODUCT_ONLY, _ACTION_ONLY, _TAG_ONLY)
+            )
+        ):
+            return "", _CHANGE_PROMPT, False
+        return "", "", False
+    prior = analyze_policy_question(previous)
+    if not prior:
+        return "", "", False
+    if prior.kind == "return":
+        action = _ACTION_ONLY.fullmatch(short)
+        if action:
+            return replace_return_condition(previous, action=action[1]), "", False
+        tag = _TAG_ONLY.fullmatch(short)
+        if tag:
+            changed = tag[1] + tag[2]
+            return replace_return_condition(previous, tag=changed), "", False
+        product = _PRODUCT_ONLY.fullmatch(short)
+        if product and not _LOCATION_OR_ORDER.search(product[1]):
+            old = prior.products or prior.terms
+            # A time, place, or other requirement attached to a named product
+            # cannot be assumed to apply to a different purchase.
+            if (
+                len(old) != 1
+                or (prior.products and prior.terms)
+                or next(iter(old)) not in previous
+            ):
+                return "", _CHANGE_PROMPT, True
+            return previous.replace(next(iter(old)), product[1]), "", True
+    elif prior.kind in {"automatic_debit", "billing_detail", "payment_status"}:
+        if parse_payment_state(short):
+            normalized = replace_payment_state(short, "未支付")
+            if normalized and _PAYMENT_DELTA.fullmatch(normalized):
+                if "尾款" in short and "尾款" not in previous:
+                    return "", _CHANGE_PROMPT, False
+                changed = replace_payment_state(previous, short)
+                if changed:
+                    # Repeating a settled charge is a separate customer question.
+                    changed = changed.replace("重复自动扣", "自动扣")
+                    if re.search(r"再扣一次|重复扣", short):
+                        changed = re.sub(r"(?=自动扣|自行扣)", "重复", changed, count=1)
+                    return changed, "", False
+    if (
+        not analyze_policy_question(message)
+        and not _LOCATION_OR_ORDER.search(short)
+        and requires_policy_evidence(short, "", "answerable")
+    ):
+        # An independently phrased policy question starts a new search. If it
+        # only names a new circumstance, the omitted facts cannot be guessed.
+        if _POLICY.search(short) or _POLICY_QUESTION.search(short):
+            return message, "", False
+        return "", _CHANGE_PROMPT, False
+    return "", "", False

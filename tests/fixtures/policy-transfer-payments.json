@@ -1,0 +1,26 @@
+{
+  "policies": [
+    {"id": "ledger-installment", "title": "预售尾款分次到账", "text": "预售尾款只支付了一部分时，客服人工核对尚欠的余款，系统不会自动补扣尾款。"},
+    {"id": "ledger-clearing", "title": "预售支付渠道清算", "text": "预售尾款支付状态为待结算时，平台等待支付渠道返回清算结果，期间不再扣款。"},
+    {"id": "ledger-reversal", "title": "预售交易撤回", "text": "预售尾款的付款交易已经撤回成功时，买家需要在订单页重新支付尾款，平台不会自动扣款。"},
+    {"id": "ledger-settled", "title": "预售尾款结清", "text": "预售订单的尾款已全部付清并到账后，平台不会重复扣尾款，也不会再发尾款催缴提醒。"}
+  ],
+  "cases": [
+    {"id": "pay-01", "query": "预售尾款只付了一部分，系统会再扣尾款吗？", "expected": "ledger-installment", "reason": "分次到账政策明确涵盖未付余款与自动补扣。"},
+    {"id": "pay-02", "query": "预售尾款显示待结算，系统会再扣尾款吗？", "expected": "ledger-clearing", "reason": "清算期间不再扣款。"},
+    {"id": "pay-03", "query": "预售尾款那笔付款已撤回成功，系统会再扣尾款吗？", "expected": "ledger-reversal", "reason": "撤回成功后仅说明由买家重新支付。"},
+    {"id": "pay-04", "query": "预售尾款已全部付清并到账，系统会再扣尾款吗？", "expected": "ledger-settled", "reason": "全部结清后有独立的防重复扣款条款。"},
+    {"id": "pay-05", "query": "预售尾款支付失败，系统会再扣尾款吗？", "expected": null, "reason": "仅失败不等于成功撤回，四份政策都未覆盖此状态。"},
+    {"id": "pay-06", "query": "预售尾款撤回申请还在审批，系统会再扣尾款吗？", "expected": null, "reason": "尚在申请的撤回未满足成功撤回前提。"},
+    {"id": "pay-07", "query": "预售尾款一分钱也没付，系统会再扣尾款吗？", "expected": null, "reason": "未支付过任何金额不符合部分支付、清算、撤回或结清。"},
+    {"id": "pay-08", "query": "预售尾款只交了一半，剩下那笔由客服人工核对吗？", "expected": "ledger-installment", "reason": "部分付款的剩余金额由客服处理。"},
+    {"id": "pay-09", "query": "预售尾款支付显示待结算，是不是要等支付渠道的清算结果？", "expected": "ledger-clearing", "reason": "清算条款直接说明所等结果。"},
+    {"id": "pay-10", "query": "预售尾款的交易已成功撤回，我应该在哪里重新支付这笔尾款？", "expected": "ledger-reversal", "reason": "撤回条款明确给出订单页。"},
+    {"id": "pay-11", "query": "预售尾款已结清到账，平台还会发尾款催缴提醒吗？", "expected": "ledger-settled", "reason": "结清条款对尾款提醒有明确规定。"},
+    {"id": "pay-12", "query": "预售尾款只付了一部分，系统会再扣会员费吗？", "expected": null, "reason": "扣费对象换成会员费，不能引用补扣尾款条款。"},
+    {"id": "pay-13", "query": "预售尾款已全部付清并到账，平台还会发运费催缴提醒吗？", "expected": null, "reason": "提醒指向运费，非结清条款中的尾款提醒。"},
+    {"id": "pay-14", "query": "预售尾款支付显示待结算，支付渠道保证几小时内完成清算？", "expected": null, "reason": "条款说明等待清算，未承诺时长。"},
+    {"id": "pay-15", "query": "预售尾款已经不是待结算了，系统会再扣尾款吗？", "expected": null, "reason": "排除了待结算却没有给出当前状态，不能假定已经到账。"},
+    {"id": "pay-16", "query": "预售尾款先显示失败，随后已经全部付清并到账，系统会再扣尾款吗？", "expected": "ledger-settled", "reason": "问题明确给出失败后的当前状态为全部到账。"}
+  ]
+}

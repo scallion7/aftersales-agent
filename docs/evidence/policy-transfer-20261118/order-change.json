@@ -1,0 +1,237 @@
+{
+  "case": "customer_order_change_with_stale_model_argument",
+  "base_commit": "33c7aae26ffe85d8135c8072e185e53e9c025a53",
+  "scope": "受控模型选择工具，真实本地 Agent、订单归属解析、SQLite 会话持久化和检索；未调用外部模型。",
+  "fixtures": {
+    "ORD-OWNED": {
+      "owner": "user-1",
+      "region": "上海",
+      "channel": "门店",
+      "product": "服饰"
+    },
+    "ORD-EMPTY": {
+      "owner": "user-1",
+      "policy_fields": {}
+    },
+    "returns": "服饰签收七天内可以退货。"
+  },
+  "session": {
+    "same_session_and_user": true,
+    "recreate_agent_for_every_turn": true,
+    "first_turn_starts_empty": true,
+    "second_turn_restores_persisted_state": true
+  },
+  "turns": [
+    {
+      "turn": 1,
+      "resumed_existing_session": false,
+      "customer_message": "请查订单 ORD-OWNED 的退货政策。",
+      "customer_selected_order": "ORD-OWNED",
+      "model_tool_call": {
+        "name": "search_knowledge",
+        "query": "服饰签收七天退货",
+        "order_id": "ORD-OWNED"
+      },
+      "expected": {
+        "evidence_state": "answerable",
+        "cited_documents": [
+          "returns"
+        ],
+        "action": "按当前订单证据作答"
+      },
+      "before": {
+        "evidence_state": "answerable",
+        "reply": "服饰签收七天内可以退货。",
+        "requires_human": false,
+        "citations": [
+          {
+            "document_id": "returns",
+            "quote": "服饰签收七天内可以退货。"
+          }
+        ],
+        "tool_outcome": "answerable",
+        "tool_error": null,
+        "applied_order_ids_from_provenance": [
+          "ORD-OWNED"
+        ],
+        "applied_context": {
+          "region": "上海",
+          "channel": "门店",
+          "product": "服饰"
+        },
+        "session_order_after_turn": "ORD-OWNED"
+      },
+      "after": {
+        "evidence_state": "answerable",
+        "reply": "服饰签收七天内可以退货。",
+        "requires_human": false,
+        "citations": [
+          {
+            "document_id": "returns",
+            "quote": "服饰签收七天内可以退货。"
+          }
+        ],
+        "tool_outcome": "answerable",
+        "tool_error": null,
+        "applied_order_ids_from_provenance": [
+          "ORD-OWNED"
+        ],
+        "applied_context": {
+          "region": "上海",
+          "channel": "门店",
+          "product": "服饰"
+        },
+        "session_order_after_turn": "ORD-OWNED"
+      },
+      "passed_before": true,
+      "passed_after": true
+    },
+    {
+      "turn": 2,
+      "resumed_existing_session": true,
+      "customer_message": "改查订单 ORD-EMPTY 的退货政策。",
+      "customer_selected_order": "ORD-EMPTY",
+      "model_tool_call": {
+        "name": "search_knowledge",
+        "query": "服饰签收七天退货",
+        "order_id": "ORD-OWNED"
+      },
+      "expected": {
+        "evidence_state": "needs_clarification",
+        "cited_documents": [],
+        "action": "停止沿用前一订单，要求确认当前选择"
+      },
+      "before": {
+        "evidence_state": "answerable",
+        "reply": "服饰签收七天内可以退货。",
+        "requires_human": false,
+        "citations": [
+          {
+            "document_id": "returns",
+            "quote": "服饰签收七天内可以退货。"
+          }
+        ],
+        "tool_outcome": "answerable",
+        "tool_error": null,
+        "applied_order_ids_from_provenance": [
+          "ORD-OWNED"
+        ],
+        "applied_context": {
+          "channel": "门店",
+          "product": "服饰",
+          "region": "上海"
+        },
+        "session_order_after_turn": "ORD-OWNED"
+      },
+      "after": {
+        "evidence_state": "needs_clarification",
+        "reply": "请确认这次要查询的订单号，我再按这笔订单核实政策。",
+        "requires_human": true,
+        "citations": [],
+        "tool_outcome": "needs_clarification",
+        "tool_error": "KNOWLEDGE_ORDER_SELECTION_REQUIRED",
+        "applied_order_ids_from_provenance": [],
+        "applied_context": {},
+        "session_order_after_turn": null
+      },
+      "passed_before": false,
+      "passed_after": true
+    }
+  ],
+  "second_turn_variants": [
+    {
+      "customer_message": "改查ORD-EMPTY的退货政策。",
+      "customer_selected_order": "ORD-EMPTY",
+      "model_tool_call": {
+        "name": "search_knowledge",
+        "query": "服饰签收七天退货",
+        "order_id": "ORD-OWNED"
+      },
+      "expected": {
+        "evidence_state": "needs_clarification",
+        "cited_documents": [],
+        "action": "停止沿用前一订单，要求确认当前选择"
+      },
+      "before": {
+        "evidence_state": "answerable",
+        "reply": "服饰签收七天内可以退货。",
+        "requires_human": false,
+        "citations": [
+          {
+            "document_id": "returns",
+            "quote": "服饰签收七天内可以退货。"
+          }
+        ],
+        "tool_outcome": "answerable",
+        "tool_error": null,
+        "applied_order_ids_from_provenance": [
+          "ORD-OWNED"
+        ],
+        "applied_context": {
+          "channel": "门店",
+          "product": "服饰",
+          "region": "上海"
+        },
+        "session_order_after_turn": "ORD-OWNED"
+      },
+      "after": {
+        "evidence_state": "needs_clarification",
+        "reply": "请确认这次要查询的订单号，我再按这笔订单核实政策。",
+        "requires_human": true,
+        "citations": [],
+        "tool_outcome": "needs_clarification",
+        "tool_error": "KNOWLEDGE_ORDER_SELECTION_REQUIRED",
+        "applied_order_ids_from_provenance": [],
+        "applied_context": {},
+        "session_order_after_turn": null
+      }
+    },
+    {
+      "customer_message": "我想改查另一笔订单的退货政策。",
+      "customer_selected_order": null,
+      "model_tool_call": {
+        "name": "search_knowledge",
+        "query": "服饰签收七天退货",
+        "order_id": "ORD-OWNED"
+      },
+      "expected": {
+        "evidence_state": "needs_clarification",
+        "cited_documents": [],
+        "action": "停止沿用前一订单，要求确认当前选择"
+      },
+      "before": {
+        "evidence_state": "answerable",
+        "reply": "服饰签收七天内可以退货。",
+        "requires_human": false,
+        "citations": [
+          {
+            "document_id": "returns",
+            "quote": "服饰签收七天内可以退货。"
+          }
+        ],
+        "tool_outcome": "answerable",
+        "tool_error": null,
+        "applied_order_ids_from_provenance": [
+          "ORD-OWNED"
+        ],
+        "applied_context": {
+          "channel": "门店",
+          "product": "服饰",
+          "region": "上海"
+        },
+        "session_order_after_turn": "ORD-OWNED"
+      },
+      "after": {
+        "evidence_state": "needs_clarification",
+        "reply": "请确认这次要查询的订单号，我再按这笔订单核实政策。",
+        "requires_human": true,
+        "citations": [],
+        "tool_outcome": "needs_clarification",
+        "tool_error": "KNOWLEDGE_ORDER_SELECTION_REQUIRED",
+        "applied_order_ids_from_provenance": [],
+        "applied_context": {},
+        "session_order_after_turn": null
+      }
+    }
+  ]
+}

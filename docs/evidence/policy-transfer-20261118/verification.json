@@ -1,0 +1,129 @@
+{
+  "app_source_sha256": "5a7f4ae2204c9ff27c3ff33bc8c2c0872f6ab28db98f8fe827316d4183f56f6a",
+  "baseline_commit": "33c7aae26ffe85d8135c8072e185e53e9c025a53",
+  "test_run": {
+    "python": "3.11.15",
+    "browser": "Chromium (Playwright), enabled",
+    "tests": 550,
+    "seconds": 123.726,
+    "skipped": 0,
+    "passed": 550,
+    "app_statement_coverage_pct": 84,
+    "app_statements": 14293,
+    "missed_statements": 2352
+  },
+  "previous_retrieval": {
+    "16": {
+      "unique_questions": 16,
+      "modes": [
+        "bm25",
+        "hybrid",
+        "hybrid_rerank",
+        "vector"
+      ],
+      "profiles": [
+        "legacy-v1",
+        "candidate-v2"
+      ],
+      "passed_decisions": 128,
+      "wrong_answers": 0,
+      "unnecessary_refusals": 0,
+      "unexpected_sources": 0,
+      "data_hashes": {
+        "documents.json": "080a0d6033ca03b72913a4d956f07369fb1743c28a763d60ac5a722c60bdf0a8",
+        "cases.json": "49ffb61cbac78fd43055856d3b902584d52994b3af33baa01d958736bf14c232"
+      }
+    },
+    "32": {
+      "unique_questions": 32,
+      "modes": [
+        "bm25",
+        "hybrid",
+        "hybrid_rerank",
+        "vector"
+      ],
+      "profiles": [
+        "legacy-v1",
+        "candidate-v2"
+      ],
+      "passed_decisions": 256,
+      "wrong_answers": 0,
+      "unnecessary_refusals": 0,
+      "unexpected_sources": 0,
+      "data_hashes": {
+        "documents.json": "d094fb75719ef152468e76da9bc1b927b771fc85d3df8e72cb83043c27aea9ea",
+        "cases.json": "c931f103289d7785b0f4cbc7ae18395ea003b4aaaf276ffa3cf0f6636ce18337"
+      }
+    },
+    "8": {
+      "profile": "candidate-v2",
+      "mode": "hybrid_rerank",
+      "results": [
+        {
+          "id": "spot01",
+          "expected": "clothing",
+          "found": [
+            "clothing"
+          ],
+          "outcome": "answerable",
+          "passed": true
+        },
+        {
+          "id": "spot02",
+          "expected": "clothing",
+          "found": [
+            "clothing"
+          ],
+          "outcome": "answerable",
+          "passed": true
+        },
+        {
+          "id": "spot03",
+          "expected": "balance",
+          "found": [
+            "balance"
+          ],
+          "outcome": "answerable",
+          "passed": true
+        },
+        {
+          "id": "spot04",
+          "expected": "balance",
+          "found": [
+            "balance"
+          ],
+          "outcome": "answerable",
+          "passed": true
+        },
+        {
+          "id": "spot05",
+          "expected": null,
+          "found": [],
+          "outcome": "no_evidence",
+          "passed": true
+        },
+        {
+          "id": "spot06",
+          "expected": null,
+          "found": [],
+          "outcome": "no_evidence",
+          "passed": true
+        },
+        {
+          "id": "spot07",
+          "expected": null,
+          "found": [],
+          "outcome": "no_evidence",
+          "passed": true
+        },
+        {
+          "id": "spot08",
+          "expected": null,
+          "found": [],
+          "outcome": "no_evidence",
+          "passed": true
+        }
+      ]
+    }
+  }
+}

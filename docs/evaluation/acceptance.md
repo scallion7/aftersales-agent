@@ -12,6 +12,23 @@
 
 审核工作台、生产发布门禁、供应商适配器等机制的实现与受控回归属于当前范围；真实审核、付费评测和生产联调的实际开展属于范围外。范围调整不放宽已有审核与发布条件，也不把受控测试结果转换为模型准确率或业务收益。下面各日期的验收记录保留当时环境与结果；范围外事项集中列于文末的后续自费验证清单。
 
+<a id="agent-boundaries-20261118"></a>
+
+## 2026-11-18 换货、政策问答与会话恢复
+
+| 场景 | 修复后的行为 | 验证入口 |
+|---|---|---|
+| 换货与历史退款 | 新换货转人工审核，客服登记履约凭证后结案。可证实从未发送的旧退款指令会取消，可能已发送的按原业务键查单。 | [操作步骤与状态](../guides/after-sale.md)、[退款分发回归](../../tests/test_refund_delivery.py) |
+| 政策问答 | 启用版本化知识库时，缺少本轮可信证据的政策问答提示人工核实。重放检索时校验引用，会话历史和短期记忆只记录用户最终看到的答复。 | [客户回合回归](../../tests/test_customer_turn_finalization.py) |
+| 会话恢复 | 切换账号或会话时清空原页面，迟到的响应按发起时的身份和会话校验。刷新后点击“连接会话”即可恢复当前会话仍保留的消息，并可继续同一项已确认操作。旧提案保留在操作卡中，后续无关问题可以正常回答。记忆更新暂时失败时，最近八轮问答可在恢复后补写。 | [会话隔离回归](../../tests/test_workspace_scope.py)、[确认后恢复回归](../../tests/test_browser_retries.py) |
+| 任务、风控与退款原因 | 同步聊天等待已被 Worker 领取的原任务，等待超时可用响应中的 `Location` 继续查询。SQLite 和 PostgreSQL 将规则激活与回滚串行执行，回滚选择最近退役的版本。浏览器和 HTTP 退款接口均接受最长 1000 字符的原因。 | [超时配置](../guides/configuration.md)、[风控回归](../../tests/test_provider_and_policy_governance.py)、[退款契约](../../tests/test_refund_delivery.py) |
+
+本轮在 Python 3.11.15 上启用 Chromium，**526 项测试通过，零跳过**，用时 116.547 秒，app 语句覆盖率为 **83%**。Ruff、格式和 104 条 OpenAPI 路径检查通过，离线计划质量门禁 40/40 通过。[本地验证清单](../evidence/agent-boundaries-20261118/checks.json) · [逐项测试结果](../evidence/agent-boundaries-20261118/unittest-results.log.gz) · [覆盖率明细](../evidence/agent-boundaries-20261118/coverage.log)
+
+在 PostgreSQL 17.11 的隔离实例上，发布与回滚同时等待写锁时，修复前留下两个活动版本，修复后只剩一个。同一任务由 8 个 Worker 争抢，只有 1 个成功领取。两类历史换货处理均未发起新的供应商退款，普通退款的 10 次回调只应用 1 次。[数据库结果](../evidence/agent-boundaries-20261118/postgres.json)
+
+在同一批 16 道合成开发题上，混合检索在 14 道有预期文档的题目上均召回了全部标注候选。最终返回了标注证据的题目由 6/14 增至 11/14，证据状态判对由 8/16 增至 13/16，仍有三道题被过度拒答。比较使用本地哈希向量和未经人工复核的开发题，保留集和真实模型未参与。[检索实验与逐项对比](retrieval-experiments.md)
+
 ## 2026-11-16 依赖安全补丁复验
 
 展示材料提交 `e7e1eed` 的 [CI 43850705491](https://github.com/scallion7/xc_sx_agent/actions/runs/43850705491) 在精确依赖审计中发现 `opentelemetry-api 1.45.1` 的 CVE-2026-126360，因此该次运行不能记为全绿。按[上游公告](https://github.com/open-telemetry/opentelemetry-python/security/advisories/GHSA-mf5v-w3w3-f6cg)，将 API/SDK 同步锁定到 `1.45.2`、semantic-conventions 到 `0.66b2`，同时提高 SDK 支持范围的安全下限。其他锁定版本保持不变。

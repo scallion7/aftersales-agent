@@ -409,12 +409,26 @@ class TrustedActionsTests(unittest.TestCase):
                 ).status_code,
                 200,
             )
+            headers = {"X-API-Key": "user"}
+            listing = "/v1/sessions/chat/actions"
+            resume = listing + "?include_confirmed=true"
+            self.assertEqual(client.get(listing, headers=headers).json()["actions"], [])
+            visible = client.get(resume, headers=headers).json()["actions"]
+            self.assertEqual(
+                [(item["action_id"], item["status"]) for item in visible],
+                [(action["action_id"], "confirmed")],
+            )
+            self.assertEqual(
+                client.get(resume, headers={"X-API-Key": "other"}).json()["actions"],
+                [],
+            )
             response = client.post(
                 url + "/execute",
                 json={"session_id": "chat"},
                 headers={"X-API-Key": "user"},
             )
             self.assertTrue(response.json()["success"], response.text)
+            self.assertEqual(client.get(resume, headers=headers).json()["actions"], [])
             self.assertEqual(
                 client.post(
                     url + "/reject",

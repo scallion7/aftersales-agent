@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from threading import RLock
 from typing import Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from sqlalchemy import insert, select, update
+from sqlalchemy import func, insert, select, update
 
 from app.infrastructure.database import get_engine, risk_rule_versions_table
 
@@ -279,16 +280,21 @@ class SqlRiskRuleRepository:
             )
         return self._record(row) if row else None
 
+    def _active_versions(self):
+        rules = risk_rule_versions_table.c
+        return (
+            select(risk_rule_versions_table)
+            .where(rules.status == "active")
+            .order_by(
+                func.coalesce(rules.activated_at, rules.created_at).desc(),
+                rules.version,
+            )
+        )
+
     def active(self) -> RiskRuleVersion | None:
-        with self.engine.begin() as connection:
+        with self.engine.connect() as connection:
             row = (
-                connection.execute(
-                    select(risk_rule_versions_table).where(
-                        risk_rule_versions_table.c.status == "active"
-                    )
-                )
-                .mappings()
-                .first()
+                connection.execute(self._active_versions().limit(1)).mappings().first()
             )
         return self._record(row) if row else None
 
@@ -305,66 +311,81 @@ class SqlRiskRuleRepository:
             )
         return [self._record(row) for row in rows]
 
-    def activate(self, version: str, actor: str) -> RiskRuleVersion:
-        candidate = self.get(version)
-        if candidate is None or candidate.status != "draft":
-            raise ValueError("只有 draft 规则可以激活")
-        now = datetime.now(timezone.utc)
+    @contextmanager
+    def _transition(self):
+        # Acquire the writer lock before reading the target, even on first activation
+        # when no active row exists. Ordinary PostgreSQL readers remain unblocked.
         with self.engine.begin() as connection:
-            connection.execute(
-                update(risk_rule_versions_table)
-                .where(risk_rule_versions_table.c.status == "active")
-                .values(
-                    status="retired",
-                    retired_at=now.isoformat(),
-                    retired_by=actor,
+            if connection.dialect.name == "postgresql":
+                connection.exec_driver_sql(
+                    "LOCK TABLE risk_rule_versions IN SHARE ROW EXCLUSIVE MODE"
                 )
+            elif connection.dialect.name == "sqlite":
+                connection.exec_driver_sql("BEGIN IMMEDIATE")
+            yield connection
+
+    def _set_active(self, connection, version, actor):
+        table = risk_rule_versions_table
+        now = datetime.now(timezone.utc).isoformat()
+        connection.execute(
+            update(table)
+            .where(table.c.status == "active")
+            .values(status="retired", retired_at=now, retired_by=actor)
+        )
+        connection.execute(
+            update(table)
+            .where(table.c.version == version)
+            .values(
+                status="active",
+                activated_at=now,
+                activated_by=actor,
+                retired_at=None,
+                retired_by="",
             )
-            connection.execute(
-                update(risk_rule_versions_table)
-                .where(risk_rule_versions_table.c.version == version)
-                .values(
-                    status="active",
-                    activated_at=now.isoformat(),
-                    activated_by=actor,
-                    retired_at=None,
-                    retired_by="",
-                )
+        )
+        row = (
+            connection.execute(select(table).where(table.c.version == version))
+            .mappings()
+            .one()
+        )
+        return self._record(row)
+
+    def activate(self, version: str, actor: str) -> RiskRuleVersion:
+        rules = risk_rule_versions_table.c
+        with self._transition() as connection:
+            status = connection.scalar(
+                select(rules.status).where(rules.version == version)
             )
-        result = self.get(version)
-        assert result is not None
-        return result
+            if status != "draft":
+                raise ValueError("只有 draft 规则可以激活")
+            return self._set_active(connection, version, actor)
 
     def rollback(self, actor: str) -> RiskRuleVersion:
-        retired = [item for item in self.list() if item.status == "retired"]
-        if not retired:
-            raise ValueError("没有可回滚的规则版本")
-        target = retired[0]
-        now = datetime.now(timezone.utc)
-        with self.engine.begin() as connection:
-            connection.execute(
-                update(risk_rule_versions_table)
-                .where(risk_rule_versions_table.c.status == "active")
-                .values(
-                    status="retired",
-                    retired_at=now.isoformat(),
-                    retired_by=actor,
-                )
+        rules = risk_rule_versions_table.c
+        with self._transition() as connection:
+            # Old concurrent deployments could leave multiple active rows. Treat the
+            # newest activation as current and its predecessor as the rollback target.
+            previous_active = (
+                connection.execute(self._active_versions().offset(1).limit(1))
+                .mappings()
+                .first()
             )
-            connection.execute(
-                update(risk_rule_versions_table)
-                .where(risk_rule_versions_table.c.version == target.version)
-                .values(
-                    status="active",
-                    activated_at=now.isoformat(),
-                    activated_by=actor,
-                    retired_at=None,
-                    retired_by="",
+            if previous_active:
+                version = previous_active["version"]
+            else:
+                version = connection.scalar(
+                    select(rules.version)
+                    .where(rules.status == "retired")
+                    .order_by(
+                        func.coalesce(rules.retired_at, rules.created_at).desc(),
+                        func.coalesce(rules.activated_at, rules.created_at).desc(),
+                        rules.version,
+                    )
+                    .limit(1)
                 )
-            )
-        result = self.get(target.version)
-        assert result is not None
-        return result
+            if version is None:
+                raise ValueError("没有可回滚的规则版本")
+            return self._set_active(connection, version, actor)
 
     @staticmethod
     def _record(row) -> RiskRuleVersion:

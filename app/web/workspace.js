@@ -7,7 +7,7 @@ import {
 const $ = id => document.getElementById(id);
 $('token').value = sessionStorage.getItem('agentToken') || '';
 $('session').value = sessionStorage.getItem('agentSession') || 'demo';
-const displayedRuns = new Set();
+let viewVersion = 0;
 const labels = {
   queued: '排队中',
   running: '执行中',
@@ -30,14 +30,21 @@ const labels = {
 let runId = '';
 const client = new RequestClient(() => $('token').value);
 const stream = new RunStream();
-const runSlot = () => client.scopeKey('run:' + $('session').value);
-const session = () => encodeURIComponent($('session').value);
+function currentView() {
+  const version = viewVersion, token = $('token').value, session = $('session').value;
+  return {
+    token, session,
+    active: () => viewVersion === version && token === $('token').value && session === $('session').value,
+    request: (path, method = 'GET', body) => client.request(path, method, body, {}, token),
+    sessionPath: '/v1/sessions/' + encodeURIComponent(session)
+  };
+}
 
 function status(text, error = false) {
   $('status').textContent = text;
   $('status').classList.toggle('error', error)
 }
-const api = (...args) => client.request(...args);
+
 
 function show(value, target) {
   const order = value.order,
@@ -59,31 +66,36 @@ function bubble(text) {
 
 function handle(fn) {
   return async () => {
+    const view = currentView();
     try {
-      await fn()
+      await fn(view)
     } catch (error) {
-      status(error.message, true)
+      if (view.active()) status(error.message, true)
     }
   }
 }
-async function refresh() {
-  const own = await api(`/v1/sessions/${session()}/ownership`);
+async function refresh(view) {
+  const [own, messages, drafts, data] = await Promise.all([
+    view.request(view.sessionPath + '/ownership'), view.request(view.sessionPath + '/human-messages'),
+    view.request(view.sessionPath + '/after-sale-intakes'), view.request(view.sessionPath + '/actions?include_confirmed=true')
+  ]);
+  if (!view.active()) return;
   $('ownership').textContent = own.state === 'human_owned' ? '人工服务中' : 'Agent 服务中';
-  const messages = await api(`/v1/sessions/${session()}/human-messages`);
   $('human').replaceChildren();
   for (const message of messages.messages) {
     const p = document.createElement('p');
     p.textContent = message.content;
     $('human').append(p)
   }
-  const drafts = await api(`/v1/sessions/${session()}/after-sale-intakes`);
   $('intakes').replaceChildren();
   for (const intake of drafts.intakes) {
     const card = document.createElement('p');
     card.textContent = `订单：${intake.fields.order_id || '待补充'}；原因：${intake.fields.reason || '待补充'}；${intake.status === 'withdrawn' ? '已撤回' : '已保存，执行仍需单独确认'}`;
+    if (intake.status !== 'withdrawn' && intake.fields.case_type === 'exchange') {
+      card.textContent += '。换货进度请查询关联工单。';
+    }
     $('intakes').append(card);
   }
-  const data = await api(`/v1/sessions/${session()}/actions`);
   $('actions').replaceChildren();
   for (const action of data.actions) {
     const card = document.createElement('div');
@@ -105,30 +117,42 @@ async function refresh() {
       quantity: '数量',
       sku: '商品编号'
     })[key] || key) + '：' + (typeof value === 'object' ? JSON.stringify(value) : value)).join('\n');
+    const confirmed = action.status === 'confirmed';
+    if (confirmed) title.textContent += '（已确认，待执行）';
     card.append(title, details);
     for (const [text, verb] of [
-        ['确认并执行', 'confirm'],
+        confirmed ? ['继续执行', 'execute'] : ['确认并执行', 'confirm'],
         ['拒绝', 'reject']
       ]) {
       const button = document.createElement('button');
       button.textContent = text;
       button.onclick = handle(async () => {
+        if (!view.active()) return;
         button.disabled = true;
         try {
-          await api(`/v1/actions/${action.action_id}/${verb}`, 'POST', {
-            session_id: $('session').value,
-            ...(verb === 'confirm' ? {
-              arguments_hash: action.arguments_hash
-            } : {})
-          });
-          if (verb === 'confirm') {
-            const result = await api(`/v1/actions/${action.action_id}/execute`, 'POST', {
-              session_id: $('session').value
-            });
-            bubble(result.accepted ? '请求已受理，请查询最终状态。' : result.case ? '工单 ' + result.case.case_id + '：' + (labels[result.case.status] || result.case.status) : result.message || (result.success ? '操作已完成' : '操作未完成，请查看状态'));
+          const body = {session_id: view.session};
+          const path = `/v1/actions/${action.action_id}`;
+          if (verb === 'reject') {
+            await view.request(path + '/reject', 'POST', body);
+          } else {
+            if (verb === 'confirm') {
+              await view.request(path + '/confirm', 'POST', {...body, arguments_hash: action.arguments_hash});
+              if (!view.active()) return;
+            }
+            const result = await view.request(path + '/execute', 'POST', body);
+            if (!view.active()) return;
+            if (result.success === false) {
+              status(result.error || result.message || '操作未完成，请查看状态', true);
+            } else if (result.accepted) {
+              bubble('请求已受理，请查询最终状态。');
+            } else if (result.case) {
+              bubble('工单 ' + result.case.case_id + '：' + (labels[result.case.status] || result.case.status) + (result.next_action ? '。' + result.next_action : ''));
+            } else {
+              bubble(result.message || (result.success ? '操作已完成' : '操作未完成，请查看状态'));
+            }
             if (result.case) $('case').value = result.case.case_id
           }
-          await refresh()
+          if (view.active()) await refresh(view)
         } finally {
           button.disabled = false
         }
@@ -138,75 +162,107 @@ async function refresh() {
     $('actions').append(card)
   }
 }
-async function watch() {
+async function restoreConversation(view) {
+  let messages = [];
+  try {
+    ({messages} = await view.request(view.sessionPath + '?conversation_only=true'));
+  } catch (error) {
+    if (error.status !== 404) throw error;
+  }
+  if (!view.active()) return;
+  $('conversation').replaceChildren();
+  for (const message of messages) bubble((message.role === 'user' ? '你：' : '') + message.content);
+}
+
+async function watch(view, slot, restoring = false) {
   const watchedRun = runId;
-  if (!watchedRun) return;
-  const token = $('token').value;
-  const sessionId = $('session').value;
-  const slot = await client.scopeKey('run:' + sessionId, token);
-  if (token !== $('token').value || sessionId !== $('session').value) return;
-  const complete = await stream.watch(watchedRun, token, slot + ':cursor:' + watchedRun, event => {
-    if (token !== $('token').value || sessionId !== $('session').value) return;
+  if (!watchedRun || !view.active()) return;
+  const current = () => view.active() && runId === watchedRun;
+  const cursorKey = slot + ':cursor:' + watchedRun;
+  if (restoring) {
+    $('events').textContent = '';
+    sessionStorage.removeItem(cursorKey);
+  }
+  const complete = await stream.watch(watchedRun, view.token, cursorKey, event => {
+    if (!current()) return;
     $('events').textContent += event.event_type + '\n';
     status('执行进度：' + event.event_type);
   });
-  if (!complete || slot !== await runSlot()) return;
-  const result = await client.request(`/v1/runs/${watchedRun}`, 'GET', undefined, {}, token);
-  if (slot !== await runSlot()) return;
+  if (!complete || !current()) return;
+  const result = await view.request('/v1/runs/' + encodeURIComponent(watchedRun));
+  if (!current()) return;
   status('任务状态：' + (labels[result.status] || result.status) + (result.error_code ? '（' + result.error_code + '）' : ''));
-  if (result.result && !displayedRuns.has(watchedRun)) {
-    bubble(result.result.reply);
-    displayedRuns.add(watchedRun);
+  if (restoring) {
+    await restoreConversation(view);
+  } else if (result.result) {
+    const {reply, follow_up_question: question} = result.result;
+    bubble(question && !reply.includes(question) ? reply + '\n' + question : reply);
   }
-  await refresh();
+  if (current()) await refresh(view);
 }
-$('connect').onclick = handle(async () => {
-  sessionStorage.setItem('agentToken', $('token').value);
-  sessionStorage.setItem('agentSession', $('session').value);
+
+async function connect(view) {
+  sessionStorage.setItem('agentToken', view.token);
+  sessionStorage.setItem('agentSession', view.session);
   stream.stop();
-  runId = sessionStorage.getItem(await runSlot()) || '';
-  await refresh();
-  status('会话已连接')
-});
-$('send').onclick = handle(async () => {
+  const slot = await client.scopeKey('run:' + view.session, view.token);
+  if (!view.active()) return;
+  runId = sessionStorage.getItem(slot) || '';
+  await Promise.all([refresh(view), restoreConversation(view)]);
+  if (!view.active()) return;
+  status('会话已连接');
+  if (runId) await watch(view, slot, true);
+}
+$('connect').onclick = handle(connect);
+$('reconnect').onclick = handle(connect);
+$('send').onclick = handle(async view => {
   if ($('send').disabled) return;
   const text = $('message').value;
-  const sessionId = $('session').value;
-  const token = $('token').value;
   $('send').disabled = true;
   try {
-    const slot = await client.scopeKey('run:' + sessionId, token);
+    const slot = await client.scopeKey('run:' + view.session, view.token);
+    if (!view.active()) return;
     const result = await client.write('/v1/runs', {
       message: text,
-      session_id: sessionId
-    }, sessionId, token);
+      session_id: view.session
+    }, view.session, view.token);
     sessionStorage.setItem(slot, result.run_id);
-    if (slot !== await runSlot()) return;
+    if (!view.active()) return;
     bubble('你：' + text);
     $('message').value = '';
     runId = result.run_id;
-    await watch();
+    $('events').textContent = '';
+    await watch(view, slot);
   } finally {
-    $('send').disabled = false;
+    if (view.active()) $('send').disabled = false;
   }
 });
-$('cancel').onclick = handle(async () => {
-  if (runId) {
-    const result = await api(`/v1/runs/${runId}/cancel`, 'POST');
-    status('取消状态：' + result.cancel_state)
+$('cancel').onclick = handle(async view => {
+  if (!runId) return;
+  const watchedRun = runId;
+  const result = await view.request('/v1/runs/' + encodeURIComponent(watchedRun) + '/cancel', 'POST');
+  if (view.active() && runId === watchedRun) status('取消状态：' + result.cancel_state);
+});
+$('queryOrder').onclick = handle(async view => {
+  const detail = await view.request('/v1/orders/' + encodeURIComponent($('order').value));
+  if (view.active()) show(detail, 'orderResult');
+});
+$('queryCase').onclick = handle(async view => {
+  const path = '/v1/after-sales/' + encodeURIComponent($('case').value);
+  const detail = await view.request(path);
+  if (!view.active()) return;
+  if (detail.exchange_state) {
+    $('caseResult').textContent = detail.message;
+  } else {
+    const operation = await view.request(path + '/operation');
+    if (view.active()) show(operation, 'caseResult');
   }
 });
-$('reconnect').onclick = handle(async () => {
-  runId = sessionStorage.getItem(await runSlot()) || '';
-  await refresh();
-  await watch()
-});
-$('queryOrder').onclick = handle(async () => show(await api('/v1/orders/' + encodeURIComponent($('order').value)), 'orderResult'));
-$('queryCase').onclick = handle(async () => show(await api('/v1/after-sales/' + encodeURIComponent($('case').value) + '/operation'), 'caseResult'));
-$('search').onclick = handle(async () => {
-  const result = await api('/v1/knowledge/search', 'POST', {
+$('search').onclick = handle(async view => {
+  const result = await view.request('/v1/knowledge/search', 'POST', {
     query: $('query').value
   });
+  if (!view.active()) return;
   $('citations').replaceChildren();
   const state = document.createElement('p');
   state.textContent = {
@@ -232,6 +288,14 @@ $('search').onclick = handle(async () => {
 });
 
 for (const name of ['token', 'session']) $(name).addEventListener('input', () => {
+  viewVersion++;
   stream.stop();
   runId = '';
+  $('send').disabled = false;
+  for (const id of ['conversation', 'events', 'actions', 'intakes', 'human', 'orderResult', 'caseResult', 'citations']) {
+    $(id).replaceChildren();
+  }
+  for (const id of ['message', 'order', 'case', 'query']) $(id).value = '';
+  $('ownership').textContent = '尚未连接';
+  status('请连接当前会话。');
 });

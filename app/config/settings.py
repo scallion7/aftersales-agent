@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     run_lease_seconds: int = Field(default=30, ge=3, le=3600)
     run_max_attempts: int = Field(default=3, ge=1, le=10)
     run_poll_seconds: float = Field(default=1.0, gt=0, le=30)
+    run_sync_wait_seconds: float = Field(default=60.0, gt=0, le=3600)
 
     # trusted deployment scope and opt-in platform integration.
     tenant_id: str = Field(default="default", pattern=r"^[A-Za-z0-9_-]{1,80}$")

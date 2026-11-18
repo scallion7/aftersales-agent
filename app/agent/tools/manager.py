@@ -241,7 +241,13 @@ class ToolManager:
                     self._governed_contract,
                     self._execution_context,
                 )
-        return self.execution_service.execute(
+        knowledge = (
+            getattr(self._registry, "knowledge_service", None)
+            if name == "search_knowledge" and self._tool_source.get(name) == "local"
+            else None
+        )
+        before = knowledge.last_result if knowledge else None
+        output = self.execution_service.execute(
             name,
             arguments,
             self._execution_context,
@@ -252,6 +258,26 @@ class ToolManager:
             else deadline,
             action_id=action_id,
         )
+        # A durable read may replay its journal without calling KnowledgeService.
+        # Restore only the result of the locally bound policy tool.
+        if (
+            knowledge
+            and knowledge.config.knowledge_versioned_enabled
+            and knowledge.last_result is before
+        ):
+            lookup = json.loads(output)
+            knowledge.last_result = (
+                lookup
+                if lookup.get("outcome")
+                in {
+                    "answerable",
+                    "no_evidence",
+                    "needs_clarification",
+                    "policy_conflict",
+                }
+                else None
+            )
+        return output
 
     def prepare_action(self, name: str, arguments: dict) -> dict:
         return json.loads(

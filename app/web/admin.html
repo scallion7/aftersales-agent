@@ -31,6 +31,12 @@
   <section><h2>离线回归</h2><pre id="regression">加载中...</pre></section>
   <section><h2>就绪诊断与熔断器</h2><pre id="diagnostics">加载中...</pre></section>
   <section><h2>待审批工单</h2><div id="cases">加载中...</div></section>
+  <section><h2>人工换货履约</h2>
+    <label>换货工单号 <input id="exchangeId"></label><button id="lookupExchange">查询工单</button>
+    <p id="exchangeState" role="status"></p>
+    <label>履约凭证 <input id="exchangeReference" maxlength="256" placeholder="补发单号或人工履约记录编号"></label>
+    <button id="completeExchange" disabled>登记换货完成</button>
+  </section>
   <section><h2>售后副作用操作</h2><div id="operations">加载中...</div></section>
   <section><h2>独立补偿操作</h2><div id="compensations">加载中...</div></section>
   <section>
@@ -49,10 +55,64 @@ async function api(path, options={}) {
   if(!response.ok) throw new Error(await response.text());
   return response.json();
 }
-async function review(id, decision) {
-  await api(`/v1/admin/after-sales/${id}/review`,{method:'POST',body:JSON.stringify({decision,note:'管理台审批'})});
+async function review(id, decision, version) {
+  await api(`/v1/admin/after-sales/${id}/review`,{method:'POST',body:JSON.stringify({decision,expected_version:version,note:'管理台审批'})});
   refreshAll();
 }
+const exchangeId = document.getElementById('exchangeId');
+const exchangeState = document.getElementById('exchangeState');
+const exchangeReference = document.getElementById('exchangeReference');
+const completeExchange = document.getElementById('completeExchange');
+let loadedExchange = null;
+let exchangeRequest = 0;
+function resetExchange() {
+  exchangeRequest++;
+  loadedExchange = null;
+  completeExchange.disabled = true;
+  exchangeState.textContent = '';
+  exchangeReference.value = '';
+}
+exchangeId.addEventListener('input', resetExchange);
+document.getElementById('token').addEventListener('input', resetExchange);
+document.getElementById('lookupExchange').onclick = async () => {
+  resetExchange();
+  const request = exchangeRequest;
+  const id = exchangeId.value.trim();
+  if (!id) return;
+  try {
+    const result = await api('/v1/after-sales/' + encodeURIComponent(id));
+    if (request !== exchangeRequest) return;
+    exchangeState.textContent = result.message || '该工单非换货工单。';
+    const eligible = (result.exchange_state === 'manual_required' && result.case.status === 'approved')
+      || (result.exchange_state === 'historical_refund_failed' && result.case.status === 'execution_failed');
+    if (eligible) loadedExchange = result.case;
+    completeExchange.disabled = !loadedExchange || !exchangeReference.value.trim();
+  } catch (error) {
+    if (request === exchangeRequest) exchangeState.textContent = error.message;
+  }
+};
+exchangeReference.oninput = () => { completeExchange.disabled = !loadedExchange || !exchangeReference.value.trim(); };
+completeExchange.onclick = async () => {
+  if (!loadedExchange || !exchangeReference.value.trim()) return;
+  const request = exchangeRequest;
+  const {case_id, version} = loadedExchange;
+  completeExchange.disabled = true;
+  exchangeReference.disabled = true;
+  try {
+    const result = await api('/v1/admin/after-sales/' + encodeURIComponent(case_id) + '/review', {
+      method:'POST', body:JSON.stringify({decision:'complete_exchange', expected_version:version, note:exchangeReference.value.trim()})
+    });
+    if (request === exchangeRequest) {
+      loadedExchange = null;
+      exchangeState.textContent = result.message;
+    }
+  } catch (error) {
+    if (request === exchangeRequest) exchangeState.textContent = error.message;
+  } finally {
+    exchangeReference.disabled = false;
+    completeExchange.disabled = !loadedExchange || !exchangeReference.value.trim();
+  }
+};
 async function recover(id) {
   await api(`/v1/admin/after-sales/${id}/recover`,{method:'POST'});
   refreshAll();
@@ -124,7 +184,7 @@ async function refreshAll(){
     document.getElementById('diagnostics').textContent=JSON.stringify(diagnostics,null,2);
     const data=await api('/v1/admin/after-sales/pending');
     document.getElementById('cases').innerHTML=data.cases.length
-      ? `<table><tr><th>工单</th><th>订单</th><th>金额</th><th>风险</th><th>操作</th></tr>${data.cases.map(c=>`<tr><td>${c.case_id}</td><td>${c.order_id}</td><td>${c.amount}</td><td>${c.risk_level}</td><td><button onclick="review('${c.case_id}','approve')">批准</button><button onclick="review('${c.case_id}','reject')">拒绝</button></td></tr>`).join('')}</table>`
+      ? `<table><tr><th>工单</th><th>订单</th><th>金额</th><th>风险</th><th>操作</th></tr>${data.cases.map(c=>`<tr><td>${c.case_id}</td><td>${c.order_id}</td><td>${c.amount}</td><td>${c.risk_level}</td><td><button onclick="review('${c.case_id}','approve',${c.version})">批准</button><button onclick="review('${c.case_id}','reject',${c.version})">拒绝</button></td></tr>`).join('')}</table>`
       : '暂无待审批工单';
     const operations=await api('/v1/admin/after-sales/operations');
     document.getElementById('operations').innerHTML=operations.count

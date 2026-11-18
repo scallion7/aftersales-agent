@@ -181,7 +181,6 @@ class MultiAgentOrchestrator(BaseConversationAgent):
                     "该计划的确认已经被消费，当前不会重复执行副作用操作。"
                     "请通过计划查询接口确认最终状态；如需重新处理，请发起新的请求。"
                 )
-                self.raw_messages.append({"role": "assistant", "content": final_text})
                 return self._finalize_turn(
                     final_text,
                     requires_human=(
@@ -235,7 +234,6 @@ class MultiAgentOrchestrator(BaseConversationAgent):
                 requires_human=requires_human,
             )
             self._record_plan(result.execution)
-            self.raw_messages.append({"role": "assistant", "content": result.text})
             return result.text
         except Exception as exc:  # noqa: BLE001 - 规划失败时保留原子 Agent 降级路径
             from app.services.run_context import current_run
@@ -277,7 +275,6 @@ class MultiAgentOrchestrator(BaseConversationAgent):
                 pending.plan.goal, conversation=self.raw_messages, agent_key=agent_key
             )
             self._record_plan(result.execution)
-            self.raw_messages.append({"role": "assistant", "content": result.text})
             return result.text
         try:
             running = pending.begin_resume()
@@ -307,10 +304,8 @@ class MultiAgentOrchestrator(BaseConversationAgent):
                 },
             )
             text = "原计划已经失效，未执行待确认操作，请重新发起请求。"
-            self.raw_messages.append({"role": "assistant", "content": text})
             return text
         self._record_plan(result.execution)
-        self.raw_messages.append({"role": "assistant", "content": result.text})
         return result.text
 
     def _finish_invalid_plan(
@@ -332,7 +327,6 @@ class MultiAgentOrchestrator(BaseConversationAgent):
             },
         )
         text = f"当前计划无法继续：{reason}。未执行待确认操作，请重新发起请求。"
-        self.raw_messages.append({"role": "assistant", "content": text})
         return text
 
     def _react_loop(self, agent_key: str) -> str:

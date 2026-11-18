@@ -17,6 +17,10 @@ from app.agent.after_sale.creation import (
     creation_hash,
 )
 from app.agent.after_sale.models import (
+    EXCHANGE_MANUAL_CODE,
+    EXCHANGE_MANUAL_MESSAGE,
+    EXCHANGE_MESSAGES,
+    EXCHANGE_REFUND_NOT_DISPATCHED,
     AfterSaleCase,
     AfterSaleOperation,
     ApprovalStatus,
@@ -253,6 +257,8 @@ class AfterSaleService:
                 "返回已有关联工单的当前状态，未创建新工单，也未修改原工单内容"
             )
             result["next_action"] = "请查询已有工单；如需更改诉求，请先处理已有工单"
+        elif case.case_type == CaseType.EXCHANGE.value:
+            result["next_action"] = EXCHANGE_MANUAL_MESSAGE
         elif case.status == CaseStatus.PENDING_REVIEW.value:
             result["next_action"] = "等待人工审批，当前不可执行退款"
         else:
@@ -265,7 +271,10 @@ class AfterSaleService:
         case = self.repository.get(case_id, user_id)
         if not case:
             return {"success": False, "error": f"未找到售后工单 {case_id}"}
-        return {"success": True, "case": case.to_dict()}
+        response = {"success": True, "case": case.to_dict()}
+        if case.case_type == CaseType.EXCHANGE.value:
+            response.update(self._exchange_details(case))
+        return response
 
     def get_operation(
         self,
@@ -295,6 +304,10 @@ class AfterSaleService:
         case = self.repository.get(case_id)
         if not case:
             return {"success": False, "error": f"未找到售后工单 {case_id}"}
+        if decision == "complete_exchange":
+            return self._complete_exchange(
+                case, reviewer, note.strip(), expected_version
+            )
         if expected_version is not None and case.version != expected_version:
             return {
                 "success": False,
@@ -332,6 +345,8 @@ class AfterSaleService:
         case = self.repository.get(case_id, user_id)
         if not case:
             return {"success": False, "error": f"未找到售后工单 {case_id}"}
+        if case.case_type == CaseType.EXCHANGE.value:
+            return self._manual_exchange(case)
         template = self._operation_template(case)
         existing = self.operation_repository.get(
             template.idempotency_key,
@@ -569,6 +584,10 @@ class AfterSaleService:
             self._idempotency_key(case_id),
             case.user_id,
         )
+        if case.case_type == CaseType.EXCHANGE.value:
+            replay = self._manual_exchange(case)
+            if replay["exchange_state"] != "historical_refund_unknown":
+                return replay
         query_claim = False
         if (
             operation is None
@@ -584,6 +603,8 @@ class AfterSaleService:
             operation = claim.operation
             query_claim = claim.disposition == "claimed"
         if operation is None:
+            if case.case_type == CaseType.EXCHANGE.value:
+                return self._manual_exchange(case)
             return {"success": False, "error": "该工单没有可恢复的执行记录"}
         if operation.provider == "external" or (
             not operation.provider
@@ -616,6 +637,151 @@ class AfterSaleService:
                 "operation": operation.to_dict(),
             }
         return self.execute_case(case_id, user_id, actor=actor)
+
+    def _exchange_details(self, case):
+        op = self.operation_repository.get(
+            self._idempotency_key(case.case_id), case.user_id
+        )
+        manual_completed = case.result.get("operation_type") == "manual_exchange"
+        state = "manual_completed" if manual_completed else "manual_required"
+        unverified_external = getattr(
+            self.commerce_service, "external_refunds", False
+        ) and not (op and op.provider)
+        if op and op.error != EXCHANGE_REFUND_NOT_DISPATCHED:
+            if op.provider == "external":
+                receipt = ExternalRefundReceipt.terminal(
+                    op.result.get("refund"),
+                    key=op.idempotency_key,
+                    order_id=case.order_id,
+                    user_id=case.user_id,
+                    amount=case.amount,
+                )
+                refund_status = (
+                    receipt.status
+                    if receipt and op.completed_at and receipt.status == op.status
+                    else "unknown"
+                )
+            else:
+                refund_status = "unknown" if unverified_external else op.status
+            if refund_status == "succeeded":
+                state = "historical_refund_recorded"
+            elif refund_status == "failed" and op.completed_at and op.provider:
+                state = (
+                    "manual_completed"
+                    if manual_completed
+                    else "historical_refund_failed"
+                )
+            else:
+                state = "historical_refund_unknown"
+        elif (
+            not op
+            and not manual_completed
+            and case.result.get("error_code") != EXCHANGE_REFUND_NOT_DISPATCHED
+        ):
+            if (
+                case.status == "completed"
+                and case.result.get("success")
+                and not unverified_external
+            ):
+                state = "historical_refund_recorded"
+            elif self._previous_refund_attempt(case):
+                state = "historical_refund_unknown"
+        if case.status == "rejected" and state == "manual_required":
+            state = "rejected"
+        return {
+            "exchange_state": state,
+            "message": EXCHANGE_MESSAGES[state],
+            **({"operation": op.to_dict()} if op else {}),
+        }
+
+    def exchange_replay(self, case_id, user_id):
+        """Read a historical action outcome without claiming or dispatching any operation."""
+        case = self.repository.get(case_id, user_id)
+        if case is not None and case.case_type == CaseType.EXCHANGE.value:
+            return self._manual_exchange(case)
+        return None
+
+    def _manual_exchange(self, case):
+        details = self._exchange_details(case)
+        state = details["exchange_state"]
+        result = (
+            case.result
+            if state == "manual_completed"
+            else details.get("operation", {}).get("result") or case.result
+        )
+        if state in {"manual_completed", "historical_refund_recorded"}:
+            return {
+                "success": True,
+                "idempotent": True,
+                "result": result,
+                "case": case.to_dict(),
+                **details,
+            }
+        code = {
+            "historical_refund_unknown": "REFUND_OUTCOME_UNKNOWN",
+            "historical_refund_failed": "EXCHANGE_PREVIOUS_REFUND_FAILED",
+            "rejected": "EXCHANGE_REJECTED",
+        }.get(state, EXCHANGE_MANUAL_CODE)
+        return {
+            "success": False,
+            "blocked": True,
+            "error_code": code,
+            "error": details["message"],
+            "case": case.to_dict(),
+            "result": result,
+            **details,
+        }
+
+    def _complete_exchange(self, case, actor, reference, expected_version):
+        if case.case_type != CaseType.EXCHANGE.value:
+            return {"success": False, "error_code": "EXCHANGE_CASE_REQUIRED"}
+        if (
+            expected_version is None
+            or not actor.strip()
+            or not (1 <= len(reference) <= 256)
+        ):
+            return {
+                "success": False,
+                "error_code": "EXCHANGE_COMPLETION_INPUT_REQUIRED",
+            }
+        details = self._exchange_details(case)
+        state = details["exchange_state"]
+        if (
+            state == "manual_completed"
+            and case.result.get("fulfillment_reference") == reference
+            and case.result.get("registered_by") == actor
+            and case.result.get("approved_version") == expected_version
+        ):
+            return {
+                "success": True,
+                "idempotent": True,
+                "case": case.to_dict(),
+                **details,
+            }
+        if case.version != expected_version:
+            return {"success": False, "error_code": "CASE_VERSION_CONFLICT"}
+        if not (
+            (case.status == "approved" and state == "manual_required")
+            or (
+                case.status == "execution_failed"
+                and state == "historical_refund_failed"
+            )
+        ):
+            return {
+                "success": False,
+                "error_code": "EXCHANGE_COMPLETION_BLOCKED",
+                **details,
+            }
+        case.status = CaseStatus.COMPLETED.value
+        case.result = {
+            "operation_type": "manual_exchange",
+            "fulfillment_reference": reference,
+            "registered_by": actor,
+            "approved_version": expected_version,
+        }
+        case.add_audit("exchange_fulfilled", actor, reference)
+        self.repository.save(case)
+        return {"success": True, "case": case.to_dict(), **self._exchange_details(case)}
 
     @staticmethod
     def _previous_refund_attempt(case):

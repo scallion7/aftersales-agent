@@ -1,0 +1,65 @@
+{
+  "date": "2026-11-18",
+  "base_commit": "26d869ab32cc4a0b8f06d6055d56477457e88199",
+  "app_python_source_sha256": "bd11b6397d9abb2fdd7a61610540be1faa869dc58d3e14f459fe3ea2b06a5b6c",
+  "python": "3.11.15",
+  "unittest": {
+    "passed": 526,
+    "skipped": 0,
+    "seconds": 116.547,
+    "chromium_enabled": true,
+    "chromium_build": 1187,
+    "command": "RUN_BROWSER_E2E=1 python -m coverage run -m unittest discover -s tests -v",
+    "results": "unittest-results.log.gz",
+    "log_format": "test identifiers and recorded outcomes"
+  },
+  "coverage": {
+    "statements": 13776,
+    "missed": 2358,
+    "percent": 83,
+    "source": "app",
+    "omit": [
+      "app/scripts/*"
+    ]
+  },
+  "plan_quality": {
+    "case_count": 40,
+    "metrics": {
+      "auth_scope_accuracy": 1.0,
+      "budget_compliance_rate": 1.0,
+      "cancellation_propagation_rate": 1.0,
+      "checkpoint_reuse_rate": 1.0,
+      "migration_success_rate": 1.0,
+      "plan_completion_rate": 1.0,
+      "policy_version_consistency_rate": 1.0,
+      "provider_idempotency_rate": 1.0,
+      "recovery_consistency_rate": 1.0,
+      "route_stability_rate": 1.0,
+      "side_effect_exactly_once_rate": 1.0,
+      "timeout_detection_rate": 1.0
+    },
+    "passed": true
+  },
+  "static_checks": {
+    "ruff": "All checks passed!",
+    "format": "391 files already formatted",
+    "openapi_paths": 104,
+    "docs": "Validated 988 local links/images across 73 Markdown files."
+  },
+  "postgres": "postgres.json",
+  "retrieval": "retrieval-comparison.json",
+  "holdout_evaluated": false,
+  "paid_model_calls": 0,
+  "git_trees_at_validation": {
+    "app": "8047487a4c0ef202cb997296818c035ad0a5bc62",
+    "tests": "cad4b9e718f8c27178f52eee6d17aad8dc413d66"
+  },
+  "artifact_sha256": {
+    "coverage.log": "16857a98d0af442a43e618d120a28c59fa23f292b493fe17a3b087ec8b3a821b",
+    "postgres.json": "19b43eb50eb54ab34b4e76534968f7ff67083cfdf80a9ab372f6d1b2925186e5",
+    "retrieval-after.raw.json.gz": "e39c41457ef8d49b2a6e93a651914a2ab8f405a80e7528119113af1b4f4a6d8c",
+    "retrieval-before.raw.json.gz": "2392ea87324863b5512053050bdecd85404d566b891fc59296d15e0d0a7b5a19",
+    "retrieval-comparison.json": "6a2a113c17159e1fe49df9c9dfdcd4ed7632a44b782d5342702fb90221124c98",
+    "unittest-results.log.gz": "0f294e5dc54b804dc3bf74a2c325419c33922e11eb89e39b690fba27819e69e1"
+  }
+}

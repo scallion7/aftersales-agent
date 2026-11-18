@@ -9,6 +9,10 @@ from typing import TYPE_CHECKING, Any
 
 from pydantic import ValidationError
 
+from app.agent.after_sale.models import (
+    EXCHANGE_MANUAL_CODE,
+    CaseType,
+)
 from app.agent.tools.after_sale import (
     create_after_sale_case as create_case,
 )
@@ -290,6 +294,7 @@ def create_default_tool_registry(
 
     registry.platform_config = runtime_config
     registry.knowledge_service = knowledge
+    registry.after_sale_service = after_sale_service
     if runtime_config.collaboration_enabled:
         from app.platform.conversation_handoff import ConversationHandoffService
 
@@ -311,6 +316,12 @@ def create_default_tool_registry(
             result = after_sale_service.get_case(arguments["case_id"], context.user_id)
             if not result.get("success"):
                 raise ActionError("ACTION_BUSINESS_INVALID", "工单不存在或无权访问")
+            if result["case"]["case_type"] == CaseType.EXCHANGE.value:
+                code = {
+                    "manual_required": EXCHANGE_MANUAL_CODE,
+                    "historical_refund_unknown": "REFUND_OUTCOME_UNKNOWN",
+                }.get(result["exchange_state"], "EXCHANGE_ALREADY_PROCESSED")
+                raise ActionError(code, result["message"])
             snapshot["case"] = result["case"]
             order_id = result["case"]["order_id"]
         result = commerce.get_order(order_id, context.user_id)

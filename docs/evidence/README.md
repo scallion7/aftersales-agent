@@ -1,6 +1,6 @@
 # 验收证据索引
 
-核验日期：2026-11-16。本目录保存已产生的原始结果；当前结论见[验收状态](../evaluation/acceptance.md)，复现方法见[文档中心](../README.md)。目录名称中的 round、阶段和日期是产物批次标识，保留用于追溯。
+核验日期：2026-11-18。本目录保存已产生的原始结果；当前结论见[验收状态](../evaluation/acceptance.md)，复现方法见[文档中心](../README.md)。目录名称中的 round、阶段和日期是产物批次标识，保留用于追溯。
 
 ## 功能修复基线的远端验收
 
@@ -19,6 +19,7 @@
 
 | 目录 | 阅读入口 | 生成时的证据身份 |
 |---|---|---|
+| [agent-boundaries-20261118](agent-boundaries-20261118/) | [本地验证清单](agent-boundaries-20261118/checks.json)、[检索开发集对比](agent-boundaries-20261118/retrieval-comparison.json) | 换货人工履约与历史退款核对、政策回答、会话恢复、SQL 风控回滚和同一批开发题的检索结果 |
 | [dependency-patch-20261116](dependency-patch-20261116/) | [检查清单](dependency-patch-20261116/checks.json)、[锁定依赖审计](dependency-patch-20261116/lock-audit.json)、[范围依赖审计](dependency-patch-20261116/range-audit.json) | 基于 `e7e1eed` 的依赖补丁工作树；修复 CI 发现的 OpenTelemetry 公告，58/53 包审计通过，500 项回归无跳过、82% 覆盖率 |
 | [showcase-20261116](showcase-20261116/) | [检查清单与素材哈希](showcase-20261116/checks.json)、[录像说明](../showcase/recording.md)、[退款恢复轨迹](showcase-20261116/unknown-refund-recovery.json) | 基于 `37e2fd7`，应用和现有测试源码未改；500 项本地回归、82% 覆盖率、两个浏览器短片及展示命令复验，真实人工审核与模型评测未开展 |
 | [release-workflow-20261113](release-workflow-20261113/) | [验收清单](release-workflow-20261113/checks.json)、[27 格原始数据入口](release-workflow-20261113/evaluation.json) | 基于 `75d364a` 的本地工作树，覆盖受控模型的逐题评分与发布、两种数据库、退款对账和浏览器续签 |

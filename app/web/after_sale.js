@@ -42,6 +42,10 @@ const status = (message, error = false) => {
 };
 const path = () => '/v1/after-sale-intakes/' + flow.intake_id;
 
+function manualExchange(flow) {
+  return flow.fields.case_type === 'exchange' || flow.case?.case?.case_type === 'exchange';
+}
+
 function controls() {
   for (const id of ['order', 'reason', 'caseType', 'evidenceIds']) $(id).disabled = !flow || busy;
   for (const id of ['save', 'propose', 'withdraw', 'executeProposal', 'refresh']) $(id).disabled = !flow || busy;
@@ -52,7 +56,10 @@ function controls() {
     $('save').disabled = started || closed;
     $('withdraw').disabled = started || closed;
     $('propose').disabled = closed || Boolean(flow.action_id) || Boolean(flow.missing.length);
-    $('executeProposal').disabled = flow.case?.case?.status !== 'approved' || ['pending', 'confirmed', 'executing', 'unknown', 'completed'].includes(flow.execution_action?.status);
+    $('executeProposal').disabled = flow.case?.case?.status !== 'approved'
+      || manualExchange(flow)
+      || flow.case_request_matches === false
+      || ['pending', 'confirmed', 'executing', 'unknown', 'completed'].includes(flow.execution_action?.status);
   }
   $('create').disabled = busy;
   $('load').disabled = busy;
@@ -112,7 +119,9 @@ function render(data) {
       case_type: "诉求"
     } [key]) + "：" + (key === "case_type" ? caseTypes[value] || value : value)).join("\n");
     $('action').append(p, detail);
-    if (['pending', 'confirmed'].includes(action.status)) {
+    const blockedExecution = action.tool_name === 'execute_after_sale_case'
+      && (manualExchange(data) || data.case_request_matches === false);
+    if (['pending', 'confirmed'].includes(action.status) && !blockedExecution) {
       const b = document.createElement('button');
       b.textContent = '确认并执行此操作';
       b.onclick = handle(async () => {
@@ -134,6 +143,11 @@ function render(data) {
     }
   }
   $('business').textContent = data.business_state ? `当前业务状态：${labels[data.business_state]||data.business_state}` : '尚未创建业务工单';
+  if (data.case_request_matches === false) {
+    $('business').textContent += '。此订单已有其他诉求的工单，请联系人工客服。';
+  } else if (data.case?.exchange_state) {
+    $('business').textContent = data.case.message;
+  }
   controls();
 }
 async function refresh() {

@@ -59,6 +59,7 @@ Linux CI 使用 `python -m playwright install --with-deps chromium` 同时安装
 | `COMPILED_RETRIEVAL_ENABLED` | 默认 false；按知识版本预编译 token 计数，保留原检索路径 |
 | `RUN_MAX_PENDING` / `RUN_MAX_PENDING_PER_USER` | 默认 0，即不限制；统计 queued/running/retry_wait，所有 API 实例须使用一致值 |
 | `RUN_LEASE_SECONDS` / `RUN_MAX_ATTEMPTS` / `RUN_POLL_SECONDS` | 默认 30 秒 / 3 次 / 1 秒；与计划步骤自身的租约配置分开 |
+| `RUN_SYNC_WAIT_SECONDS` | 同步聊天等待已被其他 Worker 领取的任务或排队重试的时限，默认 60 秒。超时返回 HTTP 504，`detail.error_code` 为 `RUN_WAIT_TIMEOUT`。通过 `Location` 查询原任务进度。 |
 | `MODEL_BUDGET_ENABLED` | 默认 false；共享累计 token 配额和调用账本，不按日自动重置 |
 | `COLLABORATION_ENABLED` | 默认 false；会话接管、人工消息及新自动调用阻断 |
 | `TELEMETRY_ENABLED` / `OBSERVABILITY_ENABLED` | 前者启用平台 Trace/指标，后者控制本地事件日志；二者不是同一开关 |

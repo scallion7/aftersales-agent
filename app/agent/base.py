@@ -6,11 +6,14 @@
 
 from __future__ import annotations
 
+import json
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from pathlib import Path
 from time import monotonic
 from typing import Any
+
+from openai import APIConnectionError, InternalServerError, RateLimitError
 
 from app.agent.after_sale import (
     AfterSaleService,
@@ -19,7 +22,9 @@ from app.agent.after_sale import (
     RiskRouter,
 )
 from app.agent.memory import MemoryManager
+from app.agent.policy_turn import requires_policy_evidence
 from app.agent.skills import SkillManager
+from app.agent.storage import canonical_messages
 from app.agent.strategies import PlanExecutionResult
 from app.agent.strategies.policies import CancellationToken
 from app.agent.summarizer import summarize
@@ -63,6 +68,16 @@ from app.security import GuardrailEngine
 from app.services.commerce import CommerceService
 from app.services.plan_runs import PlanRunService
 from app.services.plans import PlanLifecycleService, PlanNotCancellableError
+
+_BUSINESS_LOOKUPS = {
+    "query_order",
+    "query_logistics",
+    "query_product",
+    "list_user_orders",
+    "query_after_sale_case",
+    "get_after_sale_intake",
+    "update_after_sale_intake",
+}
 
 
 class BaseConversationAgent(ABC):
@@ -304,6 +319,8 @@ class BaseConversationAgent(ABC):
 
         run = current_run()
         self._knowledge_turn_id = run.run_id if run else uuid4().hex
+        self._turn_plan = None
+        self.tool_registry.knowledge_service.last_result = None
         with TraceContext(
             trace_id=current_trace_id(),
             session_id=self.session_path,
@@ -456,13 +473,31 @@ class BaseConversationAgent(ABC):
         if not loaded:
             return
         self.summary = self.guardrails.redact(loaded["summary"] or "") or None
-        self.raw_messages = self.guardrails.redact_messages(loaded["messages"])
+        messages = canonical_messages(
+            self.guardrails.redact_messages(loaded["messages"])
+        )
+        self.raw_messages = messages
         if loaded.get("short_term_memory"):
             memory_state = self.guardrails.redact_value(loaded["short_term_memory"])
             runtime_state = memory_state.get("runtime_state", {})
             if isinstance(runtime_state, dict):
                 self._runtime_state = runtime_state
             self.memory_manager.restore_stm(memory_state)
+        # Earlier versions did not persist a separate policy follow-up marker.
+        if (
+            messages
+            and messages[-1].get("role") == "assistant"
+            and "policy_followup" not in self._runtime_state
+        ):
+            try:
+                last = CustomerServiceResponse.model_validate_json(
+                    messages[-1].get("content") or ""
+                )
+            except ValueError:
+                pass
+            else:
+                if last.evidence_state != "not_requested":
+                    self._runtime_state["policy_followup"] = last.evidence_state
 
     def _restore_latest_plan(self) -> PlanExecutionResult | None:
         """从独立仓储恢复计划，首次读取时兼容旧会话快照。"""
@@ -485,6 +520,7 @@ class BaseConversationAgent(ABC):
         if durable:
             durable.check()
         saved = self.plan_lifecycle.record(execution)
+        self._turn_plan = saved
         if durable:
 
             def checkpoint(row):
@@ -663,12 +699,52 @@ class BaseConversationAgent(ABC):
     ) -> CustomerServiceResponse:
         safe_text = self.guardrails.redact(final_text)
         result = self._extract_structured_response(safe_text)
+        user_input = ""
+        tool_outputs = []
+        completed_ids = set()
+        business_tool_used = False
+        for message in reversed(self.raw_messages):
+            if message.get("role") == "user":
+                user_input = message["content"]
+                break
+            if message.get("role") == "tool":
+                try:
+                    output = json.loads(message["content"])
+                except (ValueError, TypeError):
+                    continue
+                if isinstance(output, dict):
+                    tool_outputs.append(output)
+                    if output.get("success"):
+                        completed_ids.add(message.get("tool_call_id"))
+            elif message.get("tool_calls"):
+                business_tool_used |= any(
+                    call.get("id") in completed_ids
+                    and call.get("function", {}).get("name") in _BUSINESS_LOOKUPS
+                    for call in message["tool_calls"]
+                )
+        plan = getattr(self, "_turn_plan", None)
+        if plan is not None:
+            business_tool_used |= any(
+                step.tool_name in _BUSINESS_LOOKUPS and step.status == "completed"
+                for step in plan.steps
+            )
+            tool_outputs.extend(
+                step.output
+                for step in reversed(plan.steps)
+                if isinstance(step.output, dict)
+            )
         if self.config.knowledge_versioned_enabled:
             from app.platform.common import PlatformError
             from app.platform.retrieval import HybridRetrieval
 
             knowledge = getattr(self.tool_registry, "knowledge_service", None)
             evidence = getattr(knowledge, "last_result", None)
+            # Model-provided evidence metadata is never authoritative.
+            claimed_evidence = (
+                bool(result.citations) or result.evidence_state != "not_requested"
+            )
+            result.citations = []
+            result.evidence_state = "not_requested"
             if evidence:
                 result.citations = evidence["citations"]
                 result.evidence_state = evidence["outcome"]
@@ -689,6 +765,16 @@ class BaseConversationAgent(ABC):
                     self.event_bus.emit(
                         "answer.support.checked", source="agent", data=support
                     )
+                    if (
+                        result.follow_up_question
+                        and requires_policy_evidence(
+                            "", result.follow_up_question, None
+                        )
+                        and not check_answer(result.follow_up_question, evidence)[
+                            "supported"
+                        ]
+                    ):
+                        result.follow_up_question = None
                     if not support["supported"]:
                         result.requires_human = True
                         result.evidence_state = "unsupported_claim"
@@ -696,6 +782,15 @@ class BaseConversationAgent(ABC):
                             "回答中的结论尚未获得完整政策原文支持，请人工核实。"
                         )
                 knowledge.last_result = None
+            elif claimed_evidence or requires_policy_evidence(
+                user_input,
+                "\n".join(filter(None, (result.reply, result.follow_up_question))),
+                self._runtime_state.get("policy_followup"),
+                business_tool_used=business_tool_used,
+            ):
+                result.evidence_state = "no_evidence"
+                result.requires_human = True
+                result.reply = "本轮未检索到可核实的政策依据，请人工核实。"
             try:
                 for citation in result.citations:
                     HybridRetrieval(self.config).validate_citations(
@@ -706,8 +801,15 @@ class BaseConversationAgent(ABC):
                 result.evidence_state = "invalid_evidence"
                 result.requires_human = True
                 result.reply = "引用的政策证据已失效，请重新检索或转人工核实。"
+            if result.evidence_state != "not_requested":
+                self._runtime_state["policy_followup"] = result.evidence_state
+                if result.evidence_state != "answerable":
+                    result.follow_up_question = None
+            else:
+                self._runtime_state.pop("policy_followup", None)
         else:
             result.citations = []
+            result.evidence_state = "not_requested"
         result.reply = self.guardrails.redact(result.reply)
         if result.follow_up_question:
             result.follow_up_question = self.guardrails.redact(
@@ -716,26 +818,26 @@ class BaseConversationAgent(ABC):
         if requires_human:
             result.requires_human = True
 
+        proposed_ids = {
+            action["action_id"]
+            for output in tool_outputs
+            if output.get("confirmation_required")
+            and isinstance(action := output.get("action"), dict)
+            and action.get("action_id")
+        }
         pending_actions = (
             self.tool_registry.action_service.pending(
                 self.config.memory_user_id, self.session_path
             )
-            if self.tool_registry.action_service
+            if proposed_ids and self.tool_registry.action_service
             else []
         )
+        pending_actions = [
+            item for item in pending_actions if item["action_id"] in proposed_ids
+        ]
         if self.config.conversation_intake_enabled and not pending_actions:
-            for message in reversed(self.raw_messages):
-                if message.get("role") == "user":
-                    break
-                if message.get("role") != "tool":
-                    continue
-                import json
-
-                try:
-                    draft = json.loads(message.get("content", ""))
-                except (ValueError, TypeError):
-                    continue
-                state = draft.get("intake") if isinstance(draft, dict) else None
+            for draft in tool_outputs:
+                state = draft.get("intake")
                 if state and draft.get("success") and state.get("missing"):
                     labels = {
                         "order_id": "订单号",
@@ -751,8 +853,6 @@ class BaseConversationAgent(ABC):
                     result.follow_up_question = question
                     break
         if pending_actions:
-            import json
-
             labels = {
                 "create_after_sale_case": "创建售后工单",
                 "execute_after_sale_case": "执行已审批售后工单",
@@ -782,7 +882,6 @@ class BaseConversationAgent(ABC):
                 "回复确认仅授权当前唯一提案；多个提案请按操作 ID 分别确认。"
             )
 
-        self.memory_manager.update_short_term(self.raw_messages[-6:])
         self.raw_messages.append(
             {
                 "role": "assistant",
@@ -790,10 +889,52 @@ class BaseConversationAgent(ABC):
             }
         )
 
+        if self.memory_manager.memory_enabled:
+            self._update_turn_memory(user_input, result)
         if len(self.raw_messages) > self.history_threshold:
             self._compress_history()
         self.save()
         return result
+
+    def _update_turn_memory(
+        self, user_input: str, result: CustomerServiceResponse
+    ) -> None:
+        # Persist a bounded backlog of public turns. A retry reuses the same
+        # snapshot, and a successful session commit clears the consumed backlog.
+        answer = result.reply
+        if result.follow_up_question and result.follow_up_question not in answer:
+            answer += "\n" + result.follow_up_question
+        turns = [
+            *self._runtime_state.get("pending_memory_turns", []),
+            [user_input[:2000], answer[:2000]],
+        ]
+        recent = turns[-8:]
+        messages = [
+            {"role": role, "content": content}
+            for pair in turns
+            for role, content in zip(("user", "assistant"), pair, strict=True)
+        ]
+        try:
+            self.memory_manager.update_short_term(messages)
+        except (
+            TimeoutError,
+            ConnectionError,
+            APIConnectionError,
+            InternalServerError,
+            RateLimitError,
+        ) as exc:
+            self._runtime_state["pending_memory_turns"] = recent
+            self.event_bus.emit(
+                "memory.update.deferred",
+                source="memory",
+                data={
+                    "reason": type(exc).__name__,
+                    "pending_turns": len(recent),
+                    "dropped_turns": len(turns) - len(recent),
+                },
+            )
+        else:
+            self._runtime_state.pop("pending_memory_turns", None)
 
     def _extract_structured_response(
         self,

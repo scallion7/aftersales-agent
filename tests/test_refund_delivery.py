@@ -90,6 +90,124 @@ class RefundDeliveryTests(unittest.TestCase):
         )
         self.assertEqual([self.count(t) for t in (operations, outbox, jobs)], [1, 1, 1])
 
+    def test_exchange_never_enqueues_and_legacy_messages_stop_before_delivery(self):
+        service = self.services.after_sale
+        self.case.case_type = "exchange"
+        service.repository.save(self.case)
+        self.assertEqual(self.enqueue()["error_code"], "EXCHANGE_MANUAL_REQUIRED")
+        with self.assertRaisesRegex(RefundWorkflowError, "EXCHANGE_MANUAL_REQUIRED"):
+            self.workflow.enqueue(service._operation_template(self.case), "customer")
+        self.assertEqual([self.count(t) for t in (operations, outbox, jobs)], [0, 0, 0])
+
+        # Model a persisted message written by the previous version.
+        self.case.case_type = "return_refund"
+        service.repository.save(self.case)
+        self.enqueue()
+        legacy = service.repository.get(self.case.case_id)
+        legacy.case_type = "exchange"
+        service.repository.save(legacy)
+        with patch.object(self.provider, "submit_command", create=True) as submit:
+            worker = RefundDeliveryWorker(self.workflow)
+            self.assertTrue(worker.dispatch_once())
+            self.assertFalse(worker.dispatch_once())
+            submit.assert_not_called()
+        with self.engine.connect() as conn:
+            self.assertEqual(conn.scalar(select(outbox.c.status)), "cancelled")
+            self.assertEqual(conn.scalar(select(jobs.c.status)), "cancelled")
+        self.assertEqual(self.op()["error"], "EXCHANGE_REFUND_NOT_DISPATCHED")
+        self.assertEqual(self.op()["attempt_count"], 0)
+        current = service.get_case(legacy.case_id)
+        self.assertEqual(current["exchange_state"], "manual_required")
+        closed = service.review_case(
+            legacy.case_id,
+            "complete_exchange",
+            "reviewer",
+            "SHIP-001",
+            current["case"]["version"],
+        )
+        self.assertTrue(closed["success"], closed)
+        self.assertEqual(
+            service.recover_case(legacy.case_id)["result"]["fulfillment_reference"],
+            "SHIP-001",
+        )
+
+    def test_previously_attempted_exchange_is_query_only_and_replays_the_provider_outcome(
+        self,
+    ):
+        service = self.services.after_sale
+        self.enqueue()
+        self.workflow.mark_attempt(self.op()["operation_id"])
+        case = service.repository.get(self.case.case_id)
+        case.case_type = "exchange"
+        service.repository.save(case)
+        with patch.object(self.provider, "submit_command", create=True) as submit:
+            worker = RefundDeliveryWorker(self.workflow)
+            self.assertTrue(worker.dispatch_once())
+            self.assertFalse(worker.dispatch_once())
+            submit.assert_not_called()
+        before = service.get_case(case.case_id)
+        self.assertEqual(before["exchange_state"], "historical_refund_unknown")
+        self.assertEqual(
+            service.execute_case(case.case_id)["error_code"], "REFUND_OUTCOME_UNKNOWN"
+        )
+        self.assertEqual(
+            service.review_case(
+                case.case_id, "complete_exchange", "admin", "R1", case.version
+            )["error_code"],
+            "EXCHANGE_COMPLETION_BLOCKED",
+        )
+        self.assertTrue(service.recover_case(case.case_id)["query_only"])
+        with patch.object(
+            self.provider, "get_refund", return_value=self.receipt(), create=True
+        ):
+            self.due(jobs)
+            worker.reconcile_once()
+        replay = service.execute_case(case.case_id)
+        self.assertEqual(replay["exchange_state"], "historical_refund_recorded")
+        self.assertTrue(replay["idempotent"])
+        self.assertEqual(replay["result"]["refund"]["refund_id"], "RF-one")
+        self.assertEqual(
+            service.get_case(case.case_id)["exchange_state"],
+            "historical_refund_recorded",
+        )
+        self.assertEqual(
+            service.review_case(
+                case.case_id,
+                "complete_exchange",
+                "admin",
+                "R1",
+                replay["case"]["version"],
+            )["error_code"],
+            "EXCHANGE_COMPLETION_BLOCKED",
+        )
+
+    def test_refund_reason_lengths_match_the_case_input_through_receipt(self):
+        from app.agent.tools.contracts import CreateAfterSaleArguments
+        from pydantic import ValidationError
+
+        for size in (500, 501, 1000):
+            with self.subTest(size=size):
+                args = CreateAfterSaleArguments(
+                    order_id=f"ORDER-{size}", reason="退" * size
+                )
+                case = candidate(order=args.order_id, reason=args.reason)
+                self.services.after_sale.repository.save(case)
+                queued = self.services.after_sale.execute_case(case.case_id)
+                request = queued["operation"]["request"]
+                self.assertEqual(request["reason"], args.reason)
+                receipt = RefundReceipt(
+                    **request,
+                    status="succeeded",
+                    version=1,
+                    refund_id=f"RF-{size}",
+                    amount_cents=9900,
+                )
+                self.assertEqual(
+                    self.workflow.apply_receipt(receipt)["outcome"], "applied"
+                )
+        with self.assertRaises(ValidationError):
+            CreateAfterSaleArguments(order_id="ORDER", reason="退" * 1001)
+
     def test_outbox_failure_rolls_back_case_and_operation(self):
         with patch(
             "app.services.refund_workflow.enqueue", side_effect=RuntimeError("disk")

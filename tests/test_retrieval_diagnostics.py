@@ -46,3 +46,59 @@ class RetrievalDiagnosticTests(PlatformTestCase):
         result = HybridRetrieval(self.config).diagnose("退货政策")
         self.assertEqual(result["diagnostics"]["outcome_reason"], "no_evidence")
         self.assertEqual(result["diagnostics"]["candidates"], [])
+
+    def test_conversational_installation_question_preserves_scope_and_abstention(self):
+        self.publish(
+            [self.ingest("install", "家电预约安装请联系门店。", regions=["上海"])]
+        )
+        question = "请问烤箱到家以后什么时候预约安装？"
+        for compiled in (False, True):
+            retriever = HybridRetrieval(
+                self.config.model_copy(update={"compiled_retrieval_enabled": compiled})
+            )
+            for mode in ("bm25", "vector", "hybrid"):
+                for query, context, outcome in (
+                    (question, {"region": "上海"}, "answerable"),
+                    (question, {}, "needs_clarification"),
+                    (question, {"region": "北京"}, "no_evidence"),
+                    ("可以预约宠物体检吗？", {"region": "上海"}, "no_evidence"),
+                    ("请问可以吗？", {"region": "上海"}, "no_evidence"),
+                ):
+                    with self.subTest(
+                        compiled=compiled, mode=mode, context=context, query=query
+                    ):
+                        result = retriever.search(query, context=context, mode=mode)
+                        self.assertEqual(result["outcome"], outcome)
+                        if outcome == "no_evidence":
+                            self.assertEqual(result["citations"], [])
+
+    def test_overlapping_subwords_cannot_outvote_the_product_in_a_conflict(self):
+        self.publish(
+            [
+                self.ingest(
+                    "short", "硬盘保修一年。", policy_key="disk", decision="one"
+                ),
+                self.ingest(
+                    "long", "硬盘保修两年。", policy_key="disk", decision="two"
+                ),
+                self.ingest("other", "键盘保修期从签收开始，换货期限为一个月。"),
+            ]
+        )
+        for compiled in (False, True):
+            retriever = HybridRetrieval(
+                self.config.model_copy(update={"compiled_retrieval_enabled": compiled})
+            )
+            for mode in ("bm25", "vector", "hybrid"):
+                with self.subTest(compiled=compiled, mode=mode):
+                    result = retriever.diagnose("硬盘的保修期限到底是多少？", mode=mode)
+                    self.assertEqual(result["outcome"], "policy_conflict")
+                    self.assertEqual(
+                        {r["document_id"] for r in result["results"]}, {"short", "long"}
+                    )
+                    other = next(
+                        r
+                        for r in result["diagnostics"]["candidates"]
+                        if r["document_id"] == "other"
+                    )
+                    self.assertGreater(len(other["matched_tokens"]), 1)
+                    self.assertEqual(len(other["evidence_matches"]), 1)

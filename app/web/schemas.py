@@ -22,7 +22,7 @@ class ChatRequest(BaseModel):
 class ReviewRequest(BaseModel):
     """管理员的售后审批请求。"""
 
-    decision: Literal["approve", "reject"]
+    decision: Literal["approve", "reject", "complete_exchange"]
     note: str = ""
     expected_version: int | None = Field(default=None, ge=0)
 

@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-18",
+  "dataset": {
+    "version": "review-v1",
+    "split": "development",
+    "labels": "synthetic_unreviewed",
+    "case_count": 16,
+    "family_count": 8,
+    "cases_with_gold_documents": 14,
+    "files_sha256": {
+      "documents.json": "080a0d6033ca03b72913a4d956f07369fb1743c28a763d60ac5a722c60bdf0a8",
+      "cases.json": "49ffb61cbac78fd43055856d3b902584d52994b3af33baa01d958736bf14c232"
+    }
+  },
+  "profiles_sha256": {
+    "legacy-v1": "562940e4cca0ed5f015103b3f7346035bcf9206bf39aa89a6a28df1421b4767d",
+    "candidate-v2": "8b16c6d22af11bd6b154fc8ca985e468873ce55b39f3aa1e7e382eea07981526"
+  },
+  "embedding_model": "local-hash-256-v1",
+  "paired_case_modes_per_stage": 64,
+  "within_stage_profile_output_differences": {
+    "before": 0,
+    "after": 0
+  },
+  "paid_calls": 0,
+  "holdout_evaluated": false,
+  "semantic_quality_verified": false,
+  "release_eligible": false,
+  "source_reports": {
+    "before": {
+      "summary_sha256": "6add675b0b338f245701bf78fdfc16110835d9ca5af61b49c1fde5a0a548b7d7",
+      "raw_gzip_sha256": "2392ea87324863b5512053050bdecd85404d566b891fc59296d15e0d0a7b5a19",
+      "app_source_tree_sha256": "ba1dd8293ad3197c3bb96b3535c220aa1ca513d8f4d9ff5aea770de3f55c5412",
+      "git_commit": "26d869ab32cc4a0b8f06d6055d56477457e88199"
+    },
+    "after": {
+      "summary_sha256": "abd3cac18807d9ca543563247439ddf00be88a10db88e23adffd0d822761984d",
+      "raw_gzip_sha256": "e39c41457ef8d49b2a6e93a651914a2ab8f405a80e7528119113af1b4f4a6d8c",
+      "app_source_tree_sha256": "bd11b6397d9abb2fdd7a61610540be1faa869dc58d3e14f459fe3ea2b06a5b6c"
+    }
+  },
+  "outcome_improved_ids": [
+    "dev-install-1",
+    "dev-gift-2",
+    "dev-invoice-2",
+    "dev-region-2",
+    "dev-conflict-2"
+  ],
+  "outcome_regressed_ids": [],
+  "remaining_incorrect_outcome_ids": [
+    "dev-apparel-1",
+    "dev-apparel-2",
+    "dev-preorder-2"
+  ],
+  "per_mode_metrics_each_profile": [
+    {"stage": "before", "mode": "vector", "case_count": 16, "candidate_recall": 0.9285714285714286, "evidence_recall": 0.42857142857142855, "correct_outcomes": 8, "wrong_answer_count": 1, "unnecessary_refusal_count": 6, "unsupported_document_count": 1},
+    {"stage": "before", "mode": "bm25", "case_count": 16, "candidate_recall": 1.0, "evidence_recall": 0.42857142857142855, "correct_outcomes": 8, "wrong_answer_count": 1, "unnecessary_refusal_count": 6, "unsupported_document_count": 1},
+    {"stage": "before", "mode": "hybrid", "case_count": 16, "candidate_recall": 1.0, "evidence_recall": 0.42857142857142855, "correct_outcomes": 8, "wrong_answer_count": 1, "unnecessary_refusal_count": 6, "unsupported_document_count": 1},
+    {"stage": "before", "mode": "hybrid_rerank", "case_count": 16, "candidate_recall": 1.0, "evidence_recall": 0.42857142857142855, "correct_outcomes": 8, "wrong_answer_count": 1, "unnecessary_refusal_count": 6, "unsupported_document_count": 1},
+    {"stage": "after", "mode": "vector", "case_count": 16, "candidate_recall": 0.9285714285714286, "evidence_recall": 0.7857142857142857, "correct_outcomes": 13, "wrong_answer_count": 0, "unnecessary_refusal_count": 3, "unsupported_document_count": 0},
+    {"stage": "after", "mode": "bm25", "case_count": 16, "candidate_recall": 1.0, "evidence_recall": 0.7857142857142857, "correct_outcomes": 13, "wrong_answer_count": 0, "unnecessary_refusal_count": 3, "unsupported_document_count": 0},
+    {"stage": "after", "mode": "hybrid", "case_count": 16, "candidate_recall": 1.0, "evidence_recall": 0.7857142857142857, "correct_outcomes": 13, "wrong_answer_count": 0, "unnecessary_refusal_count": 3, "unsupported_document_count": 0},
+    {"stage": "after", "mode": "hybrid_rerank", "case_count": 16, "candidate_recall": 1.0, "evidence_recall": 0.7857142857142857, "correct_outcomes": 13, "wrong_answer_count": 0, "unnecessary_refusal_count": 3, "unsupported_document_count": 0}
+  ],
+  "per_case_outcomes_and_document_sets_shared_by_all_modes_and_profiles": [
+    {"id": "dev-apparel-1", "expected": "answerable", "gold_documents": ["dev-apparel"], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "no_evidence", "after_documents": []},
+    {"id": "dev-apparel-2", "expected": "answerable", "gold_documents": ["dev-apparel"], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "no_evidence", "after_documents": []},
+    {"id": "dev-install-1", "expected": "answerable", "gold_documents": ["dev-install"], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "answerable", "after_documents": ["dev-install"]},
+    {"id": "dev-install-2", "expected": "answerable", "gold_documents": ["dev-install"], "before_outcome": "answerable", "before_documents": ["dev-install"], "after_outcome": "answerable", "after_documents": ["dev-install"]},
+    {"id": "dev-gift-1", "expected": "answerable", "gold_documents": ["dev-gift"], "before_outcome": "answerable", "before_documents": ["dev-gift"], "after_outcome": "answerable", "after_documents": ["dev-gift"]},
+    {"id": "dev-gift-2", "expected": "answerable", "gold_documents": ["dev-gift"], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "answerable", "after_documents": ["dev-gift"]},
+    {"id": "dev-preorder-1", "expected": "answerable", "gold_documents": ["dev-preorder"], "before_outcome": "answerable", "before_documents": ["dev-preorder"], "after_outcome": "answerable", "after_documents": ["dev-preorder"]},
+    {"id": "dev-preorder-2", "expected": "answerable", "gold_documents": ["dev-preorder"], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "no_evidence", "after_documents": []},
+    {"id": "dev-invoice-1", "expected": "answerable", "gold_documents": ["dev-invoice"], "before_outcome": "answerable", "before_documents": ["dev-invoice"], "after_outcome": "answerable", "after_documents": ["dev-invoice"]},
+    {"id": "dev-invoice-2", "expected": "answerable", "gold_documents": ["dev-invoice"], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "answerable", "after_documents": ["dev-invoice"]},
+    {"id": "dev-region-1", "expected": "needs_clarification", "gold_documents": ["dev-region"], "before_outcome": "needs_clarification", "before_documents": ["dev-region"], "after_outcome": "needs_clarification", "after_documents": ["dev-region"]},
+    {"id": "dev-region-2", "expected": "needs_clarification", "gold_documents": ["dev-region"], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "needs_clarification", "after_documents": ["dev-region"]},
+    {"id": "dev-unknown-1", "expected": "no_evidence", "gold_documents": [], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "no_evidence", "after_documents": []},
+    {"id": "dev-unknown-2", "expected": "no_evidence", "gold_documents": [], "before_outcome": "no_evidence", "before_documents": [], "after_outcome": "no_evidence", "after_documents": []},
+    {"id": "dev-conflict-1", "expected": "policy_conflict", "gold_documents": ["dev-conflict", "dev-conflict-alternative"], "before_outcome": "policy_conflict", "before_documents": ["dev-conflict", "dev-conflict-alternative"], "after_outcome": "policy_conflict", "after_documents": ["dev-conflict", "dev-conflict-alternative"]},
+    {"id": "dev-conflict-2", "expected": "policy_conflict", "gold_documents": ["dev-conflict", "dev-conflict-alternative"], "before_outcome": "answerable", "before_documents": ["hold-repair"], "after_outcome": "policy_conflict", "after_documents": ["dev-conflict", "dev-conflict-alternative"]}
+  ]
+}

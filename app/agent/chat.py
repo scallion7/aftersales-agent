@@ -159,7 +159,6 @@ class EcomAgent(BaseConversationAgent):
                     "该计划的确认已经被消费，当前不会重复执行副作用操作。"
                     "请通过计划查询接口确认最终状态；如需重新处理，请发起新的请求。"
                 )
-                self.raw_messages.append({"role": "assistant", "content": final_text})
                 return self._finalize_turn(
                     final_text,
                     requires_human=(
@@ -199,7 +198,6 @@ class EcomAgent(BaseConversationAgent):
                 requires_human=requires_human,
             )
             self._record_plan(result.execution)
-            self.raw_messages.append({"role": "assistant", "content": result.text})
             return result.text
         except Exception as exc:  # noqa: BLE001 - 策略失败时保留 ReAct 降级路径
             from app.services.run_context import current_run
@@ -237,7 +235,6 @@ class EcomAgent(BaseConversationAgent):
                 pending.plan.goal, conversation=self.raw_messages
             )
             self._record_plan(result.execution)
-            self.raw_messages.append({"role": "assistant", "content": result.text})
             return result.text
         try:
             running = pending.begin_resume()
@@ -266,10 +263,8 @@ class EcomAgent(BaseConversationAgent):
                 },
             )
             text = "原计划已经失效，未执行待确认操作，请重新发起请求。"
-            self.raw_messages.append({"role": "assistant", "content": text})
             return text
         self._record_plan(result.execution)
-        self.raw_messages.append({"role": "assistant", "content": result.text})
         return result.text
 
     def _finish_invalid_plan(
@@ -290,7 +285,6 @@ class EcomAgent(BaseConversationAgent):
             },
         )
         text = f"当前计划无法继续：{reason}。未执行待确认操作，请重新发起请求。"
-        self.raw_messages.append({"role": "assistant", "content": text})
         return text
 
     def _react_loop(self) -> str:
@@ -308,17 +302,17 @@ class EcomAgent(BaseConversationAgent):
             choice = response.choices[0]
             assistant_msg = choice.message
 
-            if assistant_msg.content:
-                self._print_thought(assistant_msg.content)
-
             if not assistant_msg.tool_calls:
                 content = self.guardrails.redact(assistant_msg.content or "")
-                self.raw_messages.append({"role": "assistant", "content": content})
                 return content
 
+            self._print_thought(
+                "正在调用："
+                + "、".join(tc.function.name for tc in assistant_msg.tool_calls)
+            )
             msg_dict = {
                 "role": "assistant",
-                "content": self.guardrails.redact(assistant_msg.content or ""),
+                "content": "",
             }
             msg_dict["tool_calls"] = [
                 {
@@ -360,7 +354,6 @@ class EcomAgent(BaseConversationAgent):
             purpose="react_final",
         )
         content = self.guardrails.redact(response.choices[0].message.content or "")
-        self.raw_messages.append({"role": "assistant", "content": content})
         return content
 
     def _build_messages(self) -> list[dict]:

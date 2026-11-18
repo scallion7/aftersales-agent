@@ -71,7 +71,7 @@ class RefundCommand(BaseModel):
     idempotency_key: str = Field(min_length=1, max_length=255)
     order_id: str = Field(min_length=1, max_length=64)
     user_id: str = Field(min_length=1, max_length=128)
-    reason: str = Field(min_length=1, max_length=500)
+    reason: str = Field(min_length=1, max_length=1000)
 
 
 class RefundReceipt(RefundCommand):

@@ -25,6 +25,7 @@ export class RunStream {
         let buffer = '';
         while (true) {
           const part = await reader.read();
+          if (controller.signal.aborted) return false;
           if (part.done) break;
           buffer += decoder.decode(part.value, {
             stream: true

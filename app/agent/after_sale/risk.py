@@ -186,6 +186,10 @@ class RiskRouter:
                 "manual_review",
                 ["历史发布未固定金额阈值，需人工审批"],
             )
+        if case_type == CaseType.EXCHANGE.value:
+            return RiskDecision(
+                RiskLevel.LOW.value, "manual_review", ["换货需要人工履约"]
+            )
         return RiskDecision(
             RiskLevel.LOW.value,
             "auto_process",

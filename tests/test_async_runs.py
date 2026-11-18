@@ -10,6 +10,7 @@ import threading
 import time
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from pathlib import Path
 from unittest.mock import patch
 
@@ -103,6 +104,79 @@ class AsyncRunTests(unittest.TestCase):
             "/v1/runs/" + response.json()["run_id"], headers=self.headers
         )
         self.assertEqual(fetched.json()["result"]["reply"], "完成")
+
+    def test_sync_chat_follows_a_run_claimed_by_another_worker(self):
+        entered, release, inline_claim = (
+            threading.Event(),
+            threading.Event(),
+            threading.Event(),
+        )
+
+        class SlowAgent(FakeAgent):
+            def chat(self, message):
+                if not release.wait(5):
+                    raise RuntimeError("test worker was not released")
+                return super().chat(message)
+
+        def factory(**_):
+            entered.set()
+            return SlowAgent()
+
+        self.config.run_poll_seconds = 0.02
+        remote = RunWorker(build_api_services(self.config, agent_factory=factory))
+        original_claim = RunRepository.claim
+        with ThreadPoolExecutor(max_workers=2) as pool:
+
+            def claim(repo, owner, **kwargs):
+                if kwargs.get("run_id"):
+                    pool.submit(remote.run_once)
+                    self.assertTrue(entered.wait(5))
+                    claimed = original_claim(repo, owner, **kwargs)
+                    self.assertIsNone(claimed)
+                    inline_claim.set()
+                    return claimed
+                return original_claim(repo, owner, **kwargs)
+
+            with patch.object(RunRepository, "claim", claim):
+                response = pool.submit(
+                    self.client.post,
+                    "/v1/chat",
+                    json={"message": "你好"},
+                    headers=self.headers,
+                )
+                try:
+                    self.assertTrue(inline_claim.wait(5))
+                    with self.assertRaises(FutureTimeoutError):
+                        response.result(timeout=0.1)
+                finally:
+                    release.set()
+                completed = response.result(timeout=5)
+        self.assertEqual(completed.status_code, 200, completed.text)
+        self.assertEqual(completed.json()["response"]["reply"], "完成")
+        self.assertEqual(FakeAgent.calls, 1)
+
+    def test_sync_wait_timeout_keeps_original_run_queryable(self):
+        self.config.run_sync_wait_seconds = 0.04
+        self.config.run_poll_seconds = 0.01
+        original_submit = RunRepository.submit
+
+        def submit(repo, *args, **kwargs):
+            row = original_submit(repo, *args, **kwargs)
+            self.assertIsNotNone(repo.claim("dedicated-worker", run_id=row["run_id"]))
+            return row
+
+        with patch.object(RunRepository, "submit", submit):
+            response = self.client.post(
+                "/v1/chat", json={"message": "你好"}, headers=self.headers
+            )
+        self.assertEqual(response.status_code, 504, response.text)
+        self.assertEqual(response.json()["error_code"], "RUN_WAIT_TIMEOUT")
+        detail = response.json()["detail"]
+        self.assertEqual(detail["error_code"], "RUN_WAIT_TIMEOUT")
+        self.assertEqual(response.headers["Location"], f"/v1/runs/{detail['run_id']}")
+        current = self.client.get(response.headers["Location"], headers=self.headers)
+        self.assertEqual(current.json()["status"], "running")
+        self.assertEqual(current.json()["attempt"], 1)
 
     def test_submit_idempotency_and_conflicting_request(self):
         with ThreadPoolExecutor(max_workers=8) as pool:

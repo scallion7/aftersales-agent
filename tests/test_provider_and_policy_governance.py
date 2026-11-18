@@ -378,6 +378,60 @@ class RiskRuleGovernanceTests(unittest.TestCase):
         self.assertEqual(rolled_back.status, "active")
         self.assertEqual(rolled_back.activated_by, "admin")
 
+    def test_rollback_picks_the_previous_active_rule_for_all_backends(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for repository in (
+                InMemoryRiskRuleRepository(),
+                JsonRiskRuleRepository(Path(tmp) / "rules.json"),
+                SqlRiskRuleRepository(f"sqlite:///{tmp}/rules.db"),
+            ):
+                with self.subTest(backend=type(repository).__name__):
+                    for version in ("v1", "v2", "v3"):
+                        repository.save_draft(rules(version), "admin")
+                    for version in ("v2", "v1", "v3"):
+                        repository.activate(version, "admin")
+                    self.assertEqual(repository.rollback("admin").version, "v1")
+                    self.assertEqual(repository.active().version, "v1")
+
+    def test_concurrent_sqlite_rollback_reads_the_committed_activation(self):
+        from app.scripts.database_smoke import run_policy_transition_smoke
+
+        with tempfile.TemporaryDirectory() as tmp:
+            result = run_policy_transition_smoke(f"sqlite:///{tmp}/governance.db")
+        self.assertTrue(result["previous_restored"])
+        self.assertEqual(result["active_rules"], 1)
+
+    def test_sql_transitions_recover_preexisting_active_versions(self):
+        from app.infrastructure.database import risk_rule_versions_table as table
+        from sqlalchemy import update
+
+        with tempfile.TemporaryDirectory() as tmp:
+            for transition in ("activate", "rollback"):
+                with self.subTest(transition=transition):
+                    repo = SqlRiskRuleRepository(f"sqlite:///{tmp}/{transition}.db")
+                    for version in ("older", "newer", "next"):
+                        repo.save_draft(rules(version), "admin")
+                    with repo.engine.begin() as conn:
+                        for day, version in enumerate(("older", "newer"), 1):
+                            conn.execute(
+                                update(table)
+                                .where(table.c.version == version)
+                                .values(
+                                    status="active",
+                                    activated_at=f"2026-01-0{day}T12:00:00+00:00",
+                                    activated_by="old-deployment",
+                                )
+                            )
+                    self.assertEqual(repo.active().version, "newer")
+                    if transition == "rollback":
+                        self.assertEqual(repo.rollback("admin").version, "older")
+                    else:
+                        self.assertEqual(repo.activate("next", "admin").version, "next")
+                        self.assertEqual(repo.rollback("admin").version, "newer")
+                    self.assertEqual(
+                        sum(row.status == "active" for row in repo.list()), 1
+                    )
+
     def test_json_rule_repository_preserves_concurrent_writers(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "rules.json"

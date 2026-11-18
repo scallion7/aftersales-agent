@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import insert, select, update
 from sqlalchemy.exc import IntegrityError
 
+from app.agent.after_sale.models import EXCHANGE_MANUAL_CODE, CaseType
 from app.agent.tools.contracts import CreateAfterSaleArguments
 from app.infrastructure.database import action_proposals_table, get_engine, intake
 from app.platform.common import PlatformError, encode
@@ -129,6 +130,9 @@ class AfterSaleIntake:
                 receipt = json.loads(action["result_json"] or "{}")
                 case = receipt.get("case", {})
                 if case.get("case_id"):
+                    result["case_request_matches"] = receipt.get(
+                        "request_matches", True
+                    )
                     result["case"] = self.services.after_sale.get_case(
                         case["case_id"], self.user
                     )
@@ -143,7 +147,8 @@ class AfterSaleIntake:
                 )
             operation = result.get("operation", {}).get("operation") or {}
             result["business_state"] = (
-                operation.get("status")
+                result.get("case", {}).get("exchange_state")
+                or operation.get("status")
                 or result.get("case", {}).get("case", {}).get("status")
                 or action["status"]
             )
@@ -232,6 +237,13 @@ class AfterSaleIntake:
                 raise PlatformError("INTAKE_MANAGER_REQUIRED")
             current = self.get(identity)
             case = current.get("case", {}).get("case", {})
+            if not current.get("case_request_matches", True):
+                raise PlatformError("INTAKE_EXISTING_CASE_MISMATCH")
+            if CaseType.EXCHANGE.value in (
+                case.get("case_type"),
+                payload["fields"]["case_type"],
+            ):
+                raise PlatformError(EXCHANGE_MANUAL_CODE)
             if case.get("status") != "approved":
                 raise PlatformError("INTAKE_CASE_NOT_APPROVED")
             if payload.get("execution_action_id"):

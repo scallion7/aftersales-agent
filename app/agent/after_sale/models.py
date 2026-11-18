@@ -9,6 +9,18 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 
+EXCHANGE_MANUAL_CODE = "EXCHANGE_MANUAL_REQUIRED"
+EXCHANGE_MANUAL_MESSAGE = "换货需要人工安排寄回与补发。请联系人工客服处理此工单。"
+EXCHANGE_REFUND_NOT_DISPATCHED = "EXCHANGE_REFUND_NOT_DISPATCHED"
+EXCHANGE_MESSAGES = {
+    "manual_required": EXCHANGE_MANUAL_MESSAGE,
+    "manual_completed": "换货已由人工登记完成，可查看履约凭证。",
+    "historical_refund_recorded": "此换货工单已有历史退款执行记录。请核对原退款回执，避免重复处理。",
+    "historical_refund_unknown": "历史退款结果仍需按原业务键核对。核对完成前请暂停退款和补发。",
+    "historical_refund_failed": "原供应商已确认历史退款失败。人工核实换货履约后可登记凭证。",
+    "rejected": "换货申请已被拒绝。",
+}
+
 
 class CaseType(str, Enum):
     CANCELLATION = "cancellation"

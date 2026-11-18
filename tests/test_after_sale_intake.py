@@ -156,6 +156,225 @@ class IntakeTests(PlatformTestCase):
         self.assertEqual(state["execution_action"]["status"], "pending")
         self.assertFalse(state["operation"]["success"])
 
+    def test_exchange_stays_with_human_review_and_cannot_propose_a_refund(self):
+        with TestClient(create_app(self.config)) as client:
+            client.headers["X-API-Key"] = "user"
+            path = f"/v1/after-sale-intakes/{self.identity}/commands"
+
+            def command(name, revision, **fields):
+                return client.post(
+                    path,
+                    headers={"Idempotency-Key": f"{name}-{revision}"},
+                    json={"command": name, "expected_revision": revision, **fields},
+                )
+
+            command(
+                "update",
+                0,
+                fields={
+                    "order_id": "ORD-20240125-006",
+                    "reason": "换码",
+                    "case_type": "exchange",
+                },
+            ).raise_for_status()
+            action = command("propose", 1).json()["action_id"]
+            row = self.manager.execution_service.actions.get(
+                action, "user-1", "user-1:intake"
+            )
+            client.post(
+                f"/v1/actions/{action}/confirm",
+                json={"session_id": "intake", "arguments_hash": row["arguments_hash"]},
+            ).raise_for_status()
+            created = client.post(
+                f"/v1/actions/{action}/execute", json={"session_id": "intake"}
+            ).json()
+            self.assertEqual(created["case"]["status"], "pending_review")
+            self.assertIn("人工", created["next_action"])
+            case_id = created["case"]["case_id"]
+            client.post(
+                f"/v1/admin/after-sales/{case_id}/review",
+                headers={"X-API-Key": "admin"},
+                json={
+                    "decision": "approve",
+                    "expected_version": created["case"]["version"],
+                },
+            ).raise_for_status()
+            self.assertEqual(
+                self.services.after_sale.get_case(case_id)["case"]["status"], "approved"
+            )
+            blocked = command("propose_execution", 2)
+            self.assertEqual(blocked.status_code, 409)
+            self.assertIn("EXCHANGE_MANUAL_REQUIRED", blocked.text)
+            proposal = json.loads(
+                self.manager.execute_tool(
+                    "execute_after_sale_case", {"case_id": case_id}
+                )
+            )
+            self.assertEqual(proposal["error_code"], "EXCHANGE_MANUAL_REQUIRED")
+            self.assertEqual(
+                self.services.after_sale.execute_case(case_id)["error_code"],
+                "EXCHANGE_MANUAL_REQUIRED",
+            )
+            self.assertEqual(
+                self.services.after_sale.recover_case(case_id)["error_code"],
+                "EXCHANGE_MANUAL_REQUIRED",
+            )
+            self.assertFalse(self.services.after_sale.get_operation(case_id)["success"])
+            with self.flow.engine.connect() as conn:
+                self.assertEqual(
+                    conn.scalar(
+                        select(func.count()).select_from(action_proposals_table)
+                    ),
+                    1,
+                )
+
+    def test_replay_of_an_old_completed_execution_shows_the_current_exchange_refund(
+        self,
+    ):
+        service = self.services.after_sale
+        created = service.create_case(
+            order_id="ORD-20240125-006",
+            reason="换货",
+            case_type="exchange",
+            user_confirmed=True,
+            user_id="user-1",
+        )
+        case = service.repository.get(created["case"]["case_id"])
+        actions = self.manager.execution_service.actions
+        args = {"case_id": case.case_id}
+        action = actions.propose(
+            "user-1", "user-1:intake", "execute_after_sale_case", args, "legacy"
+        )
+        confirmed = actions.confirm(
+            action["action_id"],
+            "user-1",
+            "user-1:intake",
+            action["arguments_hash"],
+            "legacy",
+            channel="api",
+        )
+        self.assertTrue(actions.claim(confirmed))
+        actions.finish(action["action_id"], {"success": True, "accepted": True})
+        case.status = "processing"
+        service.repository.save(case)
+        replay = json.loads(
+            self.manager.execute_tool(
+                "execute_after_sale_case", args, action_id=action["action_id"]
+            )
+        )
+        self.assertTrue(replay["idempotent_replay"])
+        self.assertEqual(replay["exchange_state"], "historical_refund_unknown")
+        case.status = "completed"
+        case.result = {"success": True, "refund_id": "LEGACY-REFUND"}
+        service.repository.save(case)
+        replay = json.loads(
+            self.manager.execute_tool(
+                "execute_after_sale_case", args, action_id=action["action_id"]
+            )
+        )
+        self.assertEqual(replay["exchange_state"], "historical_refund_recorded")
+        self.assertEqual(replay["result"]["refund_id"], "LEGACY-REFUND")
+        self.assertFalse(service.get_operation(case.case_id)["success"])
+
+    def test_exchange_completion_requires_operator_version_and_proof_then_releases_order(
+        self,
+    ):
+        service = self.services.after_sale
+        kwargs = dict(
+            order_id="ORD-20240125-006",
+            reason="换码",
+            case_type="exchange",
+            user_confirmed=True,
+            user_id="user-1",
+        )
+        case = service.create_case(**kwargs)["case"]
+        path = f"/v1/admin/after-sales/{case['case_id']}/review"
+        with TestClient(create_app(self.config)) as client:
+            payload = {
+                "decision": "complete_exchange",
+                "note": "SHIP-123",
+                "expected_version": case["version"],
+            }
+            denied = client.post(path, headers={"X-API-Key": "user"}, json=payload)
+            self.assertEqual(denied.status_code, 403)
+            client.headers["X-API-Key"] = "admin"
+            self.assertEqual(client.post(path, json=payload).status_code, 409)
+            approved = client.post(
+                path, json={"decision": "approve", "expected_version": case["version"]}
+            ).json()["case"]
+            self.assertEqual(client.post(path, json=payload).status_code, 409)
+            payload["expected_version"] = approved["version"]
+            self.assertEqual(
+                client.post(path, json=payload | {"note": " "}).status_code, 422
+            )
+            self.assertEqual(
+                client.post(
+                    path, json={"decision": "complete_exchange", "note": "SHIP-123"}
+                ).status_code,
+                422,
+            )
+            done = client.post(path, json=payload).json()
+            self.assertEqual(done["exchange_state"], "manual_completed")
+            self.assertEqual(done["case"]["status"], "completed")
+            self.assertEqual(done["case"]["result"]["registered_by"], "root")
+            self.assertEqual(done["case"]["audit_log"][-1]["note"], "SHIP-123")
+            self.assertTrue(client.post(path, json=payload).json()["idempotent"])
+            self.assertEqual(
+                client.post(path, json=payload | {"note": "SHIP-OTHER"}).status_code,
+                409,
+            )
+            self.assertEqual(
+                service.execute_case(case["case_id"])["result"][
+                    "fulfillment_reference"
+                ],
+                "SHIP-123",
+            )
+            self.assertTrue(service.create_case(**kwargs)["created"])
+
+    def test_exchange_reusing_an_open_refund_case_cannot_continue_its_execution(self):
+        existing = self.services.after_sale.create_case(
+            order_id="ORD-20240125-006",
+            reason="申请退货",
+            case_type="return_refund",
+            user_confirmed=True,
+            user_id="user-1",
+        )["case"]
+        self.flow.command(
+            self.identity,
+            "update",
+            0,
+            "fill",
+            {
+                "order_id": existing["order_id"],
+                "reason": "换码",
+                "case_type": "exchange",
+            },
+        )
+        prepared = self.flow.command(
+            self.identity, "propose", 1, "propose", manager=self.manager
+        )
+        action = self.manager.execution_service.actions.get(
+            prepared["action_id"], "user-1", "user-1:intake"
+        )
+        self.manager.execution_service.confirm(
+            action["action_id"],
+            self.manager._execution_context,
+            action["arguments_hash"],
+        )
+        self.manager.execute_tool(
+            action["tool_name"], action["arguments_json"], action_id=action["action_id"]
+        )
+        current = self.flow.get(self.identity)
+        self.assertFalse(current["case_request_matches"])
+        self.assertEqual(current["case"]["case"]["case_id"], existing["case_id"])
+        with self.assertRaisesRegex(PlatformError, "INTAKE_EXISTING_CASE_MISMATCH"):
+            self.flow.command(
+                self.identity, "propose_execution", 2, "execute", manager=self.manager
+            )
+        self.assertFalse(
+            self.services.after_sale.get_operation(existing["case_id"])["success"]
+        )
+
     def test_http_ownership_and_argument_validation(self):
         with TestClient(create_app(self.config)) as client:
             path = "/v1/after-sale-intakes/" + self.identity

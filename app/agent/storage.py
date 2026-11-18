@@ -4,8 +4,57 @@ import os
 from datetime import datetime
 from pathlib import Path
 
+from app.schemas.response import CustomerServiceResponse
+
 SESSION_VERSION = 1
 logger = logging.getLogger(__name__)
+
+
+def canonical_messages(history):
+    """Retain tool receipts and the customer-visible final version of each reply."""
+    # Older sessions stored the unreviewed draft immediately before the
+    # structured answer. Keep only the answer that reached the customer.
+    messages = []
+    for message in history:
+        if message.get("role") == "assistant":
+            if message.get("tool_calls"):
+                message = {**message, "content": ""}
+            elif (
+                messages
+                and messages[-1].get("role") == "assistant"
+                and not messages[-1].get("tool_calls")
+            ):
+                try:
+                    CustomerServiceResponse.model_validate_json(message["content"])
+                except ValueError:
+                    pass
+                else:
+                    messages.pop()
+        messages.append(message)
+    return messages
+
+
+def public_messages(history):
+    displayed = []
+    for message in canonical_messages(history):
+        role = message.get("role")
+        if role not in {"user", "assistant"} or message.get("tool_calls"):
+            continue
+        content = message.get("content")
+        if not isinstance(content, str) or not content:
+            continue
+        if role == "assistant":
+            try:
+                final = CustomerServiceResponse.model_validate_json(content)
+            except ValueError:
+                pass  # Standalone confirmations and older plain-text replies.
+            else:
+                content = final.reply
+                if final.follow_up_question and final.follow_up_question not in content:
+                    content += "\n" + final.follow_up_question
+        if content:
+            displayed.append({"role": role, "content": content})
+    return displayed
 
 
 def save_session(

@@ -117,7 +117,9 @@ def install_api_middleware(app: FastAPI, config) -> None:
             429: "RATE_LIMITED",
             502: "PROVIDER_FAILURE",
             503: "SERVICE_UNAVAILABLE",
-            504: "PROVIDER_TIMEOUT",
+            504: exc.detail.get("error_code", "PROVIDER_TIMEOUT")
+            if isinstance(exc.detail, dict)
+            else "PROVIDER_TIMEOUT",
         }.get(exc.status_code, "REQUEST_FAILED")
         return JSONResponse(
             status_code=exc.status_code,

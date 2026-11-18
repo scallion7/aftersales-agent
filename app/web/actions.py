@@ -75,7 +75,9 @@ def register_action_routes(app, services, require):
 
     @app.get("/v1/sessions/{session_id}/actions")
     def list_actions(
-        session_id: str, context: AuthContext = Depends(require("session:read"))
+        session_id: str,
+        include_confirmed: bool = False,
+        context: AuthContext = Depends(require("session:read")),
     ):
         tm = manager(context, session_id)
         actions = tm.execution_service.actions
@@ -83,7 +85,9 @@ def register_action_routes(app, services, require):
             "actions": [
                 actions.public(row)
                 for row in actions.pending(
-                    context.user_id, tm._execution_context.session_id
+                    context.user_id,
+                    tm._execution_context.session_id,
+                    include_confirmed=include_confirmed,
                 )
             ]
         }

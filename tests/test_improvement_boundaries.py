@@ -237,6 +237,7 @@ class ImprovementBoundaryTests(PlatformTestCase):
         )
         agent.memory_manager = Mock()
         agent.raw_messages = []
+        agent._runtime_state = {}
         agent.history_threshold = 50
         agent.save = Mock()
         agent.event_bus = Mock()

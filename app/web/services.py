@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -315,7 +316,7 @@ def invoke_chat(services, request, context, trace_id):
     """Compatibility adapter: SQL chat uses the same queue and execution journal."""
     if services.config.persistence_backend != "sql":
         return _invoke_chat(services, request, context, trace_id)
-    from app.repositories.runs import RunError, RunRepository
+    from app.repositories.runs import TERMINAL, RunError, RunRepository
     from app.services.runs import RunWorker
 
     repository = RunRepository(services.config.database_url)
@@ -341,8 +342,33 @@ def invoke_chat(services, request, context, trace_id):
             detail={"error_code": exc.code},
             headers={"Retry-After": "2"} if exc.code == "RUN_QUEUE_FULL" else None,
         ) from exc
-    RunWorker(services, repository=repository).run_once(row["run_id"])
-    row = repository.get(row["run_id"])
+    run_id = row["run_id"]
+    worker = RunWorker(services, repository=repository)
+    worker.run_once(run_id)
+    deadline = time.monotonic() + services.config.run_sync_wait_seconds
+    row = repository.get(run_id)
+    while row["status"] not in TERMINAL:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise HTTPException(
+                504,
+                detail={
+                    "error_code": "RUN_WAIT_TIMEOUT",
+                    "run_id": run_id,
+                    "status": row["status"],
+                },
+                headers={"Location": f"/v1/runs/{run_id}"},
+            )
+        # A dedicated worker may already own this run. Only reclaim it when
+        # the queue considers it eligible, using the same lease and journal.
+        now = repository.clock()
+        if (
+            row["status"] in {"queued", "retry_wait"} and row["next_retry_at"] <= now
+        ) or (row["status"] == "running" and row["lease_until"] <= now):
+            worker.run_once(run_id)
+        else:
+            time.sleep(min(services.config.run_poll_seconds, remaining))
+        row = repository.get(run_id)
     if row["status"] != "completed":
         raise HTTPException(
             409,

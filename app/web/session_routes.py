@@ -11,6 +11,7 @@ from fastapi import (
     Query,
 )
 
+from app.agent.storage import public_messages
 from app.agent.strategies.models import PlanStatus
 from app.observability import TraceContext
 from app.repositories.plan_runs import build_plan_run_repository
@@ -47,6 +48,7 @@ def register_session_routes(
     @app.get("/v1/sessions/{session_id}")
     def get_session(
         session_id: str,
+        conversation_only: bool = False,
         context: AuthContext = Depends(require("session:read")),
     ) -> dict:
         reference = session_reference(services, context, session_id)
@@ -58,6 +60,11 @@ def register_session_routes(
         state = repository.load()
         if state is None:
             raise HTTPException(status_code=404, detail="会话不存在")
+        if conversation_only:
+            return {
+                "session_id": session_id,
+                "messages": public_messages(state["messages"]),
+            }
         return {"session_id": session_id, **state}
 
     @app.delete("/v1/sessions/{session_id}")

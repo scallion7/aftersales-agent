@@ -37,16 +37,38 @@ STOPWORDS = {
     "适用",
     "不",
 }
+# Interrogatives and conversational particles describe the request, not its
+# subject. Limit this filtering to evidence checks; keep the ranking index intact.
+QUESTION_WORDS = frozenset(
+    "我 我们 你 您 请问 能 可以 会 要 该 也 还 在 到 已经 到底 "
+    "怎么 怎样 如何 什么 时候 多久 多长 多少 是否".split()
+)
+
+
+def _index_terms(words):
+    return [
+        x.lower()
+        for x in words
+        if re.search(r"[\w\u4e00-\u9fff]", x) and x not in STOPWORDS
+    ]
 
 
 def tokens(text):
     import jieba
 
-    return [
-        x.lower()
-        for x in jieba.cut_for_search(text, HMM=False)
-        if re.search(r"[\w\u4e00-\u9fff]", x) and x not in STOPWORDS
-    ]
+    return _index_terms(jieba.cut_for_search(text, HMM=False))
+
+
+def _evidence_terms(query):
+    """Count each Chinese word once, even when search tokenization expands it."""
+    import jieba
+
+    groups = {}
+    for word in _index_terms(jieba.cut(query, HMM=False)):
+        if word in QUESTION_WORDS or word in groups:
+            continue
+        groups[word] = set(_index_terms(jieba.cut_for_search(word, HMM=False)))
+    return groups
 
 
 def bm25(query, documents):
@@ -147,7 +169,7 @@ class HybridRetrieval:
                     self.service.embedder.model,
                     TOKENIZER_VERSION,
                     self.profile.fingerprint,
-                    "policy-conflicts-v2",
+                    "policy-conflicts-v2-evidence-terms-v1",
                 ],
                 context={
                     "filters": context or {},
@@ -390,32 +412,41 @@ class HybridRetrieval:
         # Hash vectors can match by collision. The offline projector cannot create
         # evidence without any lexical support, unlike a configured semantic model.
         if self.service.embedder.model.startswith("local-hash"):
-            query_terms = set(tokens(query))
-
-            def item_terms(item):
-                return (
-                    set(compiled["counts"][item["chunk_id"]])
-                    if compiled
-                    else set(tokens(self.profile.normalize(item["text"])))
-                )
-
+            groups = _evidence_terms(query)
+            # Two independent words protect a multi-topic question from a
+            # single incidental match. A single-word lookup needs that word.
             minimum = max(
-                1, math.ceil(len(query_terms) * self.profile.evidence_overlap)
+                2 if len(groups) > 1 else 1,
+                math.ceil(len(groups) * self.profile.evidence_overlap),
             )
             if explain:
                 base["diagnostics"]["minimum_lexical_overlap"] = minimum
-                for i, item in enumerate(items):
+                base["diagnostics"]["evidence_terms"] = list(groups)
+                search_terms = set(base["diagnostics"]["query_tokens"])
+            accepted = set()
+            for i in range(len(items)) if explain else selected:
+                item = items[i]
+                terms = (
+                    compiled["counts"][item["chunk_id"]].keys()
+                    if compiled
+                    else set(tokens(self.profile.normalize(item["text"])))
+                )
+                # Search-mode subwords of a compound can support that word,
+                # but cannot supply several votes for the same concept.
+                matches = set()
+                for word, forms in groups.items():
+                    shared = forms & terms
+                    if shared and (len(groups) > 1 or word in shared):
+                        matches.add(max(shared, key=lambda s: (len(s), s)))
+                if lexical[i] > 0 and len(matches) >= minimum:
+                    accepted.add(i)
+                if explain:
                     entry = trace[item["chunk_id"]]
-                    entry["matched_tokens"] = sorted(query_terms & item_terms(item))
-                    if i in selected and (
-                        lexical[i] <= 0 or len(entry["matched_tokens"]) < minimum
-                    ):
+                    entry["matched_tokens"] = sorted(search_terms & terms)
+                    entry["evidence_matches"] = sorted(matches)
+                    if i in selected and i not in accepted:
                         entry["selection_reason"] = "lexical_support_rejected"
-            selected = [
-                i
-                for i in selected
-                if lexical[i] > 0 and len(query_terms & item_terms(items[i])) >= minimum
-            ]
+            selected = [i for i in selected if i in accepted]
         if explain:
             for i in selected:
                 trace[items[i]["chunk_id"]]["evidence_accepted"] = True

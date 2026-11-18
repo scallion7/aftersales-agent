@@ -17,7 +17,7 @@ python -m app.scripts.demo_stack --directory app/sessions/intake-demo-01
 1. 输入会话 ID，新建申请并记下申请编号。
 2. 分次填写订单 `ORD-20240125-006`、原因、诉求类型和材料编号，点击“保存资料”。未补齐的字段会列在处理进度中。
 3. 资料完整后生成创建提案，核对参数，再点击“确认并执行此操作”。保存资料或生成提案本身不创建工单，也不退款。
-4. 需要人工审批的工单由客服审批；达到 `approved` 后生成执行提案，重新确认执行。创建工单的授权不能代替执行授权。
+4. 客服审批需要人工审核的工单。支持退款执行的工单获批后生成执行提案，用户再次确认。换货工单获批后由人工履约。
 5. 刷新处理进度，分别查看申请修订、工单和退款操作状态。历史回执与最新业务结果可能不同，应以当前业务状态为准。
 
 创建、读取、保存以及随后刷新期间，相关字段和按钮暂时禁用，避免迟到的响应覆盖新输入。材料由 `/v1/evidence` 提交，再由管理员审核；页面可以关联已有材料 ID，本版没有图片上传存储或自动理解证明材料。
@@ -60,12 +60,18 @@ Agent 对话任务与退款操作是两个状态机。若退款已经核对成�
 | `GET /v1/after-sale-intakes/{id}/history` | 返回本用户的修订与命令回执 |
 | `POST /v1/after-sale-intakes/{id}/commands` | `command`、`expected_revision`、`Idempotency-Key`；命令为 `update`、`propose`、`propose_execution`、`withdraw` |
 | `POST /v1/actions/{id}/confirm` | `session_id` 与 `arguments_hash`，确认具体动作 |
+| `GET /v1/sessions/{session_id}?conversation_only=true` | 按当前身份读取指定会话仍保留的用户可见消息。刷新工作区后点击“连接会话”，页面用此接口恢复对话，沿用会话的压缩与删除规则。 |
+| `GET /v1/sessions/{session_id}/actions?include_confirmed=true` | 返回本会话有效的待确认和已确认待执行操作。工作区刷新后可按原操作 ID 继续执行。省略参数时仅返回待确认操作。 |
 | `POST /v1/actions/{id}/execute` | `session_id`，消费该动作已获确认的授权 |
 | `GET /v1/after-sales/{case_id}/operation` | 查询本用户工单的最新退款操作状态 |
 
 只有 `update` 可携带 `fields`，支持 `order_id`、`reason`、`case_type`、`evidence_ids`。生成提案时校验材料归属、订单、规则与证据快照；申请修订、旧提案失效和完整命令回执同事务提交。并发修改旧修订的失败方必须重新核对，不自动合并资料。
 
 `after_sale_intakes` 保存当前资料和修订，`after_sale_intake_events` 保存命令哈希、完整回执和服务端时间。前端禁用按钮只是交互保护，服务端的修订、授权与幂等约束在直接 API 调用时仍然生效。
+
+换货由客服审核。客服确认换货实际完成后，在 `/admin` 的“人工换货履约”输入工单号并查询，填写补发单号或人工履约记录编号，点击“登记换货完成”。管理端沿用 `POST /v1/admin/after-sales/{case_id}/review`，提交 `decision=complete_exchange`、查询所得的 `expected_version` 和作为凭证的 `note`（1–256 字符）。成功后状态变为 `completed`，工单保留登记人、凭证和审计时间，同一订单可以发起后续售后。相同管理员重试同一版本、同一凭证可取回结案结果。
+
+查询换货工单可读取 `exchange_state` 和 `message`。新申请等待人工履约时为 `manual_required`，人工结案后为 `manual_completed`。历史退款的已记录、明确失败、待核对状态分别为 `historical_refund_recorded`、`historical_refund_failed`、`historical_refund_unknown`。旧队列中可证明从未投递的退款会取消并恢复人工处理；已发起过投递的退款保留原键，只查询已有记录。被拒绝的换货申请显示为 `rejected`。待核对或已记录退款的工单不能登记人工换货完成。
 
 ## 在对话中分轮办理
 

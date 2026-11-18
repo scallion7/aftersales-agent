@@ -230,6 +230,22 @@ class ToolExecutionService:
                     "ACTION_ARGUMENTS_CHANGED", "确认不能用于不同工具或参数"
                 )
             self._bind_run_action(row)
+            if name == "execute_after_sale_case" and row["status"] in {
+                "completed",
+                "executing",
+                "unknown",
+            }:
+                service = getattr(self.registry, "after_sale_service", None)
+                current = (
+                    service.exchange_replay(parsed["case_id"], context.user_id)
+                    if service
+                    else None
+                )
+                if current is not None:
+                    return current | {
+                        "idempotent_replay": True,
+                        "action": self.actions.public(row),
+                    }
             # Replay must remain available after the business operation changed the order.
             if row["status"] == "completed":
                 return json.loads(row["result_json"]) | {

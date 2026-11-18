@@ -83,7 +83,10 @@ class ActionService:
             raise ActionError("ACTION_NOT_FOUND", "提案不存在或不属于当前用户和会话")
         return dict(row)
 
-    def pending(self, user_id: str, session_id: str) -> list[dict]:
+    def pending(
+        self, user_id: str, session_id: str, *, include_confirmed: bool = False
+    ) -> list[dict]:
+        statuses = ("pending", "confirmed") if include_confirmed else ("pending",)
         with self.engine.connect() as connection:
             rows = (
                 connection.execute(
@@ -91,7 +94,7 @@ class ActionService:
                     .where(
                         proposals.c.user_id == user_id,
                         proposals.c.session_id == session_id,
-                        proposals.c.status == "pending",
+                        proposals.c.status.in_(statuses),
                         proposals.c.expires_at > self.clock().isoformat(),
                     )
                     .order_by(proposals.c.created_at)

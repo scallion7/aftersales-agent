@@ -8,6 +8,90 @@ from app.scripts.demo_stack import DemoStack
 
 @unittest.skipUnless(os.environ.get("RUN_BROWSER_E2E") == "1", "Requires Chromium")
 class BrowserRetryTests(unittest.TestCase):
+    def test_confirmed_exchange_resumes_after_reload_and_finishes_manually(self):
+        from playwright.sync_api import expect, sync_playwright
+
+        with DemoStack() as stack, sync_playwright() as playwright:
+            session = "resume-confirmed"
+            draft = stack.request(
+                "POST",
+                "/v1/after-sale-intakes",
+                json={"session_id": session},
+                headers={"Idempotency-Key": "create"},
+            ).json()
+            base = "/v1/after-sale-intakes/" + draft["intake_id"]
+            for command, fields in (
+                (
+                    "update",
+                    {
+                        "order_id": "ORD-20240125-006",
+                        "reason": "换一个尺码",
+                        "case_type": "exchange",
+                    },
+                ),
+                ("propose", None),
+            ):
+                response = stack.request(
+                    "POST",
+                    base + "/commands",
+                    json={
+                        "command": command,
+                        "expected_revision": draft["revision"],
+                        "fields": fields,
+                    },
+                    headers={"Idempotency-Key": command},
+                )
+                response.raise_for_status()
+                draft = response.json()
+            action = "/v1/actions/" + draft["action_id"]
+            browser = playwright.chromium.launch()
+            page = browser.new_page()
+            page.goto(stack.url + "/workspace")
+            page.locator("#token").fill("demo-user")
+            page.locator("#session").fill(session)
+            page.locator("#connect").click()
+            pattern = "**" + action + "/execute"
+            page.route(pattern, lambda route: route.abort())
+            with page.expect_request(pattern):
+                page.get_by_role("button", name="确认并执行").click()
+            page.reload()
+            page.unroute(pattern)
+            page.locator("#connect").click()
+            expect(page.locator("#actions")).to_contain_text("已确认，待执行")
+            # Reconfirming would fail this request and leave no created case.
+            page.route("**" + action + "/confirm", lambda route: route.abort())
+            page.get_by_role("button", name="继续执行").click()
+            expect(page.locator("#actions")).to_be_empty()
+            state = stack.request("GET", base).json()
+            self.assertEqual(state["action"]["status"], "completed")
+            case = state["case"]["case"]
+            case_id = case["case_id"]
+            self.assertEqual(case["status"], "pending_review")
+            page.locator("#case").fill(case_id)
+            page.locator("#queryCase").click()
+            expect(page.locator("#caseResult")).to_have_text(state["case"]["message"])
+
+            stack.request(
+                "POST",
+                f"/v1/admin/after-sales/{case_id}/review",
+                admin=True,
+                json={"decision": "approve", "expected_version": case["version"]},
+            ).raise_for_status()
+            admin = browser.new_page()
+            admin.goto(stack.url + "/admin")
+            admin.locator("#token").fill("demo-admin")
+            admin.locator("#exchangeId").fill(case_id)
+            admin.locator("#lookupExchange").click()
+            admin.locator("#exchangeReference").fill("人工换货凭证 EX-001")
+            with admin.expect_response("**/review") as recorded:
+                admin.locator("#completeExchange").click()
+            self.assertEqual(recorded.value.status, 200)
+            updated = stack.request("GET", "/v1/after-sales/" + case_id).json()
+            self.assertEqual(updated["exchange_state"], "manual_completed")
+            page.locator("#queryCase").click()
+            expect(page.locator("#caseResult")).to_have_text(updated["message"])
+            browser.close()
+
     def test_signed_token_renewal_reuses_pending_message_only_for_same_principal(self):
         import json
         import tempfile

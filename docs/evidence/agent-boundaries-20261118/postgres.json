@@ -1,0 +1,97 @@
+{
+  "server_version": "postgres (PostgreSQL) 17.11 (Homebrew)",
+  "migration": {
+    "current": "20261109_0009",
+    "head": "20261109_0009",
+    "up_to_date": true
+  },
+  "postgres_server_version": "17.11 (Homebrew)",
+  "rollback": {
+    "draft_order": [
+      "v1",
+      "v2",
+      "v3"
+    ],
+    "activation_order": [
+      "v2",
+      "v1",
+      "v3"
+    ],
+    "actual": "v1",
+    "expected": "v1"
+  },
+  "concurrent_policy_transition": {
+    "overlapping_writes": 2,
+    "active_rules": 1,
+    "previous_restored": true
+  },
+  "refund_delivery": {
+    "submissions": 16,
+    "callbacks": 10,
+    "applied": 1,
+    "passed": true
+  },
+  "agent_queue": {
+    "claimants": 8,
+    "winners": 1,
+    "events": 3,
+    "reconciliation": {
+      "reviewers": 4,
+      "resolved": 1,
+      "action_revoked": true,
+      "session_reopened": true,
+      "smoke_ledger_cleaned": true
+    }
+  },
+  "case_creation": {
+    "requests": 50,
+    "initial_cases": 1,
+    "creation_receipts": 50,
+    "passed": true
+  },
+  "exchange": {
+    "never_dispatched": {
+      "outbox": "cancelled",
+      "query_job": "cancelled",
+      "manual_completion": "manual_completed",
+      "same_key_replay": true,
+      "new_case_after_completion": true
+    },
+    "previously_attempted": {
+      "outbox": "cancelled",
+      "query_job_before_receipt": "pending",
+      "before_receipt": "historical_refund_unknown",
+      "manual_completion_blocked": true,
+      "after_receipt": "historical_refund_recorded"
+    },
+    "provider_submit_calls": 0
+  },
+  "refund_reason": {
+    "codepoints": 1000,
+    "receipt": "applied"
+  },
+  "passed": true,
+  "concurrent_rule_administration_comparison": {
+    "main_26d869a": {
+      "concurrently_waiting_writes": 2,
+      "active_versions": [
+        "v2",
+        "v4"
+      ]
+    },
+    "candidate_before_serialization": {
+      "concurrently_waiting_writes": 2,
+      "active_versions": [
+        "v2",
+        "v4"
+      ]
+    },
+    "final_after_serialization": {
+      "concurrently_waiting_writes": 2,
+      "active_versions": [
+        "v4"
+      ]
+    },
+    "finding": "The former and baseline implementations admitted two active versions. The final implementation leaves exactly one."
+  }
+}

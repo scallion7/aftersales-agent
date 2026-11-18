@@ -241,8 +241,15 @@ def register_admin_routes(
             request.note,
             expected_version=request.expected_version,
         )
-        if result.get("error_code") == "CASE_VERSION_CONFLICT":
-            raise HTTPException(409, detail=result)
+        if result.get("error_code") == "CASE_VERSION_CONFLICT" or (
+            request.decision == "complete_exchange" and not result["success"]
+        ):
+            raise HTTPException(
+                422
+                if result.get("error_code") == "EXCHANGE_COMPLETION_INPUT_REQUIRED"
+                else 409,
+                detail=result,
+            )
         return result
 
     @app.get("/v1/admin/metrics")

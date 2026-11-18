@@ -5,6 +5,10 @@ from uuid import uuid4
 
 from sqlalchemy import select
 
+from app.agent.after_sale.models import (
+    EXCHANGE_MANUAL_CODE,
+    EXCHANGE_REFUND_NOT_DISPATCHED,
+)
 from app.infrastructure.database import (
     after_sale_operations_table,
     outbox_events_table,
@@ -44,7 +48,13 @@ class RefundDeliveryWorker:
                 claim["aggregate_id"], guard=lambda conn: self.outbox.guard(conn, claim)
             )
             if current.status in {"succeeded", "failed", "needs_reconciliation"}:
-                self.outbox.finish(claim)
+                if current.error in {
+                    EXCHANGE_MANUAL_CODE,
+                    EXCHANGE_REFUND_NOT_DISPATCHED,
+                }:
+                    self.outbox.finish(claim, error_code=current.error, cancel=True)
+                else:
+                    self.outbox.finish(claim)
                 return True
             with self.workflow.engine.connect() as conn:
                 self.outbox.owned(conn, claim)

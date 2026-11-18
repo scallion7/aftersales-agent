@@ -151,11 +151,13 @@ class LeaseQueue:
         if changed.rowcount != 1:
             raise DeliveryConflict("DELIVERY_FENCED")
 
-    def finish(self, claim, *, error_code="", delay=None):
+    def finish(self, claim, *, error_code="", delay=None, cancel=False):
         with self.engine.begin() as conn:
             row = self.owned(conn, claim)
             status = "sent"
-            if error_code or delay is not None:
+            if cancel:
+                status = "cancelled"
+            elif error_code or delay is not None:
                 status = "dead" if row["attempt"] >= row["max_attempts"] else "pending"
             changed = conn.execute(
                 update(self.table)

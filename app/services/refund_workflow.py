@@ -12,7 +12,13 @@ from uuid import uuid4
 from sqlalchemy import insert, select, update
 from sqlalchemy.exc import IntegrityError
 
-from app.agent.after_sale.models import AfterSaleCase, AfterSaleOperation
+from app.agent.after_sale.models import (
+    EXCHANGE_MANUAL_CODE,
+    EXCHANGE_REFUND_NOT_DISPATCHED,
+    AfterSaleCase,
+    AfterSaleOperation,
+    CaseType,
+)
 from app.infrastructure.database import (
     after_sale_cases_table as cases,
 )
@@ -138,6 +144,8 @@ class RefundWorkflow:
                     if not row or row["status"] != "approved":
                         raise RefundWorkflowError("CASE_NOT_APPROVED")
                     case = AfterSaleCase.from_dict(json.loads(row["payload_json"]))
+                    if case.case_type == CaseType.EXCHANGE.value:
+                        raise RefundWorkflowError(EXCHANGE_MANUAL_CODE)
                     request = RefundCommand(
                         operation_id=template.operation_id,
                         idempotency_key=template.idempotency_key,
@@ -215,7 +223,73 @@ class RefundWorkflow:
                         .one()
                     )
                     old = operation_from(row)
-                    if old.status in {"succeeded", "failed", "needs_reconciliation"}:
+                    if old.status in {"succeeded", "failed"}:
+                        return old
+                    # Older deployments could queue a refund for an exchange.
+                    # Preserve the ledger and query job in case a prior attempt reached the provider.
+                    case_row = (
+                        conn.execute(
+                            select(cases).where(cases.c.case_id == old.case_id)
+                        )
+                        .mappings()
+                        .one()
+                    )
+                    case = AfterSaleCase.from_dict(json.loads(case_row["payload_json"]))
+                    if case.case_type == CaseType.EXCHANGE.value:
+                        if (
+                            old.attempt_count
+                            or old.provider_version
+                            or old.provider_reference
+                        ):
+                            if (
+                                old.status == "needs_reconciliation"
+                                and old.error == EXCHANGE_MANUAL_CODE
+                            ):
+                                return old
+                            return self._save_operation(
+                                conn,
+                                old,
+                                replace(
+                                    old,
+                                    status="needs_reconciliation",
+                                    error=EXCHANGE_MANUAL_CODE,
+                                ),
+                            )
+                        # No dispatcher crossed mark_attempt; the original command cannot have been submitted.
+                        result = {
+                            "success": False,
+                            "error_code": EXCHANGE_REFUND_NOT_DISPATCHED,
+                        }
+                        case.status, case.result = "approved", result
+                        case.add_audit(
+                            "exchange_refund_cancelled_before_dispatch",
+                            "system",
+                            old.operation_id,
+                        )
+                        self._save_case(conn, case_row, case)
+                        conn.execute(
+                            update(jobs)
+                            .where(jobs.c.aggregate_id == operation_id)
+                            .values(
+                                status="cancelled",
+                                error_code=EXCHANGE_REFUND_NOT_DISPATCHED,
+                                lease_until=0,
+                                version=jobs.c.version + 1,
+                                updated_at=self.clock(),
+                            )
+                        )
+                        return self._save_operation(
+                            conn,
+                            old,
+                            replace(
+                                old,
+                                status="failed",
+                                result=result,
+                                error=EXCHANGE_REFUND_NOT_DISPATCHED,
+                                completed_at=datetime.now(timezone.utc).isoformat(),
+                            ),
+                        )
+                    if old.status == "needs_reconciliation":
                         return old
                     return self._save_operation(
                         conn,
@@ -352,12 +426,14 @@ class RefundWorkflow:
                             else "",
                         )
                         self._save_operation(conn, old, new)
-                        case.status = {
-                            "succeeded": "completed",
-                            "failed": "execution_failed",
-                            "running": "processing",
-                        }[status]
-                        case.result = result
+                        # A later provider observation cannot erase an operator's recorded exchange fulfilment.
+                        if case.result.get("operation_type") != "manual_exchange":
+                            case.status = {
+                                "succeeded": "completed",
+                                "failed": "execution_failed",
+                                "running": "processing",
+                            }[status]
+                            case.result = result
                         case.add_audit(
                             "refund_" + receipt.status,
                             "provider",

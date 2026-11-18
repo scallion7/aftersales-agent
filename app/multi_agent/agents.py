@@ -95,18 +95,17 @@ class SubAgent:
             )
             assistant_msg = response.choices[0].message
 
-            if assistant_msg.content:
-                self._print_thought(assistant_msg.content)
-
             if not assistant_msg.tool_calls:
                 content = self.redactor(assistant_msg.content or "")
-                msg = {"role": "assistant", "content": content}
-                new_messages.append(msg)
                 return content, new_messages
 
+            self._print_thought(
+                "正在调用："
+                + "、".join(tc.function.name for tc in assistant_msg.tool_calls)
+            )
             msg_dict: dict = {
                 "role": "assistant",
-                "content": self.redactor(assistant_msg.content or ""),
+                "content": "",
             }
             msg_dict["tool_calls"] = [
                 {
@@ -147,7 +146,6 @@ class SubAgent:
             purpose=f"react_final_{self.name}",
         )
         content = self.redactor(response.choices[0].message.content or "")
-        new_messages.append({"role": "assistant", "content": content})
         return content, new_messages
 
     def _print_thought(self, text: str) -> None:

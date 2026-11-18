@@ -1,0 +1,1083 @@
+{
+  "baseline_commit": "39f69dba3efc95f70fa17b108f5dd9caa7ae90b5",
+  "python": "3.11.15",
+  "browser_enabled": true,
+  "passed_tests": 539,
+  "skips": 0,
+  "test_seconds": 120.512,
+  "coverage": {
+    "statements": 13998,
+    "missed": 2373,
+    "percent": 83,
+    "source": "app",
+    "omit": [
+      "app/scripts/*"
+    ]
+  },
+  "frozen_evaluation": {
+    "questions": 16,
+    "case_mode_pairs": 64,
+    "labels": "synthetic_unreviewed",
+    "input_sha256": {
+      "documents.json": "080a0d6033ca03b72913a4d956f07369fb1743c28a763d60ac5a722c60bdf0a8",
+      "cases.json": "49ffb61cbac78fd43055856d3b902584d52994b3af33baa01d958736bf14c232"
+    },
+    "metrics": {
+      "bm25": {
+        "legacy-v1": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.7857142857142857,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.8125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 3,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 0,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 0,
+            "after": 0
+          }
+        },
+        "candidate-v2": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.7857142857142857,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.8125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 3,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 0,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      },
+      "hybrid": {
+        "legacy-v1": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.7857142857142857,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.8125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 3,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 0,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 0,
+            "after": 0
+          }
+        },
+        "candidate-v2": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.7857142857142857,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.8125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 3,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 0,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      },
+      "hybrid_rerank": {
+        "legacy-v1": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.7857142857142857,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.8125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 3,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 0,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 0,
+            "after": 0
+          }
+        },
+        "candidate-v2": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.7857142857142857,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.8125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 3,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 0,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      },
+      "vector": {
+        "legacy-v1": {
+          "candidate_recall": {
+            "before": 0.9285714285714286,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.7857142857142857,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.8125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 3,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 0,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 0,
+            "after": 0
+          }
+        },
+        "candidate-v2": {
+          "candidate_recall": {
+            "before": 0.9285714285714286,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.7857142857142857,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.8125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 3,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 0,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 0,
+            "after": 0
+          }
+        }
+      }
+    },
+    "hybrid_rerank_cases": [
+      {
+        "id": "dev-apparel-1",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "dev-apparel-2",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "dev-install-1",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-install-2",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-gift-1",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-gift-2",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-preorder-1",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-preorder-2",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "dev-invoice-1",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-invoice-2",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-region-1",
+        "before": "needs_clarification",
+        "after": "needs_clarification",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-region-2",
+        "before": "needs_clarification",
+        "after": "needs_clarification",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-unknown-1",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-unknown-2",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-conflict-1",
+        "before": "policy_conflict",
+        "after": "policy_conflict",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "dev-conflict-2",
+        "before": "policy_conflict",
+        "after": "policy_conflict",
+        "before_pass": true,
+        "after_pass": true
+      }
+    ],
+    "app_python_sha256": {
+      "before": "bd11b6397d9abb2fdd7a61610540be1faa869dc58d3e14f459fe3ea2b06a5b6c",
+      "after": "0796b8a2bc31fe4a7a26d2a59c79cef38fd32036078855b3b690c5c9e442df9c"
+    },
+    "three_original_questions": [
+      {
+        "stage": "before",
+        "id": "dev-apparel-1",
+        "mode": "vector",
+        "query": "衣服还保留吊牌，签收八天能退吗？",
+        "outcome": "no_evidence",
+        "matched": [
+          "吊牌",
+          "签收"
+        ],
+        "minimum": 3,
+        "candidate_rank": 1,
+        "vector_score": 0.23570226039551584,
+        "in_candidate_pool": true,
+        "evidence": null
+      },
+      {
+        "stage": "before",
+        "id": "dev-apparel-1",
+        "mode": "hybrid",
+        "query": "衣服还保留吊牌，签收八天能退吗？",
+        "outcome": "no_evidence",
+        "matched": [
+          "吊牌",
+          "签收"
+        ],
+        "minimum": 3,
+        "candidate_rank": 1,
+        "vector_score": 0.23570226039551584,
+        "in_candidate_pool": true,
+        "evidence": null
+      },
+      {
+        "stage": "before",
+        "id": "dev-apparel-2",
+        "mode": "vector",
+        "query": "上周收到的外套吊牌完整，退货窗口多长？",
+        "outcome": "no_evidence",
+        "matched": [
+          "吊牌"
+        ],
+        "minimum": 3,
+        "candidate_rank": 15,
+        "vector_score": 0.0,
+        "in_candidate_pool": false,
+        "evidence": null
+      },
+      {
+        "stage": "before",
+        "id": "dev-apparel-2",
+        "mode": "hybrid",
+        "query": "上周收到的外套吊牌完整，退货窗口多长？",
+        "outcome": "no_evidence",
+        "matched": [
+          "吊牌"
+        ],
+        "minimum": 3,
+        "candidate_rank": 3,
+        "vector_score": 0.0,
+        "in_candidate_pool": true,
+        "evidence": null
+      },
+      {
+        "stage": "before",
+        "id": "dev-preorder-2",
+        "mode": "vector",
+        "query": "我没付预售尾款，系统会自行扣钱吗？",
+        "outcome": "no_evidence",
+        "matched": [
+          "尾款",
+          "预售"
+        ],
+        "minimum": 3,
+        "candidate_rank": 1,
+        "vector_score": 0.22613350843332278,
+        "in_candidate_pool": true,
+        "evidence": null
+      },
+      {
+        "stage": "before",
+        "id": "dev-preorder-2",
+        "mode": "hybrid",
+        "query": "我没付预售尾款，系统会自行扣钱吗？",
+        "outcome": "no_evidence",
+        "matched": [
+          "尾款",
+          "预售"
+        ],
+        "minimum": 3,
+        "candidate_rank": 1,
+        "vector_score": 0.22613350843332278,
+        "in_candidate_pool": true,
+        "evidence": null
+      },
+      {
+        "stage": "after",
+        "id": "dev-apparel-1",
+        "mode": "vector",
+        "query": "衣服还保留吊牌，签收八天能退吗？",
+        "outcome": "answerable",
+        "matched": [
+          "吊牌",
+          "签收"
+        ],
+        "minimum": 3,
+        "candidate_rank": 1,
+        "vector_score": 0.2721655269759087,
+        "in_candidate_pool": true,
+        "evidence": {
+          "supported": true,
+          "reason": "supported",
+          "kind": "return",
+          "quote": "未拆吊牌的服饰在签收十天内可申请退换。"
+        }
+      },
+      {
+        "stage": "after",
+        "id": "dev-apparel-1",
+        "mode": "hybrid",
+        "query": "衣服还保留吊牌，签收八天能退吗？",
+        "outcome": "answerable",
+        "matched": [
+          "吊牌",
+          "签收"
+        ],
+        "minimum": 3,
+        "candidate_rank": 1,
+        "vector_score": 0.2721655269759087,
+        "in_candidate_pool": true,
+        "evidence": {
+          "supported": true,
+          "reason": "supported",
+          "kind": "return",
+          "quote": "未拆吊牌的服饰在签收十天内可申请退换。"
+        }
+      },
+      {
+        "stage": "after",
+        "id": "dev-apparel-2",
+        "mode": "vector",
+        "query": "上周收到的外套吊牌完整，退货窗口多长？",
+        "outcome": "answerable",
+        "matched": [
+          "吊牌"
+        ],
+        "minimum": 3,
+        "candidate_rank": 3,
+        "vector_score": 0.12598815766974242,
+        "in_candidate_pool": true,
+        "evidence": {
+          "supported": true,
+          "reason": "supported",
+          "kind": "return",
+          "quote": "未拆吊牌的服饰在签收十天内可申请退换。"
+        }
+      },
+      {
+        "stage": "after",
+        "id": "dev-apparel-2",
+        "mode": "hybrid",
+        "query": "上周收到的外套吊牌完整，退货窗口多长？",
+        "outcome": "answerable",
+        "matched": [
+          "吊牌"
+        ],
+        "minimum": 3,
+        "candidate_rank": 1,
+        "vector_score": 0.12598815766974242,
+        "in_candidate_pool": true,
+        "evidence": {
+          "supported": true,
+          "reason": "supported",
+          "kind": "return",
+          "quote": "未拆吊牌的服饰在签收十天内可申请退换。"
+        }
+      },
+      {
+        "stage": "after",
+        "id": "dev-preorder-2",
+        "mode": "vector",
+        "query": "我没付预售尾款，系统会自行扣钱吗？",
+        "outcome": "answerable",
+        "matched": [
+          "尾款",
+          "预售"
+        ],
+        "minimum": 3,
+        "candidate_rank": 2,
+        "vector_score": 0.17407765595569788,
+        "in_candidate_pool": true,
+        "evidence": {
+          "supported": true,
+          "reason": "supported",
+          "kind": "automatic_debit",
+          "quote": "预售订单尾款截止日为活动页注明日期，超过日期须转人工处理，不自动扣款。"
+        }
+      },
+      {
+        "stage": "after",
+        "id": "dev-preorder-2",
+        "mode": "hybrid",
+        "query": "我没付预售尾款，系统会自行扣钱吗？",
+        "outcome": "answerable",
+        "matched": [
+          "尾款",
+          "预售"
+        ],
+        "minimum": 3,
+        "candidate_rank": 1,
+        "vector_score": 0.17407765595569788,
+        "in_candidate_pool": true,
+        "evidence": {
+          "supported": true,
+          "reason": "supported",
+          "kind": "automatic_debit",
+          "quote": "预售订单尾款截止日为活动页注明日期，超过日期须转人工处理，不自动扣款。"
+        }
+      }
+    ]
+  },
+  "near_neighbor_evaluation": {
+    "questions": 32,
+    "case_mode_pairs": 128,
+    "labels": "unreviewed",
+    "input_sha256": {
+      "documents.json": "d094fb75719ef152468e76da9bc1b927b771fc85d3df8e72cb83043c27aea9ea",
+      "cases.json": "c931f103289d7785b0f4cbc7ae18395ea003b4aaaf276ffa3cf0f6636ce18337"
+    },
+    "metrics": {
+      "bm25": {
+        "legacy-v1": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.5,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.53125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 6,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 9,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 9,
+            "after": 0
+          }
+        },
+        "candidate-v2": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.5,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.53125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 6,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 9,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 9,
+            "after": 0
+          }
+        }
+      },
+      "hybrid": {
+        "legacy-v1": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.5,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.53125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 6,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 9,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 9,
+            "after": 0
+          }
+        },
+        "candidate-v2": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.5,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.53125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 6,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 9,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 9,
+            "after": 0
+          }
+        }
+      },
+      "hybrid_rerank": {
+        "legacy-v1": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.5,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.53125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 6,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 9,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 9,
+            "after": 0
+          }
+        },
+        "candidate-v2": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.5,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.53125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 6,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 9,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 9,
+            "after": 0
+          }
+        }
+      },
+      "vector": {
+        "legacy-v1": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.5,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.53125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 6,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 9,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 9,
+            "after": 0
+          }
+        },
+        "candidate-v2": {
+          "candidate_recall": {
+            "before": 1.0,
+            "after": 1.0
+          },
+          "evidence_recall": {
+            "before": 0.5,
+            "after": 1.0
+          },
+          "outcome_accuracy": {
+            "before": 0.53125,
+            "after": 1.0
+          },
+          "unnecessary_refusal_count": {
+            "before": 6,
+            "after": 0
+          },
+          "wrong_answer_count": {
+            "before": 9,
+            "after": 0
+          },
+          "unsupported_document_count": {
+            "before": 9,
+            "after": 0
+          }
+        }
+      }
+    },
+    "hybrid_rerank_cases": [
+      {
+        "id": "c01",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "c02",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "c03",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "c04",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "c05",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "c06",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "p01",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "p02",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "p03",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "p04",
+        "before": "no_evidence",
+        "after": "answerable",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "p05",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "p06",
+        "before": "answerable",
+        "after": "answerable",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "cneg01",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "cneg02",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "cneg03",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "cneg04",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "cneg05",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "cneg06",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "cneg07",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "cneg08",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "cneg09",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "cneg10",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "pneg01",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "pneg02",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "pneg03",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "pneg04",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "pneg05",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "pneg06",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "pneg07",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "pneg08",
+        "before": "no_evidence",
+        "after": "no_evidence",
+        "before_pass": true,
+        "after_pass": true
+      },
+      {
+        "id": "pneg09",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      },
+      {
+        "id": "pneg10",
+        "before": "answerable",
+        "after": "no_evidence",
+        "before_pass": false,
+        "after_pass": true
+      }
+    ],
+    "app_python_sha256": {
+      "before": "bd11b6397d9abb2fdd7a61610540be1faa869dc58d3e14f459fe3ea2b06a5b6c",
+      "after": "0796b8a2bc31fe4a7a26d2a59c79cef38fd32036078855b3b690c5c9e442df9c"
+    }
+  },
+  "paid_model_calls": 0,
+  "holdout_run": false,
+  "validation_date": "2026-11-18",
+  "unittest_command": "RUN_BROWSER_E2E=1 python -m coverage run -m unittest discover -s tests -v",
+  "retrieval_modes": [
+    "bm25",
+    "vector",
+    "hybrid",
+    "hybrid_rerank"
+  ],
+  "static_checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "compiled_python_sources": "passed",
+    "openapi_paths": 104,
+    "docs": "1003 local links/images across 73 Markdown files"
+  },
+  "plan_quality": {
+    "case_count": 40,
+    "metrics": {
+      "auth_scope_accuracy": 1.0,
+      "budget_compliance_rate": 1.0,
+      "cancellation_propagation_rate": 1.0,
+      "checkpoint_reuse_rate": 1.0,
+      "migration_success_rate": 1.0,
+      "plan_completion_rate": 1.0,
+      "policy_version_consistency_rate": 1.0,
+      "provider_idempotency_rate": 1.0,
+      "recovery_consistency_rate": 1.0,
+      "route_stability_rate": 1.0,
+      "side_effect_exactly_once_rate": 1.0,
+      "timeout_detection_rate": 1.0
+    },
+    "passed": true
+  },
+  "artifact_sha256": {
+    "challenge-after.raw.json.gz": "5a6aef44b86df97fefe809675e4142314f4cc7df7a25da3c2e6d180da88b4341",
+    "challenge-before.raw.json.gz": "5eb84d081d29ff1c71a34f7a5c53e3fd1b7e78f5b45a425d17f6b45efcef1b7b",
+    "challenge.json": "c5063339e3b4a4e9ee1889e5d70d268caba3f7903528a6c79e3c74fcf7eaea41",
+    "development-after.raw.json.gz": "751864d823ec6ed256b95af9fb877f0df36248eed716816366f67995cbd3b387",
+    "development-before.raw.json.gz": "2d15f1973ec5e5a97c5ea6ccd3e989e244a089f2a8351ba8033be54762ca2c2b",
+    "extra-paraphrases.json": "3955000397774a87f5e6e3b76d9c3f272a8bbe9851c4022e349910e5a2dd370f",
+    "unittest-results.log.gz": "ed6960fb88855513c689713b8a2da00fb89a48f7cbdd1bca718584f5a005916f"
+  }
+}

@@ -9,13 +9,15 @@ _POLICY = re.compile(
     re.I,
 )
 _SUBJECT = r"(?:退换货?|退货|换货|退款|退钱|退回|理赔|赔付|运费|邮费|积分|补贴|发票|折扣|优惠券|配送|送达)"
-_CONDITION = r"(?:能否|可否|能不能|可以|可不可以|允许|支持|是否|如何|怎么|几天|多久|期限|条件|谁承担|谁付|多少|收费|免费|[一二两三四五六七八九十百\d]+[天日年])"
+_CONDITION = r"(?:能否|可否|能不能|可以|可不可以|允许|支持|是否|如何|怎么|几天|多久|期限|窗口|多长|条件|谁承担|谁付|多少|收费|免费|[一二两三四五六七八九十百\d]+[天日年])"
 _POLICY_QUESTION = re.compile(
     rf"{_CONDITION}.{{0,16}}{_SUBJECT}|{_SUBJECT}.{{0,16}}{_CONDITION}|"
     r"(?:能否|可否|还能|可不可以|能不能|能|可以)(?:申请|办理)?(?:退|换)(?:吗|么|不|货|款|[？?。！!]|$)|"
     r"(?:已拆|拆封|签收|吊牌).{0,16}(?:还能|能否|可以|能退)|"
     r"(?:退款金额|运费)(?:怎么计算|怎么算|如何计算)|"
     r"(?:运费|邮费|快递费|寄回费用).{0,8}(?:谁|哪方|由我|我出|自费|承担|报销)|"
+    r"(?:会|是否|能否|会不会|不会|不再|不)(?:由系统)?(?:自动|自行|自己)(?:代)?(?:扣[款钱费]|划扣|划走)|"
+    r"(?:自动|自行|自己)(?:代)?(?:扣[款钱费]|划走).{0,4}(?:吗|么)|"
     r"can (?:i|we) (?:get a refund|return|exchange)",
     re.I,
 )
@@ -81,3 +83,37 @@ def requires_policy_evidence(message, answer, previous, *, business_tool_used=Fa
     return previous == "needs_clarification" and bool(
         re.fullmatch(r"[\u3400-\u9fff]{2,5}[。.]?", message.strip())
     )
+
+
+def scoped_policy_quotes(message, evidence):
+    """Return None for ordinary lookups, or the quotes that support this scoped turn."""
+    if evidence["outcome"] != "answerable" or not evidence.get(
+        "embedding_model", ""
+    ).startswith("local-hash"):
+        return None
+    from app.platform.policy_evidence import analyze_policy_question
+
+    question = analyze_policy_question(message)
+    if question is None:
+        return None
+    # A shortened model query or a journal replay may carry a genuine citation
+    # that no longer answers the full customer question. Reject mixed evidence.
+    hits = {
+        hit["chunk_id"]: hit
+        for hit in evidence.get("results", [])
+        if hit.get("chunk_id")
+    }
+    quotes = []
+    for cite in evidence.get("citations", []):
+        hit = hits.get(cite.get("chunk_id"))
+        quote = cite.get("quote", "")
+        if (
+            not hit
+            or not question.check(
+                quote, context=evidence.get("context"), metadata=hit.get("metadata")
+            )["supported"]
+        ):
+            return []
+        if quote not in quotes:
+            quotes.append(quote)
+    return quotes

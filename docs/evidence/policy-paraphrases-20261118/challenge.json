@@ -1,0 +1,348 @@
+{
+  "manifest": {
+    "name": "Policy paraphrases and near-neighbor controls",
+    "version": "policy-scope-development-v1",
+    "files": {
+      "documents.json": "d094fb75719ef152468e76da9bc1b927b771fc85d3df8e72cb83043c27aea9ea",
+      "cases.json": "c931f103289d7785b0f4cbc7ae18395ea003b4aaaf276ffa3cf0f6636ce18337"
+    }
+  },
+  "documents": [
+    {
+      "document_id": "clothing",
+      "text": "未拆吊牌的服饰在签收十天内可申请退换。",
+      "metadata": {
+        "title": "服饰退换",
+        "source": "independent-development-guards",
+        "version": "1",
+        "effective_date": "2026-01-01",
+        "policy_type": "general"
+      }
+    },
+    {
+      "document_id": "balance",
+      "text": "预售订单尾款截止日为活动页注明日期，超过日期须转人工处理，不自动扣款。",
+      "metadata": {
+        "title": "预售",
+        "source": "independent-development-guards",
+        "version": "1",
+        "effective_date": "2026-01-01",
+        "policy_type": "general"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "c01",
+      "split": "development",
+      "query": "上衣的吊牌还挂着，签收第八天还能申请退货吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "clothing"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "c02",
+      "split": "development",
+      "query": "外套收到后没摘吊牌，退货申请要在几天内提出？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "clothing"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "c03",
+      "split": "development",
+      "query": "裙子签收已九天，吊牌一直没拆，能申请换货吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "clothing"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "c04",
+      "split": "development",
+      "query": "卫衣签收刚三天，衣服上的吊牌原样保留，可以退吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "clothing"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "c05",
+      "split": "development",
+      "query": "衬衫的吊牌没有剪，签收第十天可以换吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "clothing"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "c06",
+      "split": "development",
+      "query": "我想确认服饰的退换时限，衣物吊牌还在原处，期限从哪一天算？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "clothing"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "p01",
+      "split": "development",
+      "query": "预售尾款到了活动页的截止日还没付，过期后会直接从卡里扣吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "balance"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "p02",
+      "split": "development",
+      "query": "预售商品的尾款过了付款期限仍未支付，需要人工处理还是会自行扣钱？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "balance"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "p03",
+      "split": "development",
+      "query": "这单预售余款一直没有缴，付款期已过，系统还会自己收款吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "balance"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "p04",
+      "split": "development",
+      "query": "订了预售商品，活动结束仍未补尾款，下一步找人工还是等系统扣？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "balance"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "p05",
+      "split": "development",
+      "query": "预售单最后的尾款截止日期具体该去哪里看？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "balance"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "p06",
+      "split": "development",
+      "query": "预售订单错过活动页标出的尾款期限，要联系人工处理吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [
+        "balance"
+      ],
+      "outcome": "answerable"
+    },
+    {
+      "id": "cneg01",
+      "split": "development",
+      "query": "行李箱的吊牌没拆，签收八天之后还能退吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg02",
+      "split": "development",
+      "query": "家具的吊牌还在，签收第八天是否可以申请退桌子？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg03",
+      "split": "development",
+      "query": "猫粮袋的吊牌没拆，签收十天可申请退换猫粮吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg04",
+      "split": "development",
+      "query": "衣服吊牌剪掉后我重新挂上了，走例外退货需要提交哪些证明？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg05",
+      "split": "development",
+      "query": "衣服吊牌没剪，签收八天退货，寄回产生的运费谁来付？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg06",
+      "split": "development",
+      "query": "外套保留吊牌，签收后十天申请了退货，退款几天能到账？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg07",
+      "split": "development",
+      "query": "衣服签收八天吊牌没拆，吊牌标价和实付差价能退给我多少？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg08",
+      "split": "development",
+      "query": "衣服没有吊牌，签收八天后补办吊牌要几天？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg09",
+      "split": "development",
+      "query": "衣服签收十天，吊牌没拆，衣物洗涤过的例外审核找哪个部门？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "cneg10",
+      "split": "development",
+      "query": "外套签收八天了，吊牌还挂着，退换要带发票的纸质原件吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg01",
+      "split": "development",
+      "query": "预售尾款没付，已交的定金会自动退回银行卡吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg02",
+      "split": "development",
+      "query": "预售订单尾款已经付清，系统重复扣钱，要几天才能拿回？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg03",
+      "split": "development",
+      "query": "预售尾款没有按期付，平台自动扣的违约金是多少？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg04",
+      "split": "development",
+      "query": "预售尾款没付，如何取消我之前签的银行卡自动扣款授权？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg05",
+      "split": "development",
+      "query": "不是预售，是会员续费，没主动续费系统会自行扣钱吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg06",
+      "split": "development",
+      "query": "这是先用后付订单，没有付最后一期，平台会自动扣钱吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg07",
+      "split": "development",
+      "query": "预售尾款已付，银行的分期月供每月几号自动扣款？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg08",
+      "split": "development",
+      "query": "预售订金没有付，系统会先从余额自动扣订金吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg09",
+      "split": "development",
+      "query": "预售订单还没到尾款截止日，我能把自动扣款时间改成上午吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    },
+    {
+      "id": "pneg10",
+      "split": "development",
+      "query": "预售尾款逾期没付，人工处理一定能免掉逾期手续费吗？",
+      "day": "2026-11-02",
+      "context": {},
+      "gold_documents": [],
+      "outcome": "no_evidence"
+    }
+  ]
+}

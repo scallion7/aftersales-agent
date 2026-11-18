@@ -42,6 +42,44 @@ class RetrievalDiagnosticTests(PlatformTestCase):
         self.assertFalse(row["selected"])
         self.assertEqual(result["outcome"], "no_evidence")
 
+    def test_scoped_vector_query_recovers_the_coat_clause_with_both_indexes(self):
+        self.publish(
+            [
+                self.ingest("apparel", "未拆吊牌的服饰在签收十天内可申请退换。"),
+                self.ingest("gifts", "本月会员礼品在收到后可以登记。"),
+            ]
+        )
+        for compiled in (False, True):
+            retriever = HybridRetrieval(
+                self.config.model_copy(update={"compiled_retrieval_enabled": compiled})
+            )
+            with self.subTest(compiled=compiled):
+                result = retriever.diagnose(
+                    "上周收到的外套吊牌完整，退货窗口多长？", mode="vector"
+                )
+                self.assertEqual(result["outcome"], "answerable")
+                self.assertEqual(
+                    [r["document_id"] for r in result["results"]], ["apparel"]
+                )
+                row = next(
+                    r
+                    for r in result["diagnostics"]["candidates"]
+                    if r["document_id"] == "apparel"
+                )
+                self.assertGreater(row["vector_score"], 0)
+                self.assertTrue(row["in_candidate_pool"])
+                self.assertTrue(row["policy_evidence"]["supported"])
+                for product, outcome in (
+                    ("耳机", "no_evidence"),
+                    ("外套", "answerable"),
+                ):
+                    filtered = retriever.search(
+                        "上周收到的外套吊牌完整，退货窗口多长？",
+                        context={"product": product},
+                        mode="vector",
+                    )
+                    self.assertEqual(filtered["outcome"], outcome)
+
     def test_empty_release_has_complete_diagnostic_envelope(self):
         result = HybridRetrieval(self.config).diagnose("退货政策")
         self.assertEqual(result["diagnostics"]["outcome_reason"], "no_evidence")

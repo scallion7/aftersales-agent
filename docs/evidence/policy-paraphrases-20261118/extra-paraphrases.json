@@ -1,0 +1,172 @@
+{
+  "scope": "Additional development probes used during iteration; not a blinded validation set.",
+  "corpus": "Same two policy documents as challenge.json",
+  "profile": "candidate-v2",
+  "baseline_commit": "39f69dba3efc95f70fa17b108f5dd9caa7ae90b5",
+  "baseline_hybrid_rerank": [
+    {
+      "id": "spot01",
+      "query": "我的大衣签收一星期了，吊牌和衣服还连着，可以退货吗？",
+      "expected": "clothing",
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": false
+    },
+    {
+      "id": "spot02",
+      "query": "衣服签收第六天，吊牌没被摘下来，这时能申请退换吗？",
+      "expected": "clothing",
+      "mode": "hybrid_rerank",
+      "observed": "answerable",
+      "documents": [
+        "clothing"
+      ],
+      "passed": true
+    },
+    {
+      "id": "spot03",
+      "query": "预售尾款的付款期限在哪里公布？",
+      "expected": "balance",
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": false
+    },
+    {
+      "id": "spot04",
+      "query": "活动页的预售尾款日期已过，我没交余款，应找工作人员还是等平台自动扣？",
+      "expected": "balance",
+      "mode": "hybrid_rerank",
+      "observed": "answerable",
+      "documents": [
+        "balance"
+      ],
+      "passed": true
+    },
+    {
+      "id": "spot05",
+      "query": "衣服的吊牌还在，签收八天如果退货，能要求加倍赔付吗？",
+      "expected": null,
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": true
+    },
+    {
+      "id": "spot06",
+      "query": "吊牌一直没剪的外套签收八天了，退货邮寄需要填哪个仓库地址？",
+      "expected": null,
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": true
+    },
+    {
+      "id": "spot07",
+      "query": "预售尾款没交，逾期后人工处理会不会影响我的信用分？",
+      "expected": null,
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": true
+    },
+    {
+      "id": "spot08",
+      "query": "预售尾款如果逾期，平台会直接扣我积分来抵尾款吗？",
+      "expected": null,
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": true
+    }
+  ],
+  "candidate_hybrid_rerank": [
+    {
+      "id": "spot01",
+      "query": "我的大衣签收一星期了，吊牌和衣服还连着，可以退货吗？",
+      "expected": "clothing",
+      "mode": "hybrid_rerank",
+      "observed": "answerable",
+      "documents": [
+        "clothing"
+      ],
+      "passed": true
+    },
+    {
+      "id": "spot02",
+      "query": "衣服签收第六天，吊牌没被摘下来，这时能申请退换吗？",
+      "expected": "clothing",
+      "mode": "hybrid_rerank",
+      "observed": "answerable",
+      "documents": [
+        "clothing"
+      ],
+      "passed": true
+    },
+    {
+      "id": "spot03",
+      "query": "预售尾款的付款期限在哪里公布？",
+      "expected": "balance",
+      "mode": "hybrid_rerank",
+      "observed": "answerable",
+      "documents": [
+        "balance"
+      ],
+      "passed": true
+    },
+    {
+      "id": "spot04",
+      "query": "活动页的预售尾款日期已过，我没交余款，应找工作人员还是等平台自动扣？",
+      "expected": "balance",
+      "mode": "hybrid_rerank",
+      "observed": "answerable",
+      "documents": [
+        "balance"
+      ],
+      "passed": true
+    },
+    {
+      "id": "spot05",
+      "query": "衣服的吊牌还在，签收八天如果退货，能要求加倍赔付吗？",
+      "expected": null,
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": true
+    },
+    {
+      "id": "spot06",
+      "query": "吊牌一直没剪的外套签收八天了，退货邮寄需要填哪个仓库地址？",
+      "expected": null,
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": true
+    },
+    {
+      "id": "spot07",
+      "query": "预售尾款没交，逾期后人工处理会不会影响我的信用分？",
+      "expected": null,
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": true
+    },
+    {
+      "id": "spot08",
+      "query": "预售尾款如果逾期，平台会直接扣我积分来抵尾款吗？",
+      "expected": null,
+      "mode": "hybrid_rerank",
+      "observed": "no_evidence",
+      "documents": [],
+      "passed": true
+    }
+  ],
+  "candidate_passed_by_mode": {
+    "bm25": 8,
+    "hybrid": 8,
+    "hybrid_rerank": 8,
+    "vector": 8
+  }
+}

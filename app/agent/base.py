@@ -22,7 +22,7 @@ from app.agent.after_sale import (
     RiskRouter,
 )
 from app.agent.memory import MemoryManager
-from app.agent.policy_turn import requires_policy_evidence
+from app.agent.policy_turn import requires_policy_evidence, scoped_policy_quotes
 from app.agent.skills import SkillManager
 from app.agent.storage import canonical_messages
 from app.agent.strategies import PlanExecutionResult
@@ -746,6 +746,13 @@ class BaseConversationAgent(ABC):
             result.citations = []
             result.evidence_state = "not_requested"
             if evidence:
+                quotes = scoped_policy_quotes(user_input, evidence)
+                if quotes == []:
+                    evidence = evidence | {"outcome": "no_evidence", "citations": []}
+                elif quotes and not self.config.answer_evidence_check_enabled:
+                    # Publish the complete source terms for this deterministic path.
+                    result.reply = "\n".join(quotes)
+                    result.follow_up_question = None
                 result.citations = evidence["citations"]
                 result.evidence_state = evidence["outcome"]
                 if evidence["outcome"] != "answerable":

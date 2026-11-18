@@ -19,6 +19,7 @@
 
 | 目录 | 阅读入口 | 生成时的证据身份 |
 |---|---|---|
+| [policy-paraphrases-20261118](policy-paraphrases-20261118/) | [复测清单](policy-paraphrases-20261118/checks.json)、[32 道补充开发题](policy-paraphrases-20261118/challenge.json)、[逐题原因](../evaluation/retrieval-experiments.md#policy-paraphrases) | 以 `39f69db` 为基线，比较三道误拒题、同义问法及超出条款范围的反例 |
 | [agent-boundaries-20261118](agent-boundaries-20261118/) | [本地验证清单](agent-boundaries-20261118/checks.json)、[检索开发集对比](agent-boundaries-20261118/retrieval-comparison.json) | 换货人工履约与历史退款核对、政策回答、会话恢复、SQL 风控回滚和同一批开发题的检索结果 |
 | [dependency-patch-20261116](dependency-patch-20261116/) | [检查清单](dependency-patch-20261116/checks.json)、[锁定依赖审计](dependency-patch-20261116/lock-audit.json)、[范围依赖审计](dependency-patch-20261116/range-audit.json) | 基于 `e7e1eed` 的依赖补丁工作树；修复 CI 发现的 OpenTelemetry 公告，58/53 包审计通过，500 项回归无跳过、82% 覆盖率 |
 | [showcase-20261116](showcase-20261116/) | [检查清单与素材哈希](showcase-20261116/checks.json)、[录像说明](../showcase/recording.md)、[退款恢复轨迹](showcase-20261116/unknown-refund-recovery.json) | 基于 `37e2fd7`，应用和现有测试源码未改；500 项本地回归、82% 覆盖率、两个浏览器短片及展示命令复验，真实人工审核与模型评测未开展 |

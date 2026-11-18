@@ -79,7 +79,7 @@ python -m app.scripts.demo_stack --smoke --directory app/sessions/smoke-demo
 
 ## 验证与范围
 
-2026-11-18 修复了换货误退款、无证据的政策回答、刷新后的会话恢复和风控规则并发发布问题。启用 Chromium 的本地回归 **526 项全部通过，零跳过，app 语句覆盖率 83%**。换货回归同时检查工单状态、退款操作和待发送指令。版本化知识库的 16 道合成开发题中，混合检索的最终证据召回从 6/14 提高到 11/14，证据状态判对从 8/16 提高到 13/16。[本次验收与复现记录](docs/evaluation/acceptance.md#agent-boundaries-20261118)
+当前启用 Chromium 的本地回归 **539 项全部通过，零跳过，app 语句覆盖率 83%**。换货回归同时核对工单、退款记录和待发送指令。政策问答回归覆盖服饰退换时限、预售尾款扣款以及检索改写遗漏条件的问题。四种检索模式在冻结的 16 道合成开发题上均由 13 题判对提高到 **16/16**，错误放行保持 **0**。另有 20 道超出条款范围的补充题，修复后全部正确拒答。[政策问答复测](docs/evaluation/acceptance.md#policy-paraphrases-20261118) · [换货与会话恢复验收](docs/evaluation/acceptance.md#agent-boundaries-20261118)
 
 本地验收覆盖数据库迁移与恢复、人工接管、令牌续签、退款超时查单、审批阈值固定和多进程日志清理。Agent 政策质量开发集包含 9 个业务家族：ReAct、Plan-and-Execute 和多 Agent 共 27 格，逐题校验关键事实、引用及转人工原因，并在临时目标库验证发布。详细结果见[当前验收](docs/evaluation/acceptance.md)。
 

@@ -16,6 +16,7 @@ from app.agent.rag.similarity import cosine_similarity
 from app.infrastructure.database import platform
 from app.platform.common import PlatformError, encode
 from app.platform.knowledge import KnowledgePlatform
+from app.platform.policy_evidence import analyze_policy_question
 from app.platform.retrieval_profile import RetrievalProfile
 
 TOKENIZER_VERSION = "jieba-0.42.1-search-v2"
@@ -169,7 +170,7 @@ class HybridRetrieval:
                     self.service.embedder.model,
                     TOKENIZER_VERSION,
                     self.profile.fingerprint,
-                    "policy-conflicts-v2-evidence-terms-v1",
+                    "policy-conflicts-v2-evidence-terms-v3-product-scope",
                 ],
                 context={
                     "filters": context or {},
@@ -335,7 +336,16 @@ class HybridRetrieval:
             if compiled
             else bm25(query, [self.profile.normalize(x["text"]) for x in items])
         )
-        query_vector = self.service.embedder.encode_one(query) if mode != "bm25" else []
+        local_hash = self.service.embedder.model.startswith("local-hash")
+        policy_question = analyze_policy_question(query) if local_hash else None
+        groups = _evidence_terms(query) if local_hash else {}
+        vector_query = " ".join(groups) if policy_question else query
+        if explain and policy_question:
+            base["diagnostics"]["policy_question"] = policy_question.kind
+            base["diagnostics"]["vector_query"] = vector_query
+        query_vector = (
+            self.service.embedder.encode_one(vector_query) if mode != "bm25" else []
+        )
         vector = (
             [cosine_similarity(query_vector, x["vector"]) for x in items]
             if mode != "bm25"
@@ -411,8 +421,7 @@ class HybridRetrieval:
                 trace[items[i]["chunk_id"]]["in_candidate_pool"] = True
         # Hash vectors can match by collision. The offline projector cannot create
         # evidence without any lexical support, unlike a configured semantic model.
-        if self.service.embedder.model.startswith("local-hash"):
-            groups = _evidence_terms(query)
+        if local_hash:
             # Two independent words protect a multi-topic question from a
             # single incidental match. A single-word lookup needs that word.
             minimum = max(
@@ -438,12 +447,22 @@ class HybridRetrieval:
                     shared = forms & terms
                     if shared and (len(groups) > 1 or word in shared):
                         matches.add(max(shared, key=lambda s: (len(s), s)))
-                if lexical[i] > 0 and len(matches) >= minimum:
+                scoped = (
+                    policy_question.check(
+                        item["text"], context=context, metadata=item["metadata"]
+                    )
+                    if policy_question
+                    else None
+                )
+                supported = scoped["supported"] if scoped else len(matches) >= minimum
+                if lexical[i] > 0 and supported:
                     accepted.add(i)
                 if explain:
                     entry = trace[item["chunk_id"]]
                     entry["matched_tokens"] = sorted(search_terms & terms)
                     entry["evidence_matches"] = sorted(matches)
+                    if scoped:
+                        entry["policy_evidence"] = scoped
                     if i in selected and i not in accepted:
                         entry["selection_reason"] = "lexical_support_rejected"
             selected = [i for i in selected if i in accepted]
